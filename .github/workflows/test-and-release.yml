@@ -14,9 +14,40 @@ on:
   pull_request: {}
 
 jobs:
+  # Performs quick checks before the test runs
+  check-and-lint:
+    if: contains(github.event.head_commit.message, '[skip ci]') == false
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck TypeScript code
+        run: npm run check
+
+      - name: Run linters
+        run: npm run lint
+
+  # ===================
+
   # Runs unit tests on all supported node versions and OSes
   unit-tests:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
+
+    needs: [check-and-lint]
 
     runs-on: ${{ matrix.os }}
     strategy:
