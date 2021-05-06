@@ -9,7 +9,7 @@ All dependencies an ioBroker adapter developer needs
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.0.3 (2021-05-06)
 
 -   (UncleSamSwiss) Fixed npm publishing
 
