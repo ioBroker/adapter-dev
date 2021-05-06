@@ -9,6 +9,6 @@ All dependencies an ioBroker adapter developer needs
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.0.2 (2021-05-06)
 
 -   (UncleSamSwiss) Initial repository setup
