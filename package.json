@@ -10,7 +10,8 @@
 	"scripts": {
 		"prebuild": "rimraf ./build",
 		"build": "tsc -p tsconfig.build.json",
-		"test": "echo \"Warning: no test specified\" && exit 0"
+		"test": "echo \"Warning: no test specified\" && exit 0",
+		"release": "release-script"
 	},
 	"repository": {
 		"type": "git",
