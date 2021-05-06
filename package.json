@@ -3,6 +3,10 @@
 	"version": "0.0.1",
 	"description": "All developer dependencies an ioBroker adapter developer needs",
 	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"files": [
+		"/build"
+	],
 	"scripts": {
 		"prebuild": "rimraf ./build",
 		"build": "tsc -p tsconfig.build.json",
