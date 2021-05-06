@@ -11,6 +11,7 @@ module.exports = {
 	],
 	plugins: [],
 	rules: {
+		// Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
 		"@typescript-eslint/no-parameter-properties": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-use-before-define": [
@@ -45,5 +46,49 @@ module.exports = {
 				ignoreProperties: true,
 			},
 		],
+		"@typescript-eslint/ban-ts-comment": [
+			"error",
+			{
+				"ts-expect-error": false,
+				"ts-ignore": true,
+				"ts-nocheck": true,
+				"ts-check": false,
+			},
+		],
+		"@typescript-eslint/restrict-template-expressions": [
+			"error",
+			{
+				allowNumber: true,
+				allowBoolean: true,
+				// This is necessary to log errors
+				allowAny: true,
+				allowNullish: true,
+			},
+		],
+		"@typescript-eslint/no-misused-promises": [
+			"error",
+			{
+				checksVoidReturn: false,
+			},
+		],
+		// We can turn this on from time to time but in general these rules
+		// make our lives harder instead of easier
+		"@typescript-eslint/no-unsafe-assignment": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/no-unsafe-call": "off",
+
+		"@typescript-eslint/explicit-module-boundary-types": [
+			"warn",
+			{ allowArgumentsExplicitlyTypedAsAny: true },
+		],
 	},
+	overrides: [
+		{
+			files: ["*.test.ts"],
+			rules: {
+				"@typescript-eslint/explicit-function-return-type": "off",
+			},
+		},
+	],
 };
