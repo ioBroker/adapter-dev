@@ -66,7 +66,7 @@ If the options are not defined, defaults will be deduced from your project struc
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.0.4 (2021-05-26)
 
 -   (UncleSamSwiss) Implemented gulp tasks very similar to the existing tasks
 
