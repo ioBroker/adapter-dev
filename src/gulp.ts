@@ -67,12 +67,13 @@ export function tasks(options?: Partial<Options>): HtmlTasks | ReactTasks {
 				.src(opts.ioPackage)
 				.pipe(translateIoPackage())
 				.pipe(gulp.dest(dirname(opts.ioPackage))),
-		...i18nBase.map((base) => () =>
-			gulp
-				.src(path.join(admin, "**", "*.json"))
-				.pipe(filterLanguageFiles(base))
-				.pipe(translateI18n(base))
-				.pipe(gulp.dest(admin)),
+		...i18nBase.map(
+			(base) => () =>
+				gulp
+					.src(path.join(admin, "**", "*.json"))
+					.pipe(filterLanguageFiles(base))
+					.pipe(translateI18n(base))
+					.pipe(gulp.dest(admin)),
 		),
 	);
 
