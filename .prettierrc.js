@@ -6,4 +6,15 @@ module.exports = {
 	useTabs: true,
 	tabWidth: 4,
 	endOfLine: "lf",
+
+	overrides: [
+		{
+			files: [".github/**/*.yml", "package.json", "lerna.json"],
+			options: {
+				useTabs: false,
+				tabWidth: 2,
+				singleQuote: true,
+			},
+		},
+	],
 };
