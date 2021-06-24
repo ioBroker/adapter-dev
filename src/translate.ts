@@ -62,7 +62,7 @@ async function createTranslator(): Promise<Translator> {
 		}
 	}
 
-	console.log("Using Google Translate Legacy");
+	console.log("Using Legacy Google Translate");
 	return new LegacyTranslator();
 }
 
