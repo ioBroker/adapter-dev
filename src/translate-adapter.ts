@@ -8,9 +8,8 @@ import {
 	writeFile,
 	writeJson,
 } from "fs-extra";
-import { glob } from "glob";
 import { EOL } from "os";
-import { promisify } from "util";
+import glob from "tiny-glob";
 import { translateText } from "./translate";
 import { escapeRegExp, padRight } from "./util";
 import path = require("path");
@@ -131,9 +130,11 @@ function createFilePattern(baseFile: string): RegExp {
 
 async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 	const filePattern = createFilePattern(baseFile);
-	const allJsonFiles = await promisify(glob)(
-		path.join(admin, "**", "*.json"),
-		{ realpath: true },
+	const allJsonFiles = await glob(
+		path.join(admin, "**", "*.json").replace(/\\/g, "/"),
+		{
+			absolute: true,
+		},
 	);
 	const languages = getLanguages();
 	return allJsonFiles.filter((file) => {
