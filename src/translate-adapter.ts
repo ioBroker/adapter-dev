@@ -217,16 +217,16 @@ async function handleTranslateCommand(): Promise<void> {
 	}
 }
 
-async function handleToJsonCommand(): Promise<void> {
+function handleToJsonCommand(): Promise<void> {
 	if (!existsSync(words)) {
 		return die(`Couldn't find words file ${words}`);
 	}
 
-	await adminWords2languages(words, i18nBases[0]);
+	return adminWords2languages(words, i18nBases[0]);
 }
 
-async function handleToWordsCommand(): Promise<void> {
-	await adminLanguages2words(i18nBases[0]);
+function handleToWordsCommand(): Promise<void> {
+	return adminLanguages2words(i18nBases[0]);
 }
 
 async function handleAllCommand(): Promise<void> {
@@ -266,10 +266,7 @@ async function translateNotExisting(
 	obj: Partial<Record<ioBroker.Languages, string>>,
 	baseText?: string,
 ): Promise<void> {
-	let text = obj.en;
-	if (!text) {
-		text = baseText;
-	}
+	const text = obj.en || baseText;
 
 	if (text) {
 		for (const lang of getLanguages()) {

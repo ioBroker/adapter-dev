@@ -160,14 +160,14 @@ async function handleTranslateCommand() {
         await translateI18n(i18nBase);
     }
 }
-async function handleToJsonCommand() {
+function handleToJsonCommand() {
     if (!fs_extra_1.existsSync(words)) {
         return die(`Couldn't find words file ${words}`);
     }
-    await adminWords2languages(words, i18nBases[0]);
+    return adminWords2languages(words, i18nBases[0]);
 }
-async function handleToWordsCommand() {
-    await adminLanguages2words(i18nBases[0]);
+function handleToWordsCommand() {
+    return adminLanguages2words(i18nBases[0]);
 }
 async function handleAllCommand() {
     await handleTranslateCommand();
@@ -197,10 +197,7 @@ async function translateIoPackage() {
     console.log(`Successfully updated ${path.relative(".", ioPackage)}`);
 }
 async function translateNotExisting(obj, baseText) {
-    let text = obj.en;
-    if (!text) {
-        text = baseText;
-    }
+    const text = obj.en || baseText;
     if (text) {
         for (const lang of getLanguages()) {
             if (!obj[lang]) {
