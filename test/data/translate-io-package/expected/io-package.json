@@ -1,0 +1,42 @@
+{
+    "common": {
+        "news": {
+            "1.0.0": {
+                "en": "Initial version",
+                "de": "Mock translation of 'Initial version' to 'de'",
+                "ru": "Mock translation of 'Initial version' to 'ru'",
+                "pt": "Mock translation of 'Initial version' to 'pt'",
+                "nl": "Mock translation of 'Initial version' to 'nl'",
+                "fr": "Mock translation of 'Initial version' to 'fr'",
+                "it": "Mock translation of 'Initial version' to 'it'",
+                "es": "Mock translation of 'Initial version' to 'es'",
+                "pl": "Mock translation of 'Initial version' to 'pl'",
+                "zh-cn": "Mock translation of 'Initial version' to 'zh-cn'"
+            }
+        },
+        "titleLang": {
+            "en": "My title",
+            "de": "Mock translation of 'My title' to 'de'",
+            "ru": "Mock translation of 'My title' to 'ru'",
+            "pt": "Mock translation of 'My title' to 'pt'",
+            "nl": "Mock translation of 'My title' to 'nl'",
+            "fr": "Mock translation of 'My title' to 'fr'",
+            "it": "Mock translation of 'My title' to 'it'",
+            "es": "Mock translation of 'My title' to 'es'",
+            "pl": "Mock translation of 'My title' to 'pl'",
+            "zh-cn": "Mock translation of 'My title' to 'zh-cn'"
+        },
+        "desc": {
+            "en": "My description",
+            "de": "Mock translation of 'My description' to 'de'",
+            "ru": "Mock translation of 'My description' to 'ru'",
+            "pt": "Mock translation of 'My description' to 'pt'",
+            "nl": "Mock translation of 'My description' to 'nl'",
+            "fr": "Mock translation of 'My description' to 'fr'",
+            "it": "Mock translation of 'My description' to 'it'",
+            "es": "Mock translation of 'My description' to 'es'",
+            "pl": "Mock translation of 'My description' to 'pl'",
+            "zh-cn": "Mock translation of 'My description' to 'zh-cn'"
+        }
+    }
+}

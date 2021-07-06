@@ -1,0 +1,15 @@
+{
+	"common": {
+		"news": {
+			"1.0.0": {
+				"en": "Initial version"
+			}
+		},
+		"titleLang": {
+			"en": "My title"
+		},
+		"desc": {
+			"en": "My description"
+		}
+	}
+}
