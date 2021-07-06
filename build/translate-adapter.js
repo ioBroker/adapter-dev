@@ -211,13 +211,12 @@ async function translateNotExisting(obj, baseText) {
 async function translateI18n(baseFile) {
     const filePattern = createFilePattern(baseFile);
     const baseContent = await fs_extra_1.readJson(baseFile);
-    const missingLanguages = getLanguages();
+    const missingLanguages = new Set(getLanguages());
     const files = await findAllLanguageFiles(baseFile);
     for (const file of files) {
         const match = file.match(filePattern);
         const lang = match[2]; // language files always match
-        const langIndex = missingLanguages.indexOf(lang);
-        missingLanguages.splice(langIndex, 1);
+        missingLanguages.delete(lang);
         if (lang === "en")
             continue;
         const translation = await fs_extra_1.readJson(file);

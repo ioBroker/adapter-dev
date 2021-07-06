@@ -284,13 +284,12 @@ async function translateNotExisting(
 async function translateI18n(baseFile: string): Promise<void> {
 	const filePattern = createFilePattern(baseFile);
 	const baseContent = await readJson(baseFile);
-	const missingLanguages = getLanguages();
+	const missingLanguages = new Set<ioBroker.Languages>(getLanguages());
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
 		const match = file.match(filePattern);
 		const lang = match![2] as ioBroker.Languages; // language files always match
-		const langIndex = missingLanguages.indexOf(lang);
-		missingLanguages.splice(langIndex, 1);
+		missingLanguages.delete(lang);
 		if (lang === "en") continue;
 		const translation = await readJson(file);
 		await translateI18nJson(translation, lang, baseContent);
