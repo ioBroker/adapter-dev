@@ -44,11 +44,14 @@ async function runTranslation(
 		.map((d) => {
 			switch (d.state) {
 				case "left":
-					return `- ${path.join(d.relativePath, d.name1 || "?")}`;
+					return `- ${path.join(d.relativePath, d.name1 || "")}`;
 				case "right":
-					return `+ ${path.join(d.relativePath, d.name2 || "?")}`;
+					return `+ ${path.join(d.relativePath, d.name2 || "")}`;
 				default:
-					return `! ${path.join(d.relativePath, d.name2 || "?")}`;
+					return `! ${path.join(
+						d.relativePath,
+						d.name1 || d.name2 || "",
+					)}`;
 			}
 		})
 		.map((d) => `          ${d}`)
@@ -60,7 +63,7 @@ async function runTranslation(
 }
 
 describe("translate-adapter translate", () => {
-	it("translates English to all other languages if they don't exist", () => {
+	it("translates English to all other languages if they don't exist at all", () => {
 		return runTranslation(
 			"new-translations",
 			false,
@@ -77,6 +80,13 @@ describe("translate-adapter translate", () => {
 	it("translates io-package.json correctly", () => {
 		return runTranslation(
 			"translate-io-package",
+			true,
+			handleTranslateCommand,
+		);
+	});
+	it("adds translations to io-package.json", () => {
+		return runTranslation(
+			"continue-translate-io-package",
 			true,
 			handleTranslateCommand,
 		);
