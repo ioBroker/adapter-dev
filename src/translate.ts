@@ -67,11 +67,11 @@ async function createTranslator(): Promise<Translator> {
 }
 
 let creator: Promise<Translator> | undefined = undefined;
-async function getTranslator(): Promise<Translator> {
+function getTranslator(): Promise<Translator> {
 	if (!creator) {
 		creator = createTranslator();
 	}
-	return await creator;
+	return creator;
 }
 
 /**

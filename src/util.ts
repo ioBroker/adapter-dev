@@ -5,12 +5,7 @@ export function escapeRegExp(value: string): string {
 }
 
 export function padRight(text: string, totalLength: number): string {
-	return (
-		text +
-		(text.length < totalLength
-			? new Array(totalLength - text.length).join(" ")
-			: "")
-	);
+	return text.padEnd(totalLength, " ");
 }
 
 export function error(message: string): void {
