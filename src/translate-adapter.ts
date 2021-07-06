@@ -241,10 +241,9 @@ async function translateIoPackage(): Promise<void> {
 	const content = await readJson(ioPackage);
 	if (content.common.news) {
 		console.log("Translate News");
-		for (const k in content.common.news) {
+		for (const [k, nw] of Object.entries(content.common.news)) {
 			console.log(`News: ${k}`);
-			const nw = content.common.news[k];
-			await translateNotExisting(nw);
+			await translateNotExisting(nw as any);
 		}
 	}
 	if (content.common.titleLang) {
@@ -288,7 +287,8 @@ async function translateI18n(baseFile: string): Promise<void> {
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		const lang = match![2] as ioBroker.Languages; // language files always match
+		if (!match) continue;
+		const lang = match[2] as ioBroker.Languages;
 		missingLanguages.delete(lang);
 		if (lang === "en") continue;
 		const translation = await readJson(file);
@@ -318,9 +318,9 @@ async function translateI18nJson(
 		return;
 	}
 	const time = new Date().getTime();
-	for (const t in baseContent) {
+	for (const [t, base] of Object.entries(baseContent)) {
 		if (!content[t]) {
-			content[t] = await translateText(baseContent[t], lang);
+			content[t] = await translateText(base, lang);
 		}
 	}
 	console.log(
@@ -335,12 +335,10 @@ async function adminWords2languages(
 	const filePattern = createFilePattern(i18nBase);
 	const data = parseWordJs(await readFile(words, "utf-8"));
 	const langs = createEmptyLangObject(() => ({} as Record<string, string>));
-	for (const word in data) {
-		if (!data.hasOwnProperty(word)) continue;
-		for (const lang in data[word]) {
-			if (!data[word].hasOwnProperty(lang)) continue;
+	for (const [word, translations] of Object.entries(data)) {
+		for (const [lang, translation] of Object.entries(translations)) {
 			const language = lang as ioBroker.Languages;
-			langs[language][word] = data[word][language];
+			langs[language][word] = translation;
 			//  pre-fill all other languages
 			for (const j of getLanguages()) {
 				if (langs.hasOwnProperty(j)) {
@@ -349,10 +347,9 @@ async function adminWords2languages(
 			}
 		}
 	}
-	for (const lang in langs) {
-		if (!langs.hasOwnProperty(lang)) continue;
+	for (const [lang, translations] of Object.entries(langs)) {
 		const language = lang as ioBroker.Languages;
-		const keys = Object.keys(langs[language]);
+		const keys = Object.keys(translations);
 		keys.sort();
 		const obj: Record<string, string> = {};
 		for (let k = 0; k < keys.length; k++) {
@@ -385,33 +382,28 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 	const files = await findAllLanguageFiles(i18nBase);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		const lang = match![2] as ioBroker.Languages; // language files always match
+		if (!match) continue;
+		const lang = match[2] as ioBroker.Languages;
 		const translations = await readJson(file);
-		for (const key in translations) {
-			if (translations.hasOwnProperty(key)) {
-				newWords[key] =
-					newWords[key] || createEmptyLangObject(() => "");
-				newWords[key][lang] = translations[key];
-			}
+		for (const key of Object.keys(translations)) {
+			newWords[key] = newWords[key] || createEmptyLangObject(() => "");
+			newWords[key][lang] = translations[key];
 		}
 	}
 
 	try {
 		// merge existing and new words together (and check for missing translations)
 		const existingWords = parseWordJs(await readFile(words, "utf-8"));
-		for (const key in existingWords) {
-			if (existingWords.hasOwnProperty(key)) {
-				const translations = existingWords[key];
-				if (!newWords[key]) {
-					console.warn(yellow(`Take from current words.js: ${key}`));
-					newWords[key] = translations;
-				}
-				getLanguages()
-					.filter((lang) => !newWords[key][lang])
-					.forEach((lang) =>
-						console.warn(yellow(`Missing "${lang}": ${key}`)),
-					);
+		for (const [key, translations] of Object.entries(existingWords)) {
+			if (!newWords[key]) {
+				console.warn(yellow(`Take from current words.js: ${key}`));
+				newWords[key] = translations;
 			}
+			getLanguages()
+				.filter((lang) => !newWords[key][lang])
+				.forEach((lang) =>
+					console.warn(yellow(`Missing "${lang}": ${key}`)),
+				);
 		}
 	} catch (error) {
 		// ignore error, we just use the strings from the translation files
@@ -435,12 +427,9 @@ function createWordsJs(
 	lines.push("*/");
 	lines.push("'use strict';\n");
 	lines.push("systemDictionary = {");
-	for (const word in data) {
-		if (!data.hasOwnProperty(word)) continue;
+	for (const [word, translations] of Object.entries(data)) {
 		let line = "";
-		for (const lang in data[word]) {
-			if (!data[word].hasOwnProperty(lang)) continue;
-			const item = data[word][lang as ioBroker.Languages];
+		for (const [lang, item] of Object.entries(translations)) {
 			const text = padRight(item.replace(/"/g, '\\"') + '",', 50);
 			line += `"${lang}": "${text} `;
 		}
