@@ -85,7 +85,7 @@ parser
 
 /********************************** Helpers ***********************************/
 
-const _languages = {
+const _languages: Record<ioBroker.Languages, any> = {
 	en: {},
 	de: {},
 	ru: {},
@@ -98,16 +98,16 @@ const _languages = {
 	"zh-cn": {},
 };
 
-type Language = keyof typeof _languages;
-
-function getLanguages(): Language[] {
-	return Object.keys(_languages) as Language[];
+function getLanguages(): ioBroker.Languages[] {
+	return Object.keys(_languages) as ioBroker.Languages[];
 }
 
-function createEmptyLangObject<T>(createDefault: () => T): Record<Language, T> {
+function createEmptyLangObject<T>(
+	createDefault: () => T,
+): Record<ioBroker.Languages, T> {
 	return getLanguages().reduce(
 		(obj, curr) => ({ ...obj, [curr]: createDefault() }),
-		{} as Record<Language, T>,
+		{} as Record<ioBroker.Languages, T>,
 	);
 }
 
@@ -142,7 +142,7 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 		if (!match) {
 			return false;
 		}
-		const lang = match[2] as Language;
+		const lang = match[2] as ioBroker.Languages;
 		return languages.includes(lang);
 	});
 }
@@ -263,7 +263,7 @@ async function translateIoPackage(): Promise<void> {
 }
 
 async function translateNotExisting(
-	obj: Partial<Record<Language, string>>,
+	obj: Partial<Record<ioBroker.Languages, string>>,
 	baseText?: string,
 ): Promise<void> {
 	let text = obj.en;
@@ -291,7 +291,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		const lang = match![2] as Language; // language files always match
+		const lang = match![2] as ioBroker.Languages; // language files always match
 		const langIndex = missingLanguages.indexOf(lang);
 		missingLanguages.splice(langIndex, 1);
 		if (lang === "en") continue;
@@ -315,7 +315,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 
 async function translateI18nJson(
 	content: Record<string, string>,
-	lang: Language,
+	lang: ioBroker.Languages,
 	baseContent: Readonly<Record<string, string>>,
 ): Promise<void> {
 	if (lang === "en") {
@@ -343,7 +343,7 @@ async function adminWords2languages(
 		if (!data.hasOwnProperty(word)) continue;
 		for (const lang in data[word]) {
 			if (!data[word].hasOwnProperty(lang)) continue;
-			const language = lang as Language;
+			const language = lang as ioBroker.Languages;
 			langs[language][word] = data[word][language];
 			//  pre-fill all other languages
 			for (const j of getLanguages()) {
@@ -355,7 +355,7 @@ async function adminWords2languages(
 	}
 	for (const lang in langs) {
 		if (!langs.hasOwnProperty(lang)) continue;
-		const language = lang as Language;
+		const language = lang as ioBroker.Languages;
 		const keys = Object.keys(langs[language]);
 		keys.sort();
 		const obj: Record<string, string> = {};
@@ -372,7 +372,9 @@ async function adminWords2languages(
 	}
 }
 
-function parseWordJs(words: string): Record<string, Record<Language, string>> {
+function parseWordJs(
+	words: string,
+): Record<string, Record<ioBroker.Languages, string>> {
 	words = words.substring(words.indexOf("{"), words.length);
 	words = words.substring(0, words.lastIndexOf(";"));
 
@@ -383,11 +385,11 @@ function parseWordJs(words: string): Record<string, Record<Language, string>> {
 
 async function adminLanguages2words(i18nBase: string): Promise<void> {
 	const filePattern = createFilePattern(i18nBase);
-	const newWords: Record<string, Record<Language, string>> = {};
+	const newWords: Record<string, Record<ioBroker.Languages, string>> = {};
 	const files = await findAllLanguageFiles(i18nBase);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		const lang = match![2] as Language; // language files always match
+		const lang = match![2] as ioBroker.Languages; // language files always match
 		const translations = await readJson(file);
 		for (const key in translations) {
 			if (translations.hasOwnProperty(key)) {
@@ -424,7 +426,9 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 	console.log(`Successfully updated ${path.relative(".", words)}`);
 }
 
-function createWordsJs(data: Record<string, Record<Language, string>>): string {
+function createWordsJs(
+	data: Record<string, Record<ioBroker.Languages, string>>,
+): string {
 	const lines: string[] = [];
 	lines.push("/*global systemDictionary:true */");
 	lines.push("/*");
@@ -440,7 +444,7 @@ function createWordsJs(data: Record<string, Record<Language, string>>): string {
 		let line = "";
 		for (const lang in data[word]) {
 			if (!data[word].hasOwnProperty(lang)) continue;
-			const item = data[word][lang as Language];
+			const item = data[word][lang as ioBroker.Languages];
 			const text = padRight(item.replace(/"/g, '\\"') + '",', 50);
 			line += `"${lang}": "${text} `;
 		}
