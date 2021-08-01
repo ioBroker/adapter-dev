@@ -68,11 +68,11 @@
     "rimraf": "^3.0.2",
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.19",
-    "ts-node": "^10.0.0",
+    "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@google-cloud/translate": "^6.2.2",
+    "@google-cloud/translate": "^6.2.6",
     "ansi-colors": "^4.1.1",
     "axios": "^0.21.1",
     "fs-extra": "^10.0.0",
