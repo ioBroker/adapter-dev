@@ -1,7 +1,7 @@
 export declare function die(message: string): never;
 /******************************** Middlewares *********************************/
 export declare function setDirectories(options: {
-    ioPackage: string;
+    "io-package": string;
     admin: string;
     words?: string;
     base?: string[];

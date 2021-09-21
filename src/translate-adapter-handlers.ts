@@ -91,13 +91,13 @@ export function die(message: string): never {
 /******************************** Middlewares *********************************/
 
 export async function setDirectories(options: {
-	ioPackage: string;
+	"io-package": string;
 	admin: string;
 	words?: string;
 	base?: string[];
 }): Promise<void> {
 	// io-package.json
-	ioPackage = path.resolve(options.ioPackage);
+	ioPackage = path.resolve(options["io-package"]);
 	if (!existsSync(ioPackage) || !(await stat(ioPackage)).isFile()) {
 		return die(`Couldn't find file ${ioPackage}`);
 	}

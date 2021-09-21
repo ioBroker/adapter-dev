@@ -42,7 +42,7 @@ parser
 	/*
 	translateAndUpdateWordsJS: TaskFunction;*/
 	.options({
-		ioPackage: {
+		"io-package": {
 			type: "string",
 			alias: "p",
 			default: "./io-package.json",

@@ -67,7 +67,7 @@ exports.die = die;
 /******************************** Middlewares *********************************/
 async function setDirectories(options) {
     // io-package.json
-    ioPackage = path_1.default.resolve(options.ioPackage);
+    ioPackage = path_1.default.resolve(options["io-package"]);
     if (!(0, fs_extra_1.existsSync)(ioPackage) || !(await (0, fs_extra_1.stat)(ioPackage)).isFile()) {
         return die(`Couldn't find file ${ioPackage}`);
     }
