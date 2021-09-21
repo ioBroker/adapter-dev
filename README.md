@@ -122,7 +122,7 @@ Previously known as `gulp translateAndUpdateWordsJS`.
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.1.0 (2021-09-21)
 
 -   (UncleSamSwiss) Removed dependency on gulp
 -   (UncleSamSwiss) Rewrote translation management as a regular NodeJS application
