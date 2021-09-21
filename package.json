@@ -8,7 +8,6 @@
     "translate-adapter": "bin/translate-adapter.js"
   },
   "files": [
-    "/gulp.*",
     "/build"
   ],
   "scripts": {
