@@ -16,48 +16,104 @@ To use this library add it to your dev dependencies:
 npm install --save-dev @iobroker/adapter-dev
 ```
 
-## Gulp Tasks
+Add the following to the `scripts` section of your `package.json`:
 
-To get all commonly used [gulp](https://gulpjs.com/) tasks, create a `gulpfile.js` in the root of your adapter project with the following code (or strip down the existing one):
-
-```js
-"use strict";
-
-module.exports = require("@iobroker/adapter-dev/gulp")();
+```json
+  "scripts": {
+	// ... other scripts before this
+	"translate": "translate-adapter"
+  }
 ```
 
-### Tasks
+If you don't have any i18n JSON files yet, call the following exactly once:
 
-The following gulp tasks are available for all adapters:
-
--   `translate`: translates all strings in `io-package.json` and the i18n JSON files to all supported languages using Google Translate
-
-For adapters that have a `words.js` file, the following additional tasks are available:
-
--   `adminWords2languages`: converts `words.js` to the different i18n JSON files; this should be used exactly once when there are no JSON files yet
--   `adminLanguages2words`: updates `words.js` from the different i18n JSON files; call this whenever you modify any of your JSON files manually. This is also automatically called by [Weblate](https://weblate.iobroker.net/) whenever translations are updated.
--   `translateAndUpdateWordsJS`: calls `translate` and afterwards updates `words.js`
-
-### Options
-
-The exported function for `gulp` supports an optional options object:
-
-```js
-module.exports = require("@iobroker/adapter-dev/gulp")({
-	// add options here
-});
+```bash
+npm run translate to-json
 ```
 
-If the options are not defined, defaults will be deduced from your project structure.
+## TL;DR
 
--   `ioPackage`: path to your io-package.json file; default: `./io-package.json`
--   `adminDir`: path to your admin directory; default: `./admin`
--   `words`: path to your words.js file; default: `<adminDir>/words.js` or `<adminDir>/js/words.js` or `undefined` if there is no words.js file
--   `i18nBase`:
-    -   _EITHER_ a single path pointing to the English i18n base file
-    -   _OR_ an array of paths to all English i18n base files
-    -   default: `<adminDir>/i18n/en/translations.json` and/or `<adminDir>/src/i18n/en.json`
-    -   the first item of the array will be used to generate `words.js`
+-   You should only update i18n JSON files and you shouldn't touch words.js anymore.
+-   Add new strings only to the English JSON file.
+-   Call `npm run translate all` whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
+
+## Manage Translations
+
+With the above setup completed, you can use the different commands of `translate-adapter` simply by calling:
+
+```bash
+npm run translate <command>
+```
+
+The commands exist in three forms (all three will be shown as examples below):
+
+-   full name: a self-explaining name
+-   short code: a one-character command
+-   legacy name: the same name as previously used in gulp
+
+In most cases, you don't need to specify any additional arguments as the defaults should match most adapters.
+
+Note: if you need to provide arguments, you must add a double dash `--` before any arguments!
+
+```bash
+npm run translate <command> -- <args>
+```
+
+### Global Command Line Arguments
+
+The following command line arguments can be passed to all commands:
+
+-   `--io-package`: Path to the io-package.json file. Short: `-p`. Default: `./io-package.json`
+-   `--admin`: Path to the admin directory. Short: `-a`. Default: `./admin`
+-   `--words`: Path to the words.js file. Short: `-w`. Default: searches it in the admin directory, either `<admin-dir>/words.js` or `<admin-dir>/js/words.js`.
+-   `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`
+
+### `translate` Command
+
+```bash
+npm run translate translate                   # full name/legacy
+npm run translate t                           # short code
+```
+
+Translates all not yet translated strings in `io-package.json` and the i18n JSON files to all supported languages using Google Translate.
+
+Previously known as `gulp translate`.
+
+### `to-json` Command
+
+```bash
+npm run translate to-json                     # full name
+npm run translate j                           # short code
+npm run translate adminWords2languages        # legacy
+```
+
+Converts `words.js` to the different i18n JSON files; this should be used exactly once when there are no JSON files yet.
+
+Previously known as `gulp adminWords2languages`.
+
+### `to-words` Command
+
+```bash
+npm run translate to-words                    # full name
+npm run translate w                           # short code
+npm run translate adminLanguages2words        # legacy
+```
+
+Updates `words.js` from the different i18n JSON files; call this whenever you modify any of your JSON files manually. This is also automatically called by [Weblate](https://weblate.iobroker.net/) whenever translations are updated.
+
+Previously known as `gulp adminLanguages2words`.
+
+### `all` Command
+
+```bash
+npm run translate all                         # full name
+npm run translate a                           # short code
+npm run translate translateAndUpdateWordsJS   # legacy
+```
+
+Calls `translate` and afterwards updates `words.js` using `to-words` followed by `to-json`.
+
+Previously known as `gulp translateAndUpdateWordsJS`.
 
 ## Changelog
 
@@ -65,6 +121,11 @@ If the options are not defined, defaults will be deduced from your project struc
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+-   (UncleSamSwiss) Removed dependency on gulp
+-   (UncleSamSwiss) Rewrote translation management as a regular NodeJS application
 
 ### 0.0.4 (2021-05-26)
 
