@@ -115,6 +115,38 @@ Calls `translate` and afterwards updates `words.js` using `to-words` followed by
 
 Previously known as `gulp translateAndUpdateWordsJS`.
 
+### Environment Variables
+
+#### Instead of Command Line Arguments
+
+All command line arguments can also be provided as environment variables. Just prefix any argument with `IOBROKER_TRANSLATE_`:
+
+-   `--io-package` becomes `IOBROKER_TRANSLATE_IO_PACKAGE`
+-   `--admin` becomes `IOBROKER_TRANSLATE_ADMIN`
+-   `--words` becomes `IOBROKER_TRANSLATE_WORDS`
+-   `--base` becomes `IOBROKER_TRANSLATE_BASE`
+
+#### Translate with Google Translate Credentials
+
+If you wish to use the Google Translate V3 API, you can set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to point to a credentials file, so the translations can use larger quota for translations (which may result in costs).
+
+The file can be generated on the Google Cloud Platform by creating a Service Account for Google Translate V3. See [here](https://cloud.google.com/translate/docs/setup) for additional information. The expected format looks something like this:
+
+```json
+{
+	"type": "service_account",
+	"project_id": "your-project-id-123456",
+	"private_key_id": "1234567890abcdef1234567890abcdef12345678",
+	"private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+	"client_email": "your-app-name@your-project-id-123456.iam.gserviceaccount.com",
+	"client_id": "123456789012345678901",
+	"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+	"token_uri": "https://oauth2.googleapis.com/token",
+	"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+	"client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/your-app-name%40your-project-id-123456.iam.gserviceaccount.com"
+}
+```
+
 ## Changelog
 
 <!--
