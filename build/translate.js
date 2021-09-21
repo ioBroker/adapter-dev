@@ -31,7 +31,7 @@ async function translateText(text, targetLang) {
             translated = await translator.translate(text, targetLang);
         }
         catch (e) {
-            util_1.error(`Could not translate to "${targetLang}": ${e}`);
+            (0, util_1.error)(`Could not translate to "${targetLang}": ${e}`);
             return text;
         }
         langCache.set(text, translated);
@@ -52,7 +52,7 @@ async function createTranslator() {
             return v3;
         }
         catch (err) {
-            util_1.error(err);
+            (0, util_1.error)(err);
         }
     }
     console.log("Using Legacy Google Translate");
@@ -81,7 +81,7 @@ class TestingTranslator {
  */
 class GoogleV3Translator {
     async init() {
-        this.credentials = await fs_extra_1.readJson(process.env.GOOGLE_APPLICATION_CREDENTIALS || "");
+        this.credentials = await (0, fs_extra_1.readJson)(process.env.GOOGLE_APPLICATION_CREDENTIALS || "");
         this.translationClient = new translate_1.TranslationServiceClient();
     }
     async translate(text, targetLang) {
@@ -112,11 +112,11 @@ class LegacyTranslator {
             const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}&ie=UTF-8&oe=UTF-8`;
             let options = {
                 url,
-                timeout: network_1.getRequestTimeout(),
+                timeout: (0, network_1.getRequestTimeout)(),
             };
             // If an https-proxy is defined as an env variable, use it
-            options = network_1.applyHttpsProxy(options);
-            const response = await axios_1.default(options);
+            options = (0, network_1.applyHttpsProxy)(options);
+            const response = await (0, axios_1.default)(options);
             if (Array.isArray(response.data)) {
                 // we got a valid response
                 return response.data[0][0][0];

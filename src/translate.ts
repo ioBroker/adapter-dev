@@ -29,7 +29,7 @@ export async function translateText(
 		let translated;
 		try {
 			translated = await translator.translate(text, targetLang);
-		} catch (e) {
+		} catch (e: any) {
 			error(`Could not translate to "${targetLang}": ${e}`);
 			return text;
 		}
@@ -57,7 +57,7 @@ async function createTranslator(): Promise<Translator> {
 			await v3.init();
 			console.log("Using Google Translate V3");
 			return v3;
-		} catch (err) {
+		} catch (err: any) {
 			error(err);
 		}
 	}
@@ -141,7 +141,7 @@ class LegacyTranslator implements Translator {
 				// we got a valid response
 				return response.data[0][0][0];
 			}
-		} catch (e) {
+		} catch (e: any) {
 			if (e.response?.status === 429) {
 				throw new Error(
 					`Could not translate to "${targetLang}": Rate-limited by Google Translate`,

@@ -75,7 +75,7 @@ function interceptErrors(func: () => Promise<void>): () => Promise<void> {
 	return async () => {
 		try {
 			await func();
-		} catch (error) {
+		} catch (error: any) {
 			die(error.stack || error);
 		}
 	};

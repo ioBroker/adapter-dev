@@ -49,7 +49,7 @@ function interceptErrors(func) {
             await func();
         }
         catch (error) {
-            translate_adapter_handlers_1.die(error.stack || error);
+            (0, translate_adapter_handlers_1.die)(error.stack || error);
         }
     };
 }
