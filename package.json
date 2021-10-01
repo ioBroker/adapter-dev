@@ -47,7 +47,7 @@
     "@alcalzone/release-script": "^2.2.1",
     "@tsconfig/node12": "^1.0.9",
     "@types/chai": "^4.2.22",
-    "@types/fs-extra": "^9.0.12",
+    "@types/fs-extra": "^9.0.13",
     "@types/iobroker": "^3.3.4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.10",
