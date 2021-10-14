@@ -35,7 +35,9 @@ npm run translate to-json
 
 -   You should only update i18n JSON files and you shouldn't touch words.js anymore.
 -   Add new strings only to the English JSON file.
--   Call `npm run translate all` whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
+-   Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
+    -   If you have an HTML/JavaScript admin UI: `npm run translate all`
+    -   If you have a React admin UI: `npm run translate translate`
 
 ## Manage Translations
 
