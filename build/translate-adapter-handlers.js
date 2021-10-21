@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.setDirectories = exports.die = void 0;
+exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.parseOptions = exports.die = void 0;
 const ansi_colors_1 = require("ansi-colors");
 const fs_extra_1 = require("fs-extra");
 const os_1 = require("os");
@@ -15,6 +15,7 @@ let ioPackage;
 let admin;
 let words;
 let i18nBases;
+let translateLanguages;
 /********************************** Helpers ***********************************/
 const _languages = {
     en: {},
@@ -29,7 +30,7 @@ const _languages = {
     "zh-cn": {},
 };
 function getLanguages() {
-    return Object.keys(_languages);
+    return (translateLanguages !== null && translateLanguages !== void 0 ? translateLanguages : Object.keys(_languages));
 }
 function createEmptyLangObject(createDefault) {
     return getLanguages().reduce((obj, curr) => ({ ...obj, [curr]: createDefault() }), {});
@@ -65,7 +66,8 @@ function die(message) {
 }
 exports.die = die;
 /******************************** Middlewares *********************************/
-async function setDirectories(options) {
+async function parseOptions(options) {
+    var _a;
     // io-package.json
     ioPackage = path_1.default.resolve(options["io-package"]);
     if (!(0, fs_extra_1.existsSync)(ioPackage) || !(await (0, fs_extra_1.stat)(ioPackage)).isFile()) {
@@ -102,8 +104,17 @@ async function setDirectories(options) {
             i18nBases = [defaultPath];
         }
     }
+    if ((_a = options.languages) === null || _a === void 0 ? void 0 : _a.length) {
+        // Check if an unknown language was specified
+        const allLanguages = Object.keys(_languages);
+        const unknownLanguages = options.languages.filter((l) => !allLanguages.includes(l));
+        if (unknownLanguages.length > 0) {
+            return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
+        }
+        translateLanguages = options.languages;
+    }
 }
-exports.setDirectories = setDirectories;
+exports.parseOptions = parseOptions;
 /***************************** Command Handlers *******************************/
 async function handleTranslateCommand() {
     await translateIoPackage();

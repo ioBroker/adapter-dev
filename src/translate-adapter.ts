@@ -4,7 +4,7 @@ import {
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
-	setDirectories,
+	parseOptions,
 } from "./translate-adapter-handlers";
 import yargs = require("yargs/yargs");
 
@@ -66,8 +66,14 @@ parser
 			description:
 				"Path to the english i18n file, multiple files are possible",
 		},
+		languages: {
+			type: "string",
+			alias: "l",
+			array: true,
+			description: "Specify a subset of languages to be translated",
+		},
 	})
-	.middleware(setDirectories)
+	.middleware(parseOptions)
 	.wrap(Math.min(100, parser.terminalWidth()))
 	.help().argv;
 

@@ -39,8 +39,14 @@ parser
         array: true,
         description: "Path to the english i18n file, multiple files are possible",
     },
+    languages: {
+        type: "string",
+        alias: "l",
+        array: true,
+        description: "Specify a subset of languages to be translated",
+    },
 })
-    .middleware(translate_adapter_handlers_1.setDirectories)
+    .middleware(translate_adapter_handlers_1.parseOptions)
     .wrap(Math.min(100, parser.terminalWidth()))
     .help().argv;
 function interceptErrors(func) {

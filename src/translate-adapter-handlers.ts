@@ -18,6 +18,7 @@ let ioPackage: string;
 let admin: string;
 let words: string;
 let i18nBases: string[];
+let translateLanguages: ioBroker.Languages[] | undefined;
 
 /********************************** Helpers ***********************************/
 
@@ -35,7 +36,9 @@ const _languages: Record<ioBroker.Languages, any> = {
 };
 
 function getLanguages(): ioBroker.Languages[] {
-	return Object.keys(_languages) as ioBroker.Languages[];
+	return (
+		translateLanguages ?? (Object.keys(_languages) as ioBroker.Languages[])
+	);
 }
 
 function createEmptyLangObject<T>(
@@ -90,11 +93,12 @@ export function die(message: string): never {
 
 /******************************** Middlewares *********************************/
 
-export async function setDirectories(options: {
+export async function parseOptions(options: {
 	"io-package": string;
 	admin: string;
 	words?: string;
 	base?: string[];
+	languages?: string[];
 }): Promise<void> {
 	// io-package.json
 	ioPackage = path.resolve(options["io-package"]);
@@ -131,6 +135,18 @@ export async function setDirectories(options: {
 			// expect the i18n file to be in the default path
 			i18nBases = [defaultPath];
 		}
+	}
+
+	if (options.languages?.length) {
+		// Check if an unknown language was specified
+		const allLanguages = Object.keys(_languages);
+		const unknownLanguages = options.languages.filter(
+			(l) => !allLanguages.includes(l as any),
+		);
+		if (unknownLanguages.length > 0) {
+			return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
+		}
+		translateLanguages = options.languages as ioBroker.Languages[];
 	}
 }
 

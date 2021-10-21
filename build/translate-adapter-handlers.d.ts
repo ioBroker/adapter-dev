@@ -1,10 +1,11 @@
 export declare function die(message: string): never;
 /******************************** Middlewares *********************************/
-export declare function setDirectories(options: {
+export declare function parseOptions(options: {
     "io-package": string;
     admin: string;
     words?: string;
     base?: string[];
+    languages?: string[];
 }): Promise<void>;
 /***************************** Command Handlers *******************************/
 export declare function handleTranslateCommand(): Promise<void>;
