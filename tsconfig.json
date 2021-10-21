@@ -24,7 +24,8 @@
 		"inlineSourceMap": false,
 
 		// watch=true breaks CI build steps
-		"watch": false
+		"watch": false,
+		"newLine": "lf"
 	},
 	"include": [
 		"**/*.ts",
