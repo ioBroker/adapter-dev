@@ -44,6 +44,7 @@ parser
         alias: "l",
         array: true,
         description: "Specify a subset of languages to be translated",
+        choices: translate_adapter_handlers_1.allLanguages,
     },
 })
     .middleware(translate_adapter_handlers_1.parseOptions)

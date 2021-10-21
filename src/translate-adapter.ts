@@ -1,4 +1,5 @@
 import {
+	allLanguages,
 	die,
 	handleAllCommand,
 	handleToJsonCommand,
@@ -71,6 +72,7 @@ parser
 			alias: "l",
 			array: true,
 			description: "Specify a subset of languages to be translated",
+			choices: allLanguages,
 		},
 	})
 	.middleware(parseOptions)

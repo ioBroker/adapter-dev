@@ -68,13 +68,15 @@ The following command line arguments can be passed to all commands:
 -   `--io-package`: Path to the io-package.json file. Short: `-p`. Default: `./io-package.json`
 -   `--admin`: Path to the admin directory. Short: `-a`. Default: `./admin`
 -   `--words`: Path to the words.js file. Short: `-w`. Default: searches it in the admin directory, either `<admin-dir>/words.js` or `<admin-dir>/js/words.js`.
--   `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`
+-   `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`: Specify a subset of languages to be translated. Short `-l`. Default: all languages.
+-   `--languages:
 
 ### `translate` Command
 
 ```bash
 npm run translate translate                   # full name/legacy
 npm run translate t                           # short code
+npm run translate t -- -l de fr it            # Only translate into german, french and italian
 ```
 
 Translates all not yet translated strings in `io-package.json` and the i18n JSON files to all supported languages using Google Translate.
@@ -127,6 +129,7 @@ All command line arguments can also be provided as environment variables. Just p
 -   `--admin` becomes `IOBROKER_TRANSLATE_ADMIN`
 -   `--words` becomes `IOBROKER_TRANSLATE_WORDS`
 -   `--base` becomes `IOBROKER_TRANSLATE_BASE`
+-   `--languages` becomes `IOBROKER_TRANSLATE_LANGUAGES`
 
 #### Translate with Google Translate Credentials
 

@@ -18,7 +18,7 @@ let ioPackage: string;
 let admin: string;
 let words: string;
 let i18nBases: string[];
-let translateLanguages: ioBroker.Languages[] | undefined;
+let translateLanguages: ioBroker.Languages[];
 
 /********************************** Helpers ***********************************/
 
@@ -34,17 +34,12 @@ const _languages: Record<ioBroker.Languages, any> = {
 	pl: {},
 	"zh-cn": {},
 };
-
-function getLanguages(): ioBroker.Languages[] {
-	return (
-		translateLanguages ?? (Object.keys(_languages) as ioBroker.Languages[])
-	);
-}
+export const allLanguages = Object.keys(_languages) as ioBroker.Languages[];
 
 function createEmptyLangObject<T>(
 	createDefault: () => T,
 ): Record<ioBroker.Languages, T> {
-	return getLanguages().reduce(
+	return translateLanguages.reduce(
 		(obj, curr) => ({ ...obj, [curr]: createDefault() }),
 		{} as Record<ioBroker.Languages, T>,
 	);
@@ -75,14 +70,14 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 			absolute: true,
 		},
 	);
-	const languages = getLanguages();
+
 	return allJsonFiles.filter((file) => {
 		const match = file.match(filePattern);
 		if (!match) {
 			return false;
 		}
 		const lang = match[2] as ioBroker.Languages;
-		return languages.includes(lang);
+		return translateLanguages.includes(lang);
 	});
 }
 
@@ -139,7 +134,6 @@ export async function parseOptions(options: {
 
 	if (options.languages?.length) {
 		// Check if an unknown language was specified
-		const allLanguages = Object.keys(_languages);
 		const unknownLanguages = options.languages.filter(
 			(l) => !allLanguages.includes(l as any),
 		);
@@ -147,6 +141,8 @@ export async function parseOptions(options: {
 			return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
 		}
 		translateLanguages = options.languages as ioBroker.Languages[];
+	} else {
+		translateLanguages = allLanguages;
 	}
 }
 
@@ -210,7 +206,7 @@ async function translateNotExisting(
 	const text = obj.en || baseText;
 
 	if (text) {
-		for (const lang of getLanguages()) {
+		for (const lang of translateLanguages) {
 			if (!obj[lang]) {
 				const time = new Date().getTime();
 				obj[lang] = await translateText(text, lang);
@@ -225,7 +221,7 @@ async function translateNotExisting(
 async function translateI18n(baseFile: string): Promise<void> {
 	const filePattern = createFilePattern(baseFile);
 	const baseContent = await readJson(baseFile);
-	const missingLanguages = new Set<ioBroker.Languages>(getLanguages());
+	const missingLanguages = new Set<ioBroker.Languages>(translateLanguages);
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
 		const match = file.match(filePattern);
@@ -282,7 +278,7 @@ async function adminWords2languages(
 			const language = lang as ioBroker.Languages;
 			langs[language][word] = translation;
 			//  pre-fill all other languages
-			for (const j of getLanguages()) {
+			for (const j of translateLanguages) {
 				if (langs.hasOwnProperty(j)) {
 					langs[j][word] = langs[j][word] || "";
 				}
@@ -341,7 +337,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 				console.warn(yellow(`Take from current words.js: ${key}`));
 				newWords[key] = translations;
 			}
-			getLanguages()
+			translateLanguages
 				.filter((lang) => !newWords[key][lang])
 				.forEach((lang) =>
 					console.warn(yellow(`Missing "${lang}": ${key}`)),
