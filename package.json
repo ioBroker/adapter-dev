@@ -73,7 +73,7 @@
   "dependencies": {
     "@google-cloud/translate": "^6.3.1",
     "ansi-colors": "^4.1.1",
-    "axios": "^0.22.0",
+    "axios": "^0.24.0",
     "fs-extra": "^10.0.0",
     "tiny-glob": "^0.2.9",
     "yargs": "^17.2.1"
