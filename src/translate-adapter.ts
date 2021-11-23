@@ -17,7 +17,7 @@ parser
 	.alias("h", "help")
 	.alias("v", "version")
 	.command(
-		["translate", "t"],
+		["translate", "t", "$0"],
 		"Translate io-package.json and all admin language files",
 		{},
 		interceptErrors(handleTranslateCommand),

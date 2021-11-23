@@ -37,7 +37,7 @@ npm run translate to-json
 -   Add new strings only to the English JSON file.
 -   Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
     -   If you have an HTML/JavaScript admin UI: `npm run translate all`
-    -   If you have a React admin UI: `npm run translate translate`
+    -   If you have a React admin UI: `npm run translate`
 
 ## Manage Translations
 
@@ -73,7 +73,10 @@ The following command line arguments can be passed to all commands:
 
 ### `translate` Command
 
+This is the default command and does not need to be specified.
+
 ```bash
+npm run translate                             # (default)
 npm run translate translate                   # full name/legacy
 npm run translate t                           # short code
 npm run translate t -- -l de fr it            # Only translate into german, french and italian

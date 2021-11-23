@@ -9,7 +9,7 @@ parser
     .usage("ioBroker adapter translator\n\nUsage: $0 <command> [options]")
     .alias("h", "help")
     .alias("v", "version")
-    .command(["translate", "t"], "Translate io-package.json and all admin language files", {}, interceptErrors(translate_adapter_handlers_1.handleTranslateCommand))
+    .command(["translate", "t", "$0"], "Translate io-package.json and all admin language files", {}, interceptErrors(translate_adapter_handlers_1.handleTranslateCommand))
     .command(["to-json", "adminWords2languages", "j"], "Convert words.js to i18n JSON files", {}, interceptErrors(translate_adapter_handlers_1.handleToJsonCommand))
     .command(["to-words", "adminLanguages2words", "w"], "Generate words.js from i18n JSON files", {}, interceptErrors(translate_adapter_handlers_1.handleToWordsCommand))
     .command(["all", "translateAndUpdateWordsJS", "a"], "Sequence of translate, to-words, to-json", {}, interceptErrors(translate_adapter_handlers_1.handleAllCommand))
