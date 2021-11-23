@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.setDirectories = exports.die = void 0;
+exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.parseOptions = exports.die = exports.allLanguages = void 0;
 const ansi_colors_1 = require("ansi-colors");
 const fs_extra_1 = require("fs-extra");
 const os_1 = require("os");
@@ -15,6 +15,7 @@ let ioPackage;
 let admin;
 let words;
 let i18nBases;
+let translateLanguages;
 /********************************** Helpers ***********************************/
 const _languages = {
     en: {},
@@ -28,11 +29,9 @@ const _languages = {
     pl: {},
     "zh-cn": {},
 };
-function getLanguages() {
-    return Object.keys(_languages);
-}
+exports.allLanguages = Object.keys(_languages);
 function createEmptyLangObject(createDefault) {
-    return getLanguages().reduce((obj, curr) => ({ ...obj, [curr]: createDefault() }), {});
+    return translateLanguages.reduce((obj, curr) => ({ ...obj, [curr]: createDefault() }), {});
 }
 /**
  * Creates a regexp pattern for an english base file name.
@@ -49,14 +48,13 @@ async function findAllLanguageFiles(baseFile) {
     const allJsonFiles = await (0, tiny_glob_1.default)(path_1.default.join(admin, "**", "*.json").replace(/\\/g, "/"), {
         absolute: true,
     });
-    const languages = getLanguages();
     return allJsonFiles.filter((file) => {
         const match = file.match(filePattern);
         if (!match) {
             return false;
         }
         const lang = match[2];
-        return languages.includes(lang);
+        return translateLanguages.includes(lang);
     });
 }
 function die(message) {
@@ -65,7 +63,8 @@ function die(message) {
 }
 exports.die = die;
 /******************************** Middlewares *********************************/
-async function setDirectories(options) {
+async function parseOptions(options) {
+    var _a;
     // io-package.json
     ioPackage = path_1.default.resolve(options["io-package"]);
     if (!(0, fs_extra_1.existsSync)(ioPackage) || !(await (0, fs_extra_1.stat)(ioPackage)).isFile()) {
@@ -102,8 +101,19 @@ async function setDirectories(options) {
             i18nBases = [defaultPath];
         }
     }
+    if ((_a = options.languages) === null || _a === void 0 ? void 0 : _a.length) {
+        // Check if an unknown language was specified
+        const unknownLanguages = options.languages.filter((l) => !exports.allLanguages.includes(l));
+        if (unknownLanguages.length > 0) {
+            return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
+        }
+        translateLanguages = options.languages;
+    }
+    else {
+        translateLanguages = exports.allLanguages;
+    }
 }
-exports.setDirectories = setDirectories;
+exports.parseOptions = parseOptions;
 /***************************** Command Handlers *******************************/
 async function handleTranslateCommand() {
     await translateIoPackage();
@@ -153,7 +163,7 @@ async function translateIoPackage() {
 async function translateNotExisting(obj, baseText) {
     const text = obj.en || baseText;
     if (text) {
-        for (const lang of getLanguages()) {
+        for (const lang of translateLanguages) {
             if (!obj[lang]) {
                 const time = new Date().getTime();
                 obj[lang] = await (0, translate_1.translateText)(text, lang);
@@ -165,7 +175,7 @@ async function translateNotExisting(obj, baseText) {
 async function translateI18n(baseFile) {
     const filePattern = createFilePattern(baseFile);
     const baseContent = await (0, fs_extra_1.readJson)(baseFile);
-    const missingLanguages = new Set(getLanguages());
+    const missingLanguages = new Set(translateLanguages);
     const files = await findAllLanguageFiles(baseFile);
     for (const file of files) {
         const match = file.match(filePattern);
@@ -213,7 +223,7 @@ async function adminWords2languages(words, i18nBase) {
             const language = lang;
             langs[language][word] = translation;
             //  pre-fill all other languages
-            for (const j of getLanguages()) {
+            for (const j of translateLanguages) {
                 if (langs.hasOwnProperty(j)) {
                     langs[j][word] = langs[j][word] || "";
                 }
@@ -266,7 +276,7 @@ async function adminLanguages2words(i18nBase) {
                 console.warn((0, ansi_colors_1.yellow)(`Take from current words.js: ${key}`));
                 newWords[key] = translations;
             }
-            getLanguages()
+            translateLanguages
                 .filter((lang) => !newWords[key][lang])
                 .forEach((lang) => console.warn((0, ansi_colors_1.yellow)(`Missing "${lang}": ${key}`)));
         }

@@ -8,7 +8,7 @@ import {
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
-	setDirectories,
+	parseOptions,
 } from "../src/translate-adapter-handlers";
 
 async function runTranslation(
@@ -23,7 +23,7 @@ async function runTranslation(
 	await copy(inputDir, outputDir);
 
 	const adminDir = path.join(outputDir, "admin");
-	await setDirectories({
+	await parseOptions({
 		"io-package": path.join(outputDir, "io-package.json"),
 		admin: adminDir,
 		base: ignoreAdmin ? [] : undefined, // don't do admin translations if the directory doesn't exist
