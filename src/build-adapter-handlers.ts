@@ -30,11 +30,11 @@ export async function buildReact(): Promise<void> {
 	);
 	await build({
 		entryPoints,
-		tsconfig: `${reactOptions.rootDir}/${reactOptions.tsConfig}`, // default: tsconfig.json
+		tsconfig: `${reactOptions.rootDir}/${reactOptions.tsConfig}`,
 		outdir: `${reactOptions.rootDir}/${reactOptions.outDir}`,
-		bundle: reactOptions.bundle, // default: true
-		format: reactOptions.format, // default: none/iife
-		target: reactOptions.compileTarget, // default "es2018",
+		bundle: reactOptions.bundle,
+		format: reactOptions.format,
+		target: reactOptions.compileTarget,
 		minify: !watch,
 		sourcemap: true,
 		logLevel: "info",
@@ -53,15 +53,15 @@ export async function buildTypeScript(): Promise<void> {
 	);
 	await build({
 		entryPoints,
-		tsconfig: `${typescriptOptions.rootDir}/${typescriptOptions.tsConfig}`, // default: tsconfig.build.json
-		outdir: `${reactOptions.rootDir}/${reactOptions.outDir}`,
-		bundle: typescriptOptions.bundle, // default: false
+		tsconfig: `${typescriptOptions.rootDir}/${typescriptOptions.tsConfig}`,
+		outdir: `${typescriptOptions.rootDir}/${typescriptOptions.outDir}`,
+		bundle: typescriptOptions.bundle,
 		minify: false,
 		sourcemap: true,
 		logLevel: "info",
 		platform: "node",
-		format: typescriptOptions.format, // default: "cjs"
-		target: typescriptOptions.compileTarget, // default: node12
+		format: typescriptOptions.format,
+		target: typescriptOptions.compileTarget,
 	});
 }
 
