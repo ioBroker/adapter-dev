@@ -1,6 +1,5 @@
 /// <reference types="iobroker" />
 export declare const allLanguages: ioBroker.Languages[];
-export declare function die(message: string): never;
 /******************************** Middlewares *********************************/
 export declare function parseOptions(options: {
     "io-package": string;
