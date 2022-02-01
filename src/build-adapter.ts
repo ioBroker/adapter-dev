@@ -1,7 +1,7 @@
 import {
-	buildAll,
-	buildReact,
-	buildTypeScript,
+	handleBuildAllCommand,
+	handleBuildReactCommand,
+	handleBuildTypeScriptCommand,
 	parseOptions,
 } from "./build-adapter-handlers";
 import { interceptErrors } from "./util";
@@ -18,15 +18,20 @@ parser
 		["react"],
 		"Compiles React sources",
 		{},
-		interceptErrors(buildReact),
+		interceptErrors(handleBuildReactCommand),
 	)
 	.command(
 		["typescript", "ts"],
 		"Compile TypeScript sources",
 		{},
-		interceptErrors(buildTypeScript),
+		interceptErrors(handleBuildTypeScriptCommand),
 	)
-	.command(["all"], "Compile all of the above", {}, interceptErrors(buildAll))
+	.command(
+		["all"],
+		"Compile all of the above",
+		{},
+		interceptErrors(handleBuildAllCommand),
+	)
 	.options({
 		watch: {
 			type: "boolean",

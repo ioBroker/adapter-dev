@@ -10,9 +10,9 @@ parser
     .usage("ioBroker adapter build script\n\nUsage: $0 <command> [options]")
     .alias("h", "help")
     .alias("v", "version")
-    .command(["react"], "Compiles React sources", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.buildReact))
-    .command(["typescript", "ts"], "Compile TypeScript sources", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.buildTypeScript))
-    .command(["all"], "Compile all of the above", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.buildAll))
+    .command(["react"], "Compiles React sources", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.handleBuildReactCommand))
+    .command(["typescript", "ts"], "Compile TypeScript sources", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.handleBuildTypeScriptCommand))
+    .command(["all"], "Compile all of the above", {}, (0, util_1.interceptErrors)(build_adapter_handlers_1.handleBuildAllCommand))
     .options({
     watch: {
         type: "boolean",

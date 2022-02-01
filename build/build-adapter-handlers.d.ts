@@ -1,6 +1,6 @@
-export declare function buildReact(): Promise<void>;
-export declare function buildTypeScript(): Promise<void>;
-export declare function buildAll(): Promise<void>;
+export declare function handleBuildReactCommand(): Promise<void>;
+export declare function handleBuildTypeScriptCommand(): Promise<void>;
+export declare function handleBuildAllCommand(): Promise<void>;
 /******************************** Middlewares *********************************/
 export declare function parseOptions(options: {
     watch: boolean;
