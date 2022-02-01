@@ -246,7 +246,7 @@ export async function handleBuildReactCommand(): Promise<void> {
 				console.log(gray("SIGINT received, shutting down..."));
 				build.stop?.();
 				if (check) {
-					check.kill?.("SIGINT");
+					check.kill("SIGINT");
 				} else {
 					resolve();
 				}
@@ -268,7 +268,7 @@ export async function handleBuildTypeScriptCommand(): Promise<void> {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
 				build.stop?.();
-				check.kill?.("SIGINT");
+				check.kill("SIGINT");
 			});
 		});
 	} else {
