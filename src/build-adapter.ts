@@ -50,6 +50,12 @@ parser
 			description:
 				"Directory where the compiled React output will be placed, relative to reactRootDir",
 		},
+		reactWatchDir: {
+			type: "string",
+			default: ".watch",
+			description:
+				"Directory where the compiled React output will be placed in watch mode, relative to reactRootDir",
+		},
 		reactPattern: {
 			type: "string",
 			default: "src/{index,tab}.{tsx,jsx}",

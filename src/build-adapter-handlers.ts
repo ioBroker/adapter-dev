@@ -18,6 +18,7 @@ interface BuildOptions {
 	compileTarget: string;
 	rootDir: string;
 	outDir: string;
+	watchDir?: string;
 }
 
 // Build options
@@ -113,7 +114,9 @@ function getReactBuildOptions(
 	return {
 		entryPoints,
 		tsconfig: tsConfigPath,
-		outdir: `${reactOptions.rootDir}/${reactOptions.outDir}`,
+		outdir: `${reactOptions.rootDir}/${
+			(watch && reactOptions.watchDir) || reactOptions.outDir
+		}`,
 		bundle: reactOptions.bundle,
 		format: reactOptions.format,
 		target: reactOptions.compileTarget,
@@ -238,13 +241,14 @@ export async function handleBuildReactCommand(): Promise<void> {
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel
 		// and wait until they end
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build, check } = await watchReact();
 		return new Promise((resolve) => {
 			check?.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				build.stop?.();
+				// build.stop?.();
 				if (check) {
 					check.kill("SIGINT");
 				} else {
@@ -261,13 +265,14 @@ export async function handleBuildTypeScriptCommand(): Promise<void> {
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel
 		// and wait until they end
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build, check } = await watchTypeScript();
 		return new Promise((resolve) => {
 			check.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				build.stop?.();
+				// build.stop?.();
 				check.kill("SIGINT");
 			});
 		});
@@ -280,7 +285,9 @@ export async function handleBuildAllCommand(): Promise<void> {
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel
 		// and wait until they end
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build: buildReact, check: checkReact } = await watchReact();
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build: buildTS, check: checkTS } = await watchTypeScript();
 		return new Promise((resolve) => {
 			Promise.all([checkReact, checkTS].filter(Boolean))
@@ -290,8 +297,8 @@ export async function handleBuildAllCommand(): Promise<void> {
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				buildReact.stop?.();
-				buildTS.stop?.();
+				// buildReact.stop?.();
+				// buildTS.stop?.();
 				checkReact?.kill("SIGINT");
 				checkTS.kill("SIGINT");
 			});
@@ -311,6 +318,7 @@ export async function parseOptions(options: {
 	reactCompileTarget: string;
 	reactRootDir: string;
 	reactOutDir: string;
+	reactWatchDir: string;
 	typescriptPattern: string;
 	typescriptTsConfig: string;
 	typescriptBundle: boolean;
@@ -328,6 +336,7 @@ export async function parseOptions(options: {
 		compileTarget: options.reactCompileTarget,
 		rootDir: options.reactRootDir,
 		outDir: options.reactOutDir,
+		watchDir: options.reactWatchDir,
 	};
 	typescriptOptions = {
 		pattern: options.typescriptPattern,

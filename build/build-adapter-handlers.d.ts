@@ -11,6 +11,7 @@ export declare function parseOptions(options: {
     reactCompileTarget: string;
     reactRootDir: string;
     reactOutDir: string;
+    reactWatchDir: string;
     typescriptPattern: string;
     typescriptTsConfig: string;
     typescriptBundle: boolean;
