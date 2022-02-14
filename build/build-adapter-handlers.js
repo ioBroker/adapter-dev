@@ -3,17 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseOptions = exports.handleBuildAllCommand = exports.handleBuildTypeScriptCommand = exports.handleBuildReactCommand = void 0;
+exports.handleBuildAllCommand = exports.handleBuildTypeScriptCommand = exports.handleBuildReactCommand = void 0;
 /** Build script to use esbuild without specifying 1000 CLI options */
 const ansi_colors_1 = require("ansi-colors");
 const esbuild_1 = require("esbuild");
 const execa_1 = __importDefault(require("execa"));
 const path_1 = __importDefault(require("path"));
 const tiny_glob_1 = __importDefault(require("tiny-glob"));
-// Build options
-let watch;
-let reactOptions;
-let typescriptOptions;
+const util_1 = require("./util");
 function findTsc() {
     try {
         const packageJsonPath = require.resolve("typescript/package.json");
@@ -23,12 +20,11 @@ function findTsc() {
         return path_1.default.join(path_1.default.dirname(packageJsonPath), binPath);
     }
     catch (e) {
-        console.error((0, ansi_colors_1.red)(`Could not find tsc executable: ${e.message}`));
-        process.exit(1);
+        (0, util_1.die)(`Could not find tsc executable: ${e.message}`);
     }
 }
 /** Helper function to determine file paths that serve as input for React builds */
-async function getReactFilePaths() {
+async function getReactFilePaths(reactOptions) {
     let entryPoints = await (0, tiny_glob_1.default)(`${reactOptions.rootDir}/${reactOptions.pattern}`);
     entryPoints = entryPoints.filter((ep) => !ep.endsWith(".d.ts") &&
         !ep.endsWith(".test.ts") &&
@@ -37,7 +33,7 @@ async function getReactFilePaths() {
     return { entryPoints, tsConfigPath };
 }
 /** Helper function to determine file paths that serve as input for TypeScript builds */
-async function getTypeScriptFilePaths() {
+async function getTypeScriptFilePaths(typescriptOptions) {
     let entryPoints = await (0, tiny_glob_1.default)(`${typescriptOptions.rootDir}/${typescriptOptions.pattern}`);
     entryPoints = entryPoints.filter((ep) => !ep.endsWith(".d.ts") && !ep.endsWith(".test.ts"));
     const tsConfigPath = `${typescriptOptions.rootDir}/${typescriptOptions.tsConfig}`;
@@ -70,7 +66,7 @@ function typeCheckWatch(tsConfigPath) {
         stderr: "inherit",
     });
 }
-function getReactBuildOptions(entryPoints, tsConfigPath) {
+function getReactBuildOptions(watch, reactOptions, entryPoints, tsConfigPath) {
     return {
         entryPoints,
         tsconfig: tsConfigPath,
@@ -86,7 +82,7 @@ function getReactBuildOptions(entryPoints, tsConfigPath) {
         },
     };
 }
-function getTypeScriptBuildOptions(entryPoints, tsConfigPath) {
+function getTypeScriptBuildOptions(typescriptOptions, entryPoints, tsConfigPath) {
     return {
         entryPoints,
         tsconfig: tsConfigPath,
@@ -100,13 +96,13 @@ function getTypeScriptBuildOptions(entryPoints, tsConfigPath) {
         target: typescriptOptions.compileTarget,
     };
 }
-async function buildReact() {
-    const { entryPoints, tsConfigPath } = await getReactFilePaths();
+async function buildReact(options) {
+    const { entryPoints, tsConfigPath } = await getReactFilePaths(options);
     // Building React happens in one or two steps:
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling React with ESBuild..."));
-    await (0, esbuild_1.build)(getReactBuildOptions(entryPoints, tsConfigPath));
+    await (0, esbuild_1.build)(getReactBuildOptions(false, options, entryPoints, tsConfigPath));
     // 2. type-check with TypeScript (if there are TSX entry points)
     if (entryPoints.some((e) => e.endsWith(".tsx"))) {
         if (!(await typeCheck(tsConfigPath))) {
@@ -114,29 +110,32 @@ async function buildReact() {
         }
     }
 }
-async function buildTypeScript() {
-    const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths();
+async function buildTypeScript(options) {
+    const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths(options);
     // Building TS happens in two steps:
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling TypeScript with ESBuild..."));
-    await (0, esbuild_1.build)(getTypeScriptBuildOptions(entryPoints, tsConfigPath));
+    await (0, esbuild_1.build)(getTypeScriptBuildOptions(options, entryPoints, tsConfigPath));
     // 2. type-check with TypeScript
     if (!(await typeCheck(tsConfigPath))) {
         process.exit(1);
     }
 }
-async function buildAll() {
-    await Promise.all([buildReact(), buildTypeScript()]);
+async function buildAll(reactOptions, typescriptOptions) {
+    await Promise.all([
+        buildReact(reactOptions),
+        buildTypeScript(typescriptOptions),
+    ]);
 }
-async function watchReact() {
-    const { entryPoints, tsConfigPath } = await getReactFilePaths();
+async function watchReact(options) {
+    const { entryPoints, tsConfigPath } = await getReactFilePaths(options);
     // Building React happens in one or two steps:
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling React with ESBuild in watch mode..."));
     const buildProcess = await (0, esbuild_1.build)({
-        ...getReactBuildOptions(entryPoints, tsConfigPath),
+        ...getReactBuildOptions(true, options, entryPoints, tsConfigPath),
         // We could run a separate type checking process after each successful
         // watch build, but keeping the process alive decreases the check time
         watch: true,
@@ -151,14 +150,14 @@ async function watchReact() {
         check: checkProcess,
     };
 }
-async function watchTypeScript() {
-    const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths();
+async function watchTypeScript(options) {
+    const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths(options);
     // Building TS happens in two steps:
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling TypeScript with ESBuild..."));
     const buildProcess = await (0, esbuild_1.build)({
-        ...getTypeScriptBuildOptions(entryPoints, tsConfigPath),
+        ...getTypeScriptBuildOptions(options, entryPoints, tsConfigPath),
         // We could run a separate type checking process after each successful
         // watch build, but keeping the process alive decreases the check time
         watch: true,
@@ -171,12 +170,13 @@ async function watchTypeScript() {
     };
 }
 // Entry points for the CLI
-async function handleBuildReactCommand() {
+async function handleBuildReactCommand(watch, options) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel
         // and wait until they end
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { build, check } = await watchReact();
+        const { build, check } = await watchReact(options);
+        // TODO: build is unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
         return new Promise((resolve) => {
             check === null || check === void 0 ? void 0 : check.then(() => resolve()).catch(() => resolve());
             process.on("SIGINT", () => {
@@ -193,16 +193,17 @@ async function handleBuildReactCommand() {
         });
     }
     else {
-        await buildReact();
+        await buildReact(options);
     }
 }
 exports.handleBuildReactCommand = handleBuildReactCommand;
-async function handleBuildTypeScriptCommand() {
+async function handleBuildTypeScriptCommand(watch, options) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel
         // and wait until they end
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { build, check } = await watchTypeScript();
+        const { build, check } = await watchTypeScript(options);
+        // TODO: build is unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
         return new Promise((resolve) => {
             check.then(() => resolve()).catch(() => resolve());
             process.on("SIGINT", () => {
@@ -214,18 +215,19 @@ async function handleBuildTypeScriptCommand() {
         });
     }
     else {
-        await buildTypeScript();
+        await buildTypeScript(options);
     }
 }
 exports.handleBuildTypeScriptCommand = handleBuildTypeScriptCommand;
-async function handleBuildAllCommand() {
+async function handleBuildAllCommand(watch, reactOptions, typescriptOptions) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel
         // and wait until they end
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { build: buildReact, check: checkReact } = await watchReact();
+        const { build: buildReact, check: checkReact } = await watchReact(reactOptions);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { build: buildTS, check: checkTS } = await watchTypeScript();
+        const { build: buildTS, check: checkTS } = await watchTypeScript(typescriptOptions);
+        // TODO: buildReact and buildTS are unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
         return new Promise((resolve) => {
             Promise.all([checkReact, checkTS].filter(Boolean))
                 .then(() => resolve())
@@ -241,32 +243,8 @@ async function handleBuildAllCommand() {
         });
     }
     else {
-        await buildAll();
+        await buildAll(reactOptions, typescriptOptions);
     }
 }
 exports.handleBuildAllCommand = handleBuildAllCommand;
-/******************************** Middlewares *********************************/
-async function parseOptions(options) {
-    watch = options.watch;
-    reactOptions = {
-        pattern: options.reactPattern,
-        tsConfig: options.reactTsConfig,
-        bundle: options.reactBundle,
-        format: options.reactFormat,
-        compileTarget: options.reactCompileTarget,
-        rootDir: options.reactRootDir,
-        outDir: options.reactOutDir,
-        watchDir: options.reactWatchDir,
-    };
-    typescriptOptions = {
-        pattern: options.typescriptPattern,
-        tsConfig: options.typescriptTsConfig,
-        bundle: options.typescriptBundle,
-        format: options.typescriptFormat,
-        compileTarget: options.typescriptCompileTarget,
-        rootDir: options.typescriptRootDir,
-        outDir: options.typescriptOutDir,
-    };
-}
-exports.parseOptions = parseOptions;
 //# sourceMappingURL=build-adapter-handlers.js.map

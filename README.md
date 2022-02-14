@@ -174,7 +174,7 @@ npm run build all        [options]      # Everything (at the moment this is Type
 
 These options are available for all commands:
 
--   `--watch`: Watch for changes and recompile
+-   `--watch`, short `-w`: Watch for changes and recompile
 
 These only have an effect for the `ts/typescript` and `all` commands:
 
@@ -196,6 +196,19 @@ These only have an effect for the `react` and `all` commands:
 -   `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
 -   `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
 
+### Using a config file
+
+By default, the build script looks for a `.buildconfig.json` file where the above options can be saved (without leading `--`), so they don't have to be specified on the command line. Example:
+
+```json
+{
+	"typescriptBundle": true,
+	"typescriptCompileTarget": "node16"
+}
+```
+
+This path can be changed with the `--config` option, short `-c`.
+
 ## Changelog
 
 <!--
@@ -203,10 +216,14 @@ These only have an effect for the `react` and `all` commands:
 	### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+-   (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
+
 ### 0.1.0 (2021-09-21)
 
 -   (UncleSamSwiss) Removed dependency on gulp
--   (UncleSamSwiss) Rewrote translation management as a regular NodeJS application
+-   (UncleSamSwiss) Rewrote translation management as a regular Node.js application
 
 ### 0.0.4 (2021-05-26)
 
