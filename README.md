@@ -216,7 +216,7 @@ This path can be changed with the `--config` option, short `-c`.
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 1.0.0 (2022-02-15)
 
 -   (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
 
