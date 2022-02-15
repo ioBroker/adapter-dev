@@ -1,12 +1,12 @@
 import {
 	allLanguages,
-	die,
 	handleAllCommand,
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
 	parseOptions,
 } from "./translate-adapter-handlers";
+import { interceptErrors } from "./util";
 import yargs = require("yargs/yargs");
 
 const parser = yargs(process.argv.slice(2));
@@ -78,13 +78,3 @@ parser
 	.middleware(parseOptions)
 	.wrap(Math.min(100, parser.terminalWidth()))
 	.help().argv;
-
-function interceptErrors(func: () => Promise<void>): () => Promise<void> {
-	return async () => {
-		try {
-			await func();
-		} catch (error: any) {
-			die(error.stack || error);
-		}
-	};
-}

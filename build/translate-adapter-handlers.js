@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.parseOptions = exports.die = exports.allLanguages = void 0;
+exports.handleAllCommand = exports.handleToWordsCommand = exports.handleToJsonCommand = exports.handleTranslateCommand = exports.parseOptions = exports.allLanguages = void 0;
 const ansi_colors_1 = require("ansi-colors");
 const fs_extra_1 = require("fs-extra");
 const os_1 = require("os");
@@ -57,23 +57,18 @@ async function findAllLanguageFiles(baseFile) {
         return translateLanguages.includes(lang);
     });
 }
-function die(message) {
-    console.error((0, ansi_colors_1.red)(message));
-    process.exit(1);
-}
-exports.die = die;
 /******************************** Middlewares *********************************/
 async function parseOptions(options) {
     var _a;
     // io-package.json
     ioPackage = path_1.default.resolve(options["io-package"]);
     if (!(0, fs_extra_1.existsSync)(ioPackage) || !(await (0, fs_extra_1.stat)(ioPackage)).isFile()) {
-        return die(`Couldn't find file ${ioPackage}`);
+        return (0, util_1.die)(`Couldn't find file ${ioPackage}`);
     }
     // admin directory
     admin = path_1.default.resolve(options.admin);
     if (!(0, fs_extra_1.existsSync)(admin) || !(await (0, fs_extra_1.stat)(admin)).isDirectory()) {
-        return die(`Couldn't find directory ${admin}`);
+        return (0, util_1.die)(`Couldn't find directory ${admin}`);
     }
     // words.js
     if (options.words) {
@@ -105,7 +100,7 @@ async function parseOptions(options) {
         // Check if an unknown language was specified
         const unknownLanguages = options.languages.filter((l) => !exports.allLanguages.includes(l));
         if (unknownLanguages.length > 0) {
-            return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
+            return (0, util_1.die)(`Unknown language(s): ${unknownLanguages.join(", ")}`);
         }
         translateLanguages = options.languages;
     }
@@ -124,7 +119,7 @@ async function handleTranslateCommand() {
 exports.handleTranslateCommand = handleTranslateCommand;
 function handleToJsonCommand() {
     if (!(0, fs_extra_1.existsSync)(words)) {
-        return die(`Couldn't find words file ${words}`);
+        return (0, util_1.die)(`Couldn't find words file ${words}`);
     }
     return adminWords2languages(words, i18nBases[0]);
 }

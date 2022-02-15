@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "bin": {
+    "build-adapter": "bin/build-adapter.js",
     "translate-adapter": "bin/translate-adapter.js"
   },
   "files": [
@@ -19,7 +20,8 @@
     "test:ts": "mocha src/**/*.test.ts",
     "test:integration": "mocha test/translate-adapter.test.ts",
     "test": "npm run test:ts && npm run test:integration",
-    "release": "release-script"
+    "release": "release-script",
+    "debug": "ts-node src/build-adapter.ts"
   },
   "repository": {
     "type": "git",
@@ -74,6 +76,8 @@
     "@google-cloud/translate": "^6.3.1",
     "ansi-colors": "^4.1.1",
     "axios": "^0.24.0",
+    "esbuild": "^0.14.21",
+    "execa": "^5.1.1",
     "fs-extra": "^10.0.0",
     "tiny-glob": "^0.2.9",
     "yargs": "^17.3.1"

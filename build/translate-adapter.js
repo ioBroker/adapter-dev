@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const translate_adapter_handlers_1 = require("./translate-adapter-handlers");
+const util_1 = require("./util");
 const yargs = require("yargs/yargs");
 const parser = yargs(process.argv.slice(2));
 parser
@@ -9,10 +10,10 @@ parser
     .usage("ioBroker adapter translator\n\nUsage: $0 <command> [options]")
     .alias("h", "help")
     .alias("v", "version")
-    .command(["translate", "t", "$0"], "Translate io-package.json and all admin language files", {}, interceptErrors(translate_adapter_handlers_1.handleTranslateCommand))
-    .command(["to-json", "adminWords2languages", "j"], "Convert words.js to i18n JSON files", {}, interceptErrors(translate_adapter_handlers_1.handleToJsonCommand))
-    .command(["to-words", "adminLanguages2words", "w"], "Generate words.js from i18n JSON files", {}, interceptErrors(translate_adapter_handlers_1.handleToWordsCommand))
-    .command(["all", "translateAndUpdateWordsJS", "a"], "Sequence of translate, to-words, to-json", {}, interceptErrors(translate_adapter_handlers_1.handleAllCommand))
+    .command(["translate", "t", "$0"], "Translate io-package.json and all admin language files", {}, (0, util_1.interceptErrors)(translate_adapter_handlers_1.handleTranslateCommand))
+    .command(["to-json", "adminWords2languages", "j"], "Convert words.js to i18n JSON files", {}, (0, util_1.interceptErrors)(translate_adapter_handlers_1.handleToJsonCommand))
+    .command(["to-words", "adminLanguages2words", "w"], "Generate words.js from i18n JSON files", {}, (0, util_1.interceptErrors)(translate_adapter_handlers_1.handleToWordsCommand))
+    .command(["all", "translateAndUpdateWordsJS", "a"], "Sequence of translate, to-words, to-json", {}, (0, util_1.interceptErrors)(translate_adapter_handlers_1.handleAllCommand))
     /*
     translateAndUpdateWordsJS: TaskFunction;*/
     .options({
@@ -50,14 +51,4 @@ parser
     .middleware(translate_adapter_handlers_1.parseOptions)
     .wrap(Math.min(100, parser.terminalWidth()))
     .help().argv;
-function interceptErrors(func) {
-    return async () => {
-        try {
-            await func();
-        }
-        catch (error) {
-            (0, translate_adapter_handlers_1.die)(error.stack || error);
-        }
-    };
-}
 //# sourceMappingURL=translate-adapter.js.map

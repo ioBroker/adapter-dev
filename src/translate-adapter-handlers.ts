@@ -1,4 +1,4 @@
-import { gray, red, yellow } from "ansi-colors";
+import { gray, yellow } from "ansi-colors";
 import {
 	ensureDir,
 	existsSync,
@@ -12,7 +12,7 @@ import { EOL } from "os";
 import path from "path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
-import { escapeRegExp, padRight } from "./util";
+import { die, escapeRegExp, padRight } from "./util";
 
 let ioPackage: string;
 let admin: string;
@@ -79,11 +79,6 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 		const lang = match[2] as ioBroker.Languages;
 		return translateLanguages.includes(lang);
 	});
-}
-
-export function die(message: string): never {
-	console.error(red(message));
-	process.exit(1);
 }
 
 /******************************** Middlewares *********************************/

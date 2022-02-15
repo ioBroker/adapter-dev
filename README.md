@@ -21,7 +21,9 @@ Add the following to the `scripts` section of your `package.json`:
 ```json
   "scripts": {
 	// ... other scripts before this
-	"translate": "translate-adapter"
+	"translate": "translate-adapter",
+	// If you need to compile React or TypeScript:
+	"build": "build-adapter",
   }
 ```
 
@@ -38,6 +40,10 @@ npm run translate to-json
 -   Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
     -   If you have an HTML/JavaScript admin UI: `npm run translate all`
     -   If you have a React admin UI: `npm run translate`
+-   Run the following commands to (re)compile your adapter:
+    -   If you are using TypeScript: `npm run build-adapter typescript`
+    -   If you have a React admin UI: `npm run build-adapter react`
+    -   If you have both: `npm run build-adapter all`
 
 ## Manage Translations
 
@@ -155,6 +161,54 @@ The file can be generated on the Google Cloud Platform by creating a Service Acc
 }
 ```
 
+## Compile adapter files
+
+The `build-adapter` command uses esbuild under the hood for lightning fast compilation. It has an extensive set of options you can use to fine tune the compilation process, although the defaults should work out of the box when the adapter was created with `@iobroker/create-adapter`:
+
+```bash
+npm run build typescript [options]      # TypeScript, full name
+npm run build ts         [options]      # TypeScript, short code
+npm run build react      [options]      # React
+npm run build all        [options]      # Everything (at the moment this is TypeScript and React)
+```
+
+These options are available for all commands:
+
+-   `--watch`, short `-w`: Watch for changes and recompile
+
+These only have an effect for the `ts/typescript` and `all` commands:
+
+-   `--typescriptRootDir`: Directory where the TypeScript part of the adapter is located. Default: `.`
+-   `--typescriptOutDir`: Directory where the compiled TypeScript output will be placed, relative to `typescriptRootDir`. Default: `build`
+-   `--typescriptPattern`: Glob pattern for TypeScript source files, relative to typescriptRootDir. Should not be changed unless bundling is enabled. Each match will result in a separate bundle. Default: `src/**/*.ts`
+-   `--typescriptTsConfig`: Path to the tsconfig.json file used for building TypeScript, relative to `typescriptRootDir`. Default: `tsconfig.build.json`
+-   `--typescriptBundle`: Bundle compiled TypeScript output into one file per entry point. Default: `false`
+-   `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Only CommonJS (`cjs`) is supported at the moment.
+-   `--typescriptCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker. Default: `node12`
+
+These only have an effect for the `react` and `all` commands:
+
+-   `--reactRootDir`: Directory where the React part of the adapter is located. Default: `admin`
+-   `--reactOutDir`: Directory where the compiled React output will be placed, relative to `reactRootDir`. Default: `build`
+-   `--reactPattern`: Glob pattern for React source files, relative to reactRootDir. Each match will result in a separate bundle. Default: `src/{index,tab}.{tsx,jsx}`
+-   `--reactTsConfig`: Path to the tsconfig.json file used for building React, relative to `reactRootDir`. Default: `tsconfig.json`
+-   `--reactBundle`: Bundle compiled React output into one file per entry point. Default: `true`
+-   `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
+-   `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
+
+### Using a config file
+
+By default, the build script looks for a `.buildconfig.json` file where the above options can be saved (without leading `--`), so they don't have to be specified on the command line. Example:
+
+```json
+{
+	"typescriptBundle": true,
+	"typescriptCompileTarget": "node16"
+}
+```
+
+This path can be changed with the `--config` option, short `-c`.
+
 ## Changelog
 
 <!--
@@ -162,10 +216,14 @@ The file can be generated on the Google Cloud Platform by creating a Service Acc
 	### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+-   (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
+
 ### 0.1.0 (2021-09-21)
 
 -   (UncleSamSwiss) Removed dependency on gulp
--   (UncleSamSwiss) Rewrote translation management as a regular NodeJS application
+-   (UncleSamSwiss) Rewrote translation management as a regular Node.js application
 
 ### 0.0.4 (2021-05-26)
 
