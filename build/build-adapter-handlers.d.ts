@@ -3,6 +3,7 @@ interface BuildOptions {
     pattern: string;
     tsConfig: string;
     bundle: boolean;
+    splitting?: boolean;
     format?: Format;
     compileTarget: string;
     rootDir: string;
