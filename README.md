@@ -194,6 +194,7 @@ These only have an effect for the `react` and `all` commands:
 -   `--reactTsConfig`: Path to the tsconfig.json file used for building React, relative to `reactRootDir`. Default: `tsconfig.json`
 -   `--reactBundle`: Bundle compiled React output into one file per entry point. Default: `true`
 -   `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
+-   `--reactSplitting`: Moves common code from multiple entry points into separate files, so they only have to be loaded once. Only relevant when `reactBundle` is `true`, `reactFormat` is `"esm"` and there are multiple entry points. If this is the case and there are [unexpected differences](https://esbuild.github.io/api/#splitting) between the watch mode and a normal build, try turning this off. Default: `true`
 -   `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
 
 ### Using a config file

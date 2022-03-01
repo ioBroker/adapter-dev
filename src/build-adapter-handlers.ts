@@ -15,6 +15,7 @@ interface BuildOptions {
 	pattern: string;
 	tsConfig: string;
 	bundle: boolean;
+	splitting?: boolean;
 	format?: Format;
 	compileTarget: string;
 	rootDir: string;
@@ -118,6 +119,14 @@ function getReactBuildOptions(
 		}`,
 		bundle: reactOptions.bundle,
 		format: reactOptions.format,
+		// Splitting moves common code from multiple entry points into separate files
+		// This is only relevant for React builds with output format ESM though
+		splitting:
+			!watch &&
+			entryPoints.length > 1 &&
+			reactOptions.splitting &&
+			reactOptions.bundle &&
+			reactOptions.format === "esm",
 		target: reactOptions.compileTarget,
 		minify: !watch,
 		sourcemap: true,
@@ -250,19 +259,16 @@ export async function handleBuildReactCommand(
 	options: BuildOptions,
 ): Promise<void> {
 	if (watch) {
-		// In watch mode, we start the ESBuild and TSC processes in parallel
-		// and wait until they end
+		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build, check } = await watchReact(options);
-		// TODO: build is unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
 
 		return new Promise((resolve) => {
 			check?.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				// build.stop?.();
+				build.stop?.();
 				if (check) {
 					check.kill("SIGINT");
 				} else {
@@ -280,19 +286,16 @@ export async function handleBuildTypeScriptCommand(
 	options: BuildOptions,
 ): Promise<void> {
 	if (watch) {
-		// In watch mode, we start the ESBuild and TSC processes in parallel
-		// and wait until they end
+		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build, check } = await watchTypeScript(options);
-		// TODO: build is unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
 
 		return new Promise((resolve) => {
 			check.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				// build.stop?.();
+				build.stop?.();
 				check.kill("SIGINT");
 			});
 		});
@@ -307,18 +310,14 @@ export async function handleBuildAllCommand(
 	typescriptOptions: BuildOptions,
 ): Promise<void> {
 	if (watch) {
-		// In watch mode, we start the ESBuild and TSC processes in parallel
-		// and wait until they end
+		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build: buildReact, check: checkReact } = await watchReact(
 			reactOptions,
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { build: buildTS, check: checkTS } = await watchTypeScript(
 			typescriptOptions,
 		);
-		// TODO: buildReact and buildTS are unused, because I'm not sure if https://github.com/evanw/esbuild/issues/2007 is intended or a bug
 
 		return new Promise((resolve) => {
 			Promise.all([checkReact, checkTS].filter(Boolean))
@@ -328,8 +327,8 @@ export async function handleBuildAllCommand(
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				// buildReact.stop?.();
-				// buildTS.stop?.();
+				buildReact.stop?.();
+				buildTS.stop?.();
 				checkReact?.kill("SIGINT");
 				checkTS.kill("SIGINT");
 			});

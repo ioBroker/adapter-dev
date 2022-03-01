@@ -53,6 +53,12 @@ const reactOptions = {
 		description:
 			"Format of the output file(s). ESM should only be selected when targeting modern browsers exclusively.",
 	},
+	reactSplitting: {
+		type: "boolean",
+		alias: "rs",
+		default: true,
+		description: `Moves common code from multiple entry points into separate files. Only relevant when reactBundle is true, reactFormat is "esm" and there are multiple entry points.`,
+	},
 	reactCompileTarget: {
 		type: "string",
 		alias: "rt",
@@ -143,6 +149,7 @@ parser
 				pattern: argv.reactPattern,
 				tsConfig: argv.reactTsConfig,
 				bundle: argv.reactBundle,
+				splitting: argv.reactSplitting,
 				format: argv.reactFormat,
 				compileTarget: argv.reactCompileTarget,
 				rootDir: argv.reactRootDir,
@@ -182,6 +189,7 @@ parser
 				pattern: argv.reactPattern,
 				tsConfig: argv.reactTsConfig,
 				bundle: argv.reactBundle,
+				splitting: argv.reactSplitting,
 				format: argv.reactFormat,
 				compileTarget: argv.reactCompileTarget,
 				rootDir: argv.reactRootDir,
