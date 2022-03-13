@@ -87,6 +87,7 @@ function getReactBuildOptions(watch, reactOptions, entryPoints, tsConfigPath) {
         define: {
             "process.env.NODE_ENV": watch ? '"development"' : '"production"',
         },
+        ...reactOptions.raw,
     };
 }
 function getTypeScriptBuildOptions(typescriptOptions, entryPoints, tsConfigPath) {
@@ -101,6 +102,7 @@ function getTypeScriptBuildOptions(typescriptOptions, entryPoints, tsConfigPath)
         platform: "node",
         format: typescriptOptions.format || "cjs",
         target: typescriptOptions.compileTarget,
+        ...typescriptOptions.raw,
     };
 }
 async function buildReact(options) {

@@ -21,6 +21,7 @@ interface BuildOptions {
 	rootDir: string;
 	outDir: string;
 	watchDir?: string;
+	raw?: Record<string, any>;
 }
 
 function findTsc(): string {
@@ -134,6 +135,7 @@ function getReactBuildOptions(
 		define: {
 			"process.env.NODE_ENV": watch ? '"development"' : '"production"',
 		},
+		...reactOptions.raw,
 	};
 }
 
@@ -153,6 +155,7 @@ function getTypeScriptBuildOptions(
 		platform: "node",
 		format: typescriptOptions.format || "cjs",
 		target: typescriptOptions.compileTarget,
+		...typescriptOptions.raw,
 	};
 }
 

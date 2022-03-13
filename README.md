@@ -185,6 +185,7 @@ These only have an effect for the `ts/typescript` and `all` commands:
 -   `--typescriptBundle`: Bundle compiled TypeScript output into one file per entry point. Default: `false`
 -   `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Only CommonJS (`cjs`) is supported at the moment.
 -   `--typescriptCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker. Default: `node12`
+-   `--typescriptRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for TypeScript. This has to be specified in a config file (see below). Default: (none)
 
 These only have an effect for the `react` and `all` commands:
 
@@ -196,6 +197,7 @@ These only have an effect for the `react` and `all` commands:
 -   `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
 -   `--reactSplitting`: Moves common code from multiple entry points into separate files, so they only have to be loaded once. Only relevant when `reactBundle` is `true`, `reactFormat` is `"esm"` and there are multiple entry points. If this is the case and there are [unexpected differences](https://esbuild.github.io/api/#splitting) between the watch mode and a normal build, try turning this off. Default: `true`
 -   `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
+-   `--reactRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for React. This has to be specified in a config file (see below). Default: (none)
 
 ### Using a config file
 
@@ -209,6 +211,18 @@ By default, the build script looks for a `.buildconfig.json` file where the abov
 ```
 
 This path can be changed with the `--config` option, short `-c`.
+
+When using a `.js` file instead, this can be used to specify additional [esbuild plugins](https://github.com/esbuild/community-plugins), for example:
+
+```js
+const { html } = require("@esbuilder/html");
+
+module.exports = {
+	reactRaw: {
+		plugins: [html()],
+	},
+};
+```
 
 ## Changelog
 
