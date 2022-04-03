@@ -9,6 +9,7 @@ interface BuildOptions {
     rootDir: string;
     outDir: string;
     watchDir?: string;
+    raw?: Record<string, any>;
 }
 export declare function handleBuildReactCommand(watch: boolean, options: BuildOptions): Promise<void>;
 export declare function handleBuildTypeScriptCommand(watch: boolean, options: BuildOptions): Promise<void>;
