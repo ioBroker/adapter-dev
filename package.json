@@ -46,7 +46,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "^2.2.1",
+    "@alcalzone/release-script": "^3.5.9",
     "@tsconfig/node12": "^1.0.9",
     "@types/chai": "^4.3.1",
     "@types/fs-extra": "^9.0.13",
