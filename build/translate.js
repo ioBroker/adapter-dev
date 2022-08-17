@@ -119,7 +119,9 @@ class LegacyTranslator {
             const response = await (0, axios_1.default)(options);
             if (Array.isArray(response.data)) {
                 // we got a valid response
-                return response.data[0][0][0];
+                let resText = "";
+                response.data[0].forEach((t) => (resText += t[0]));
+                return resText;
             }
         }
         catch (e) {
