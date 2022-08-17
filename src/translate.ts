@@ -140,7 +140,7 @@ class LegacyTranslator implements Translator {
 			if (Array.isArray(response.data)) {
 				// we got a valid response
 				let resText = '';
-				response.data[0].forEach(t => resText += t[0]);
+				response.data[0].forEach(t => (Array.isArray(t) && t.length) ? resText += t[0] : '');
 				return resText;
 			}
 		} catch (e: any) {
