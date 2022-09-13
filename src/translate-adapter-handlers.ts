@@ -193,11 +193,11 @@ async function translateIoPackage(): Promise<void> {
 	// https://github.com/ioBroker/adapter-dev/issues/138
 	if (content.common.messages) {
 		console.log("Translate Messages");
-		for (let n = 0; n < content.common.messages.length; n++) {
-			console.log(`   Message: ${content.common.messages[n].title.en}`);
-			await translateNotExisting(content.common.messages[n].title);
-			await translateNotExisting(content.common.messages[n].text);
-			await translateNotExisting(content.common.messages[n].linkText);
+		for (const message of content.common.messages) {
+			console.log(`   Message: ${message.title.en}`);
+			await translateNotExisting(message.title);
+			await translateNotExisting(message.text);
+			await translateNotExisting(message.linkText);
 		}
 	}
 	await writeJson(ioPackage, content, { spaces: 4, EOL });

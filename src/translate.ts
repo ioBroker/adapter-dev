@@ -139,9 +139,7 @@ class LegacyTranslator implements Translator {
 			const response = await axios(options);
 			if (Array.isArray(response.data)) {
 				// we got a valid response
-				let resText = "";
-				response.data[0].forEach((t: string[]) => (resText += t[0]));
-				return resText;
+				return response.data[0].map((t: string[]) => t[0]).join("");
 			}
 		} catch (e: any) {
 			if (e.response?.status === 429) {
