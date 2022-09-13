@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleBuildAllCommand = exports.handleBuildTypeScriptCommand = exports.handleBuildReactCommand = void 0;
 /** Build script to use esbuild without specifying 1000 CLI options */
+const execa_1 = require("@esm2cjs/execa");
 const ansi_colors_1 = require("ansi-colors");
 const esbuild_1 = require("esbuild");
-const execa_1 = __importDefault(require("execa"));
 const path_1 = __importDefault(require("path"));
 const tiny_glob_1 = __importDefault(require("tiny-glob"));
 const util_1 = require("./util");
@@ -45,7 +45,7 @@ async function typeCheck(tsConfigPath) {
     console.log((0, ansi_colors_1.gray)(`Type-checking ${tsConfigPath} with tsc...`));
     const tscPath = findTsc();
     try {
-        await execa_1.default.node(tscPath, `-p ${tsConfigPath} --noEmit`.split(" "), {
+        await (0, execa_1.execaNode)(tscPath, `-p ${tsConfigPath} --noEmit`.split(" "), {
             stdout: "inherit",
             stderr: "inherit",
         });
@@ -61,7 +61,7 @@ function typeCheckWatch(tsConfigPath) {
     console.log();
     console.log((0, ansi_colors_1.gray)(`Type-checking ${tsConfigPath} with tsc in watch mode...`));
     const tscPath = findTsc();
-    return execa_1.default.node(tscPath, `-p ${tsConfigPath} --noEmit --watch --preserveWatchOutput`.split(" "), {
+    return (0, execa_1.execaNode)(tscPath, `-p ${tsConfigPath} --noEmit --watch --preserveWatchOutput`.split(" "), {
         stdout: "inherit",
         stderr: "inherit",
     });

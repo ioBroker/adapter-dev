@@ -1,4 +1,5 @@
 /** Build script to use esbuild without specifying 1000 CLI options */
+import { ExecaChildProcess, execaNode } from "@esm2cjs/execa";
 import { gray, green, red } from "ansi-colors";
 import type {
 	BuildOptions as ESBuildOptions,
@@ -6,7 +7,6 @@ import type {
 	Format,
 } from "esbuild";
 import { build } from "esbuild";
-import execa, { ExecaChildProcess } from "execa";
 import path from "path";
 import glob from "tiny-glob";
 import { die } from "./util";
@@ -78,7 +78,7 @@ async function typeCheck(tsConfigPath: string): Promise<boolean> {
 	console.log(gray(`Type-checking ${tsConfigPath} with tsc...`));
 	const tscPath = findTsc();
 	try {
-		await execa.node(tscPath, `-p ${tsConfigPath} --noEmit`.split(" "), {
+		await execaNode(tscPath, `-p ${tsConfigPath} --noEmit`.split(" "), {
 			stdout: "inherit",
 			stderr: "inherit",
 		});
@@ -96,7 +96,7 @@ function typeCheckWatch(tsConfigPath: string): ExecaChildProcess {
 		gray(`Type-checking ${tsConfigPath} with tsc in watch mode...`),
 	);
 	const tscPath = findTsc();
-	return execa.node(
+	return execaNode(
 		tscPath,
 		`-p ${tsConfigPath} --noEmit --watch --preserveWatchOutput`.split(" "),
 		{
