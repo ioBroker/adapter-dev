@@ -59,6 +59,9 @@ const reactOptions = {
         default: "es2018",
         description: "Compilation target for React. Determines which JS features will be used in the output file.",
     },
+    reactRaw: {
+        description: "Set additional raw esbuild options for React. Needs to be specified in the config file.",
+    },
 };
 const tsOptions = {
     typescriptRootDir: {
@@ -102,6 +105,9 @@ const tsOptions = {
         default: "node12",
         description: "Compilation target for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker.",
     },
+    typescriptRaw: {
+        description: "Set additional raw esbuild options for TypeScript. Needs to be specified in the config file.",
+    },
 };
 const parser = (0, yargs_1.default)(process.argv.slice(2));
 parser
@@ -135,6 +141,7 @@ parser
         rootDir: argv.reactRootDir,
         outDir: argv.reactOutDir,
         watchDir: argv.reactWatchDir,
+        raw: argv.reactRaw,
     };
     await (0, build_adapter_handlers_1.handleBuildReactCommand)(argv.watch, reactOptions);
 })
@@ -147,6 +154,7 @@ parser
         compileTarget: argv.typescriptCompileTarget,
         rootDir: argv.typescriptRootDir,
         outDir: argv.typescriptOutDir,
+        raw: argv.typescriptRaw,
     };
     await (0, build_adapter_handlers_1.handleBuildTypeScriptCommand)(argv.watch, typescriptOptions);
 })
@@ -164,6 +172,7 @@ parser
         rootDir: argv.reactRootDir,
         outDir: argv.reactOutDir,
         watchDir: argv.reactWatchDir,
+        raw: argv.reactRaw,
     };
     const typescriptOptions = {
         pattern: argv.typescriptPattern,
@@ -173,6 +182,7 @@ parser
         compileTarget: argv.typescriptCompileTarget,
         rootDir: argv.typescriptRootDir,
         outDir: argv.typescriptOutDir,
+        raw: argv.typescriptRaw,
     };
     await (0, build_adapter_handlers_1.handleBuildAllCommand)(argv.watch, reactOptions, typescriptOptions);
 })

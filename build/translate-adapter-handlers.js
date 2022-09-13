@@ -152,6 +152,16 @@ async function translateIoPackage() {
         console.log("Translate Description");
         await translateNotExisting(content.common.desc);
     }
+    // https://github.com/ioBroker/adapter-dev/issues/138
+    if (content.common.messages) {
+        console.log("Translate Messages");
+        for (let n = 0; n < content.common.messages.length; n++) {
+            console.log(`   Message: ${content.common.messages[n].title.en}`);
+            await translateNotExisting(content.common.messages[n].title);
+            await translateNotExisting(content.common.messages[n].text);
+            await translateNotExisting(content.common.messages[n].linkText);
+        }
+    }
     await (0, fs_extra_1.writeJson)(ioPackage, content, { spaces: 4, EOL: os_1.EOL });
     console.log(`Successfully updated ${path_1.default.relative(".", ioPackage)}`);
 }

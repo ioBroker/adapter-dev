@@ -66,6 +66,10 @@ const reactOptions = {
 		description:
 			"Compilation target for React. Determines which JS features will be used in the output file.",
 	},
+	reactRaw: {
+		description:
+			"Set additional raw esbuild options for React. Needs to be specified in the config file.",
+	},
 } as const;
 
 const tsOptions = {
@@ -117,6 +121,10 @@ const tsOptions = {
 		description:
 			"Compilation target for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker.",
 	},
+	typescriptRaw: {
+		description:
+			"Set additional raw esbuild options for TypeScript. Needs to be specified in the config file.",
+	},
 } as const;
 
 const parser = yargs(process.argv.slice(2));
@@ -155,6 +163,7 @@ parser
 				rootDir: argv.reactRootDir,
 				outDir: argv.reactOutDir,
 				watchDir: argv.reactWatchDir,
+				raw: argv.reactRaw as any,
 			};
 			await handleBuildReactCommand(argv.watch, reactOptions);
 		},
@@ -172,6 +181,7 @@ parser
 				compileTarget: argv.typescriptCompileTarget,
 				rootDir: argv.typescriptRootDir,
 				outDir: argv.typescriptOutDir,
+				raw: argv.typescriptRaw as any,
 			};
 			await handleBuildTypeScriptCommand(argv.watch, typescriptOptions);
 		},
@@ -195,6 +205,7 @@ parser
 				rootDir: argv.reactRootDir,
 				outDir: argv.reactOutDir,
 				watchDir: argv.reactWatchDir,
+				raw: argv.reactRaw as any,
 			};
 			const typescriptOptions = {
 				pattern: argv.typescriptPattern,
@@ -204,6 +215,7 @@ parser
 				compileTarget: argv.typescriptCompileTarget,
 				rootDir: argv.typescriptRootDir,
 				outDir: argv.typescriptOutDir,
+				raw: argv.typescriptRaw as any,
 			};
 			await handleBuildAllCommand(
 				argv.watch,
