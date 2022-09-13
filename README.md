@@ -231,6 +231,9 @@ module.exports = {
 	### **WORK IN PROGRESS**
 -->
 
+### 1.0.1 (2022-08-17)
+-   (Apollon77) make sure that also texts with multiple sentences are correctly translated via Google Translate
+
 ### 1.0.0 (2022-02-15)
 
 -   (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
