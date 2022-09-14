@@ -230,10 +230,9 @@ module.exports = {
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### __WORK IN PROGRESS__
+### 1.1.0 (2022-09-14)
 -	(Grizzelbee) Also translate admin messages in io-package.json
--   (AlCalzone) support specifying raw esbuild options, like loaders/plugins 
+-   (AlCalzone) support specifying raw esbuild options, like loaders/plugins
 
 ### 1.0.1 (2022-08-17)
 -   (Apollon77) make sure that also texts with multiple sentences are correctly translated via Google Translate
