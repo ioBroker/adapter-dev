@@ -206,7 +206,8 @@ async function translateIoPackage(): Promise<void> {
 			console.log(gray(`   Message: ${message.title.en}`));
 			await translateNotExisting(message.title);
 			await translateNotExisting(message.text);
-			await translateNotExisting(message.linkText);
+			// test first if there is a linkText - since it's not mandatory
+			if (message.linkText) await translateNotExisting(message.linkText);
 		}
 	}
 	await writeJson(ioPackage, content, { spaces: 4, EOL });
