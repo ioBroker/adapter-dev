@@ -25,6 +25,7 @@ async function runTranslation(
 	const adminDir = path.join(outputDir, "admin");
 	await parseOptions({
 		"io-package": path.join(outputDir, "io-package.json"),
+		jsonConfig: path.join(adminDir, "jsonConfig.json"),
 		admin: adminDir,
 		base: ignoreAdmin ? [] : undefined, // don't do admin translations if the directory doesn't exist
 	});
