@@ -72,6 +72,7 @@ npm run translate <command> -- <args>
 The following command line arguments can be passed to all commands:
 
 -   `--io-package`: Path to the io-package.json file. Short: `-p`. Default: `./io-package.json`
+-   `--jsonConfig`: Path to the jsonConfig.json file. Short: `-c`. Default: `./admin/jsonConfig.json`
 -   `--admin`: Path to the admin directory. Short: `-a`. Default: `./admin`
 -   `--words`: Path to the words.js file. Short: `-w`. Default: searches it in the admin directory, either `<admin-dir>/words.js` or `<admin-dir>/js/words.js`.
 -   `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`
@@ -226,10 +227,16 @@ module.exports = {
 
 ## Changelog
 
-<!--
-	Placeholder for the next version (at the beginning of the line):
-	### **WORK IN PROGRESS**
+<!--	
+ Placeholder for the next version (at the beginning of the line):
+ ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+-	(Grizzelbee) New: Also translate TITLE fields in jsonConfig file
+-   (Grizzelbee) Chg: log message titles in gray just like the rest
+-   (Grizzelbee) Fix: test if there is a linkText first before translating - since it's not mandatory 
+
 ### 1.1.0 (2022-09-14)
 -	(Grizzelbee) Also translate admin messages in io-package.json
 -   (AlCalzone) support specifying raw esbuild options, like loaders/plugins
