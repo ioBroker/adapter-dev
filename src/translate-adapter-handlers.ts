@@ -203,7 +203,7 @@ async function translateIoPackage(): Promise<void> {
 	if (content.common.messages) {
 		console.log("Translate Messages");
 		for (const message of content.common.messages) {
-			console.log(`   Message: ${message.title.en}`);
+			console.log(gray(`   Message: ${message.title.en}`));
 			await translateNotExisting(message.title);
 			await translateNotExisting(message.text);
 			await translateNotExisting(message.linkText);
