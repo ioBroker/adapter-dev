@@ -49,6 +49,12 @@ parser
 			default: "./io-package.json",
 			description: "Path to the io-package.json file",
 		},
+		jsonConfig: {
+			type: "string",
+			alias: "c",
+			default: "./admin/jsonConfig.json",
+			description: "Path to the jsonConfig.json file",
+		},
 		admin: {
 			type: "string",
 			alias: "a",

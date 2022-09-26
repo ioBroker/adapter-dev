@@ -15,6 +15,7 @@ import { translateText } from "./translate";
 import { die, escapeRegExp, padRight } from "./util";
 
 let ioPackage: string;
+let jsonConfig: string;
 let admin: string;
 let words: string;
 let i18nBases: string[];
@@ -85,6 +86,7 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 
 export async function parseOptions(options: {
 	"io-package": string;
+	jsonConfig: string;
 	admin: string;
 	words?: string;
 	base?: string[];
@@ -94,6 +96,12 @@ export async function parseOptions(options: {
 	ioPackage = path.resolve(options["io-package"]);
 	if (!existsSync(ioPackage) || !(await stat(ioPackage)).isFile()) {
 		return die(`Couldn't find file ${ioPackage}`);
+	}
+
+	// jsonConfig.json
+	jsonConfig = path.resolve(options.jsonConfig);
+	if (!existsSync(jsonConfig) || !(await stat(jsonConfig)).isFile()) {
+		return die(`Couldn't find file ${jsonConfig}`);
 	}
 
 	// admin directory
@@ -145,6 +153,7 @@ export async function parseOptions(options: {
 
 export async function handleTranslateCommand(): Promise<void> {
 	await translateIoPackage();
+	await translateJsonConfig();
 	for (const i18nBase of i18nBases) {
 		await translateI18n(i18nBase);
 	}
@@ -202,6 +211,42 @@ async function translateIoPackage(): Promise<void> {
 	}
 	await writeJson(ioPackage, content, { spaces: 4, EOL });
 	console.log(`Successfully updated ${path.relative(".", ioPackage)}`);
+}
+
+async function loopJSON(content: object): Promise<object> {
+	for (const [key, value] of Object.entries(content)) {
+		if (key === "i18n" && value === false) {
+			console.log(
+				"Info: i18n-switch is set to false; No translation of jsonConfig needed; Exiting.",
+			);
+			return content;
+		}
+		if (typeof value === "object") {
+			if (value.title) {
+				if (value.title.en) {
+					console.log(gray(`Translating: "${value.title.en}"`));
+					await translateNotExisting(value.title);
+				} else {
+					console.log(
+						"No english text-tag found. You'll need to provide an english text to use automated translation.",
+					);
+				}
+			}
+			await loopJSON(value);
+		}
+	}
+	return content;
+}
+
+async function translateJsonConfig(): Promise<void> {
+	// labels and titles may have language objects
+	const content = await readJson(jsonConfig);
+	if (content) {
+		console.log("Translate jsonConfig");
+		const result = await loopJSON(content);
+		await writeJson(jsonConfig, result, { spaces: 4, EOL });
+		console.log(`Successfully updated ${path.relative(".", jsonConfig)}`);
+	}
 }
 
 async function translateNotExisting(
