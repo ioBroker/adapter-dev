@@ -98,10 +98,11 @@ export async function parseOptions(options: {
 		return die(`Couldn't find file ${ioPackage}`);
 	}
 
-	// jsonConfig.json
+	// 1.json
 	jsonConfig = path.resolve(options.jsonConfig);
 	if (!existsSync(jsonConfig) || !(await stat(jsonConfig)).isFile()) {
-		return die(`Couldn't find file ${jsonConfig}`);
+		jsonConfig = "N/A";
+		console.log("No jsonConfig file found. Skipping translation.");
 	}
 
 	// admin directory
@@ -153,7 +154,7 @@ export async function parseOptions(options: {
 
 export async function handleTranslateCommand(): Promise<void> {
 	await translateIoPackage();
-	await translateJsonConfig();
+	if ("N/A" !== jsonConfig) await translateJsonConfig();
 	for (const i18nBase of i18nBases) {
 		await translateI18n(i18nBase);
 	}
