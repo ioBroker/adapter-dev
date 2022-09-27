@@ -98,11 +98,11 @@ export async function parseOptions(options: {
 		return die(`Couldn't find file ${ioPackage}`);
 	}
 
-	// 1.json
+	// jsonConfig.json
 	jsonConfig = path.resolve(options.jsonConfig);
 	if (!existsSync(jsonConfig) || !(await stat(jsonConfig)).isFile()) {
 		jsonConfig = "N/A";
-		console.log("No jsonConfig file found. Skipping translation.");
+		console.log("  No jsonConfig file found. Skipping translation.");
 	}
 
 	// admin directory
@@ -224,14 +224,22 @@ async function loopJSON(content: object): Promise<object> {
 			return content;
 		}
 		if (typeof value === "object") {
-			if (value.title) {
-				if (value.title.en) {
-					console.log(gray(`Translating: "${value.title.en}"`));
-					await translateNotExisting(value.title);
-				} else {
-					console.log(
-						"No english text-tag found. You'll need to provide an english text to use automated translation.",
-					);
+			if (value.en) {
+				console.log(gray(`Translating: "${value.en}"`));
+				await translateNotExisting(value);
+			} else {
+				if (value.title || value.tooltip || value.label || value.text) {
+					const logText =
+						value.title ||
+						value.tooltip ||
+						value.label ||
+						value.text;
+					if (typeof logText === "string")
+						console.log(
+							gray(
+								`No english language-tag found for text "${logText}". You'll need to provide an english text to use automated translation.`,
+							),
+						);
 				}
 			}
 			await loopJSON(value);
