@@ -12,6 +12,7 @@ const tiny_glob_1 = __importDefault(require("tiny-glob"));
 const translate_1 = require("./translate");
 const util_1 = require("./util");
 let ioPackage;
+let jsonConfig;
 let admin;
 let words;
 let i18nBases;
@@ -65,6 +66,12 @@ async function parseOptions(options) {
     if (!(0, fs_extra_1.existsSync)(ioPackage) || !(await (0, fs_extra_1.stat)(ioPackage)).isFile()) {
         return (0, util_1.die)(`Couldn't find file ${ioPackage}`);
     }
+    // jsonConfig.json
+    jsonConfig = path_1.default.resolve(options.jsonConfig);
+    if (!(0, fs_extra_1.existsSync)(jsonConfig) || !(await (0, fs_extra_1.stat)(jsonConfig)).isFile()) {
+        jsonConfig = "N/A";
+        console.log("  No jsonConfig file found. Skipping translation.");
+    }
     // admin directory
     admin = path_1.default.resolve(options.admin);
     if (!(0, fs_extra_1.existsSync)(admin) || !(await (0, fs_extra_1.stat)(admin)).isDirectory()) {
@@ -112,6 +119,8 @@ exports.parseOptions = parseOptions;
 /***************************** Command Handlers *******************************/
 async function handleTranslateCommand() {
     await translateIoPackage();
+    if ("N/A" !== jsonConfig)
+        await translateJsonConfig();
     for (const i18nBase of i18nBases) {
         await translateI18n(i18nBase);
     }
@@ -156,14 +165,52 @@ async function translateIoPackage() {
     if (content.common.messages) {
         console.log("Translate Messages");
         for (const message of content.common.messages) {
-            console.log(`   Message: ${message.title.en}`);
+            console.log((0, ansi_colors_1.gray)(`   Message: ${message.title.en}`));
             await translateNotExisting(message.title);
             await translateNotExisting(message.text);
-            await translateNotExisting(message.linkText);
+            // test first if there is a linkText - since it's not mandatory
+            if (message.linkText)
+                await translateNotExisting(message.linkText);
         }
     }
     await (0, fs_extra_1.writeJson)(ioPackage, content, { spaces: 4, EOL: os_1.EOL });
     console.log(`Successfully updated ${path_1.default.relative(".", ioPackage)}`);
+}
+async function loopJSON(content) {
+    for (const [key, value] of Object.entries(content)) {
+        if (key === "i18n" && value === false) {
+            console.log("Info: i18n-switch is set to false; No translation of jsonConfig needed; Exiting.");
+            return content;
+        }
+        if (typeof value === "object") {
+            if (value.en) {
+                console.log((0, ansi_colors_1.gray)(`Translating: "${value.en}"`));
+                await translateNotExisting(value);
+            }
+            else {
+                if (value.title || value.tooltip || value.label || value.text) {
+                    const logText = value.title ||
+                        value.tooltip ||
+                        value.label ||
+                        value.text;
+                    if (typeof logText === "string")
+                        console.log((0, ansi_colors_1.gray)(`No english language-tag found for text "${logText}". You'll need to provide an english text to use automated translation.`));
+                }
+            }
+            await loopJSON(value);
+        }
+    }
+    return content;
+}
+async function translateJsonConfig() {
+    // labels and titles may have language objects
+    const content = await (0, fs_extra_1.readJson)(jsonConfig);
+    if (content) {
+        console.log("Translate jsonConfig");
+        const result = await loopJSON(content);
+        await (0, fs_extra_1.writeJson)(jsonConfig, result, { spaces: 4, EOL: os_1.EOL });
+        console.log(`Successfully updated ${path_1.default.relative(".", jsonConfig)}`);
+    }
 }
 async function translateNotExisting(obj, baseText) {
     const text = obj.en || baseText;

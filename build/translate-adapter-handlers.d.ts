@@ -3,6 +3,7 @@ export declare const allLanguages: ioBroker.Languages[];
 /******************************** Middlewares *********************************/
 export declare function parseOptions(options: {
     "io-package": string;
+    jsonConfig: string;
     admin: string;
     words?: string;
     base?: string[];
