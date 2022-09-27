@@ -1,0 +1,203 @@
+{
+    "type": "tabs",
+    "i18n": true,
+    "items": {
+        "mainTab": {
+            "type": "panel",
+            "label": "Main config",
+            "items": {
+                "staticText": {
+                    "type": "staticText",
+                    "text": "Some example text."
+                },
+                "someButton": {
+                    "type": "staticImage",
+                    "src": "adapter/myAdapter/admin/adapterLogo.png",
+                    "href": "https://www.example.com"
+                },
+                "hosts": {
+                    "type": "table",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "some example label",
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "name",
+                            "width": "20%",
+                            "title": {
+                                "en": "name",
+                                "de": "Name",
+                                "ru": "имя",
+                                "pt": "nome",
+                                "nl": "naam",
+                                "fr": "Nom",
+                                "it": "nome",
+                                "es": "nombre",
+                                "pl": "Nazwa",
+                                "zh-cn": "姓名"
+                            },
+                            "filter": true,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "hostaddress",
+                            "width": "10%",
+                            "title": {
+                                "en": "Host",
+                                "de": "Gastgeber",
+                                "ru": "Хозяин",
+                                "pt": "Hospedeiro",
+                                "nl": "Gastheer",
+                                "fr": "Héberger",
+                                "it": "Ospite",
+                                "es": "Anfitrión",
+                                "pl": "Gospodarz",
+                                "zh-cn": "主持人"
+                            },
+                            "tooltip": {
+                                "en": "May be an IP, DNS-Hostname or FQDN.",
+                                "de": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'de'",
+                                "ru": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'ru'",
+                                "pt": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'pt'",
+                                "nl": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'nl'",
+                                "fr": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'fr'",
+                                "it": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'it'",
+                                "es": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'es'",
+                                "pl": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'pl'",
+                                "zh-cn": "Mock translation of 'May be an IP, DNS-Hostname or FQDN.' to 'zh-cn'"
+                            }
+                        },
+                        {
+                            "type": "number",
+                            "min": 1,
+                            "max": 65565,
+                            "attr": "port",
+                            "title": {
+                                "en": "Port",
+                                "de": "Mock translation of 'Port' to 'de'",
+                                "ru": "Mock translation of 'Port' to 'ru'",
+                                "pt": "Mock translation of 'Port' to 'pt'",
+                                "nl": "Mock translation of 'Port' to 'nl'",
+                                "fr": "Mock translation of 'Port' to 'fr'",
+                                "it": "Mock translation of 'Port' to 'it'",
+                                "es": "Mock translation of 'Port' to 'es'",
+                                "pl": "Mock translation of 'Port' to 'pl'",
+                                "zh-cn": "Mock translation of 'Port' to 'zh-cn'"
+                            },
+                            "tooltip": "The Port your SSH server listens to.",
+                            "width": "10%",
+                            "default": 100
+                        },
+                        {
+                            "type": "text",
+                            "attr": "user",
+                            "title": {
+                                "en": "User",
+                                "de": "Benutzer",
+                                "ru": "Пользователь",
+                                "pt": "Do utilizador",
+                                "nl": "Gebruiker",
+                                "fr": "Utilisateur",
+                                "it": "Utente",
+                                "es": "Usuario",
+                                "pl": "Użytkownik",
+                                "zh-cn": "用户"
+                            },
+                            "tooltip": "Name of your user.",
+                            "width": "10%",
+                            "encrypted": true
+                        },
+                        {
+                            "type": "password",
+                            "attr": "password",
+                            "title": {
+                                "en": "Password",
+                                "de": "Passwort",
+                                "ru": "Пароль",
+                                "pt": "Senha",
+                                "nl": "Wachtwoord",
+                                "fr": "Mot de passe",
+                                "it": "Parola d'ordine",
+                                "es": "Clave",
+                                "pl": "Hasło",
+                                "zh-cn": "密码"
+                            },
+                            "width": "10%"
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "myCheckbox",
+                            "title": {
+                                "en": "checkbox",
+                                "de": "Mock translation of 'checkbox' to 'de'",
+                                "ru": "Mock translation of 'checkbox' to 'ru'",
+                                "pt": "Mock translation of 'checkbox' to 'pt'",
+                                "nl": "Mock translation of 'checkbox' to 'nl'",
+                                "fr": "Mock translation of 'checkbox' to 'fr'",
+                                "it": "Mock translation of 'checkbox' to 'it'",
+                                "es": "Mock translation of 'checkbox' to 'es'",
+                                "pl": "Mock translation of 'checkbox' to 'pl'",
+                                "zh-cn": "Mock translation of 'checkbox' to 'zh-cn'"
+                            },
+                            "tooltip": {
+                                "en": "Check if you like to use.",
+                                "de": "Mock translation of 'Check if you like to use.' to 'de'",
+                                "ru": "Mock translation of 'Check if you like to use.' to 'ru'",
+                                "pt": "Mock translation of 'Check if you like to use.' to 'pt'",
+                                "nl": "Mock translation of 'Check if you like to use.' to 'nl'",
+                                "fr": "Mock translation of 'Check if you like to use.' to 'fr'",
+                                "it": "Mock translation of 'Check if you like to use.' to 'it'",
+                                "es": "Mock translation of 'Check if you like to use.' to 'es'",
+                                "pl": "Mock translation of 'Check if you like to use.' to 'pl'",
+                                "zh-cn": "Mock translation of 'Check if you like to use.' to 'zh-cn'"
+                            },
+                            "width": "3%"
+                        }
+                    ]
+                }
+            }
+        },
+        "names": {
+            "type": "panel",
+            "label": "just a second panel",
+            "items": {
+                "installationHint7": {
+                    "type": "staticText",
+                    "text": "Some example static text here."
+                },
+                "names": {
+                    "type": "table",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "groupname",
+                            "width": "50%",
+                            "title": {
+                                "en": "Group name",
+                                "de": "Mock translation of 'Group name' to 'de'",
+                                "ru": "Mock translation of 'Group name' to 'ru'",
+                                "pt": "Mock translation of 'Group name' to 'pt'",
+                                "nl": "Mock translation of 'Group name' to 'nl'",
+                                "fr": "Mock translation of 'Group name' to 'fr'",
+                                "it": "Mock translation of 'Group name' to 'it'",
+                                "es": "Mock translation of 'Group name' to 'es'",
+                                "pl": "Mock translation of 'Group name' to 'pl'",
+                                "zh-cn": "Mock translation of 'Group name' to 'zh-cn'"
+                            },
+                            "filter": true,
+                            "sort": true,
+                            "default": ""
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

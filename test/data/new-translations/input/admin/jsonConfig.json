@@ -1,0 +1,154 @@
+{
+	"type": "tabs",
+	"i18n": true,
+	"items": {
+		"mainTab": {
+			"type": "panel",
+			"label": "Main config",
+			"items": {
+				"staticText": {
+					"type": "staticText",
+					"text": "Some example text."
+				},
+				"someButton": {
+					"type": "staticImage",
+					"src": "adapter/myAdapter/admin/adapterLogo.png",
+					"href": "https://www.example.com"
+				},
+				"hosts": {
+					"type": "table",
+					"sm": 12,
+					"md": 12,
+					"lg": 12,
+					"label": "some example label",
+					"items": [
+						{
+							"type": "text",
+							"attr": "name",
+							"width": "20%",
+							"title": {
+								"en": "name",
+								"de": "Name",
+								"ru": "имя",
+								"pt": "nome",
+								"nl": "naam",
+								"fr": "Nom",
+								"it": "nome",
+								"es": "nombre",
+								"pl": "Nazwa",
+								"zh-cn": "姓名"
+							},
+							"filter": true,
+							"sort": true,
+							"default": ""
+						},
+						{
+							"type": "text",
+							"attr": "hostaddress",
+							"width": "10%",
+							"title": {
+								"en": "Host",
+								"de": "Gastgeber",
+								"ru": "Хозяин",
+								"pt": "Hospedeiro",
+								"nl": "Gastheer",
+								"fr": "Héberger",
+								"it": "Ospite",
+								"es": "Anfitrión",
+								"pl": "Gospodarz",
+								"zh-cn": "主持人"
+							},
+							"tooltip": {"en": "May be an IP, DNS-Hostname or FQDN."}
+						},
+						{
+							"type": "number",
+							"min": 1,
+							"max": 65565,
+							"attr": "port",
+							"title": {
+								"en": "Port"
+							},
+							"tooltip": "The Port your SSH server listens to.",
+							"width": "10%",
+							"default": 100
+						},
+						{
+							"type": "text",
+							"attr": "user",
+							"title": {
+								"en": "User",
+								"de": "Benutzer",
+								"ru": "Пользователь",
+								"pt": "Do utilizador",
+								"nl": "Gebruiker",
+								"fr": "Utilisateur",
+								"it": "Utente",
+								"es": "Usuario",
+								"pl": "Użytkownik",
+								"zh-cn": "用户"
+							},
+							"tooltip": "Name of your user.",
+							"width": "10%",
+							"encrypted": true
+						},
+						{
+							"type": "password",
+							"attr": "password",
+							"title": {
+								"en": "Password",
+								"de": "Passwort",
+								"ru": "Пароль",
+								"pt": "Senha",
+								"nl": "Wachtwoord",
+								"fr": "Mot de passe",
+								"it": "Parola d'ordine",
+								"es": "Clave",
+								"pl": "Hasło",
+								"zh-cn": "密码"
+							},
+							"width": "10%"
+						},
+						{
+							"type": "checkbox",
+							"attr": "myCheckbox",
+							"title": {
+								"en": "checkbox"
+							},
+							"tooltip": {"en":"Check if you like to use."},
+							"width": "3%"
+						}
+					]
+				}
+			}
+		},
+		"names": {
+			"type": "panel",
+			"label": "just a second panel",
+			"items": {
+				"installationHint7": {
+					"type": "staticText",
+					"text": "Some example static text here."
+				},
+				"names": {
+					"type": "table",
+					"sm": 12,
+					"md": 12,
+					"lg": 12,
+					"items": [
+						{
+							"type": "text",
+							"attr": "groupname",
+							"width": "50%",
+							"title": {
+								"en": "Group name"
+							},
+							"filter": true,
+							"sort": true,
+							"default": ""
+						}
+					]
+				}
+			}
+		}
+	}
+}
