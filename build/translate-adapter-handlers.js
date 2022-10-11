@@ -177,6 +177,18 @@ async function translateIoPackage() {
     console.log(`Successfully updated ${path_1.default.relative(".", ioPackage)}`);
 }
 async function loopJSON(content) {
+    const baseContent = [];
+    // read all existing language files
+    for (let n = 0; n < i18nBases.length; n++) {
+        if ((0, fs_extra_1.existsSync)(i18nBases[n])) {
+            baseContent.push(await (0, fs_extra_1.readJson)(i18nBases[n]));
+        }
+    }
+    // if there is no existing lang file create the default one
+    if (baseContent.length === 0)
+        baseContent[0] = await (0, fs_extra_1.readJson)("./admin/i18n/en/translations.json");
+    let baseContentChanged = false;
+    // iterate over the jsonConfig to find translatable entries
     for (const [key, value] of Object.entries(content)) {
         if (key === "i18n" && value === false) {
             console.log("Info: i18n-switch is set to false; No translation of jsonConfig needed; Exiting.");
@@ -186,6 +198,7 @@ async function loopJSON(content) {
             if (value.en) {
                 console.log((0, ansi_colors_1.gray)(`Translating: "${value.en}"`));
                 await translateNotExisting(value);
+                console.log((0, ansi_colors_1.yellow)(`Translated text object - but please consider changing it to: >"${key}": "${value.en}"< to be compliant with WebLate translation.`));
             }
             else {
                 if (value.title || value.tooltip || value.label || value.text) {
@@ -193,11 +206,26 @@ async function loopJSON(content) {
                         value.tooltip ||
                         value.label ||
                         value.text;
-                    if (typeof logText === "string")
-                        console.log((0, ansi_colors_1.gray)(`No english language-tag found for text "${logText}". You'll need to provide an english text to use automated translation.`));
+                    if (typeof logText === "string") {
+                        for (let n = 0; n < baseContent.length; n++) {
+                            // @ts-ignore
+                            if (!baseContent[n][logText]) {
+                                baseContentChanged = true;
+                                // @ts-ignore
+                                baseContent[n][logText] = logText;
+                                console.log((0, ansi_colors_1.gray)(`Added (${logText}) to english language file to get translated in the next step.`));
+                            }
+                        }
+                    }
                 }
             }
             await loopJSON(value);
+        }
+    }
+    if (baseContentChanged) {
+        for (let n = 0; n < baseContent.length; n++) {
+            await (0, fs_extra_1.writeJson)(i18nBases[n], baseContent[n], { spaces: 4, EOL: os_1.EOL });
+            console.log(`Successfully updated english base file (${i18nBases[n]}).`);
         }
     }
     return content;

@@ -216,6 +216,18 @@ async function translateIoPackage(): Promise<void> {
 }
 
 async function loopJSON(content: object): Promise<object> {
+	const baseContent: object[] = [];
+	// read all existing language files
+	for (let n = 0; n < i18nBases.length; n++) {
+		if (existsSync(i18nBases[n])) {
+			baseContent.push(await readJson(i18nBases[n]));
+		}
+	}
+	// if there is no existing lang file create the default one
+	if (baseContent.length === 0)
+		baseContent[0] = await readJson("./admin/i18n/en/translations.json");
+	let baseContentChanged = false;
+	// iterate over the jsonConfig to find translatable entries
 	for (const [key, value] of Object.entries(content)) {
 		if (key === "i18n" && value === false) {
 			console.log(
@@ -227,6 +239,11 @@ async function loopJSON(content: object): Promise<object> {
 			if (value.en) {
 				console.log(gray(`Translating: "${value.en}"`));
 				await translateNotExisting(value);
+				console.log(
+					yellow(
+						`Translated text object - but please consider changing it to: >"${key}": "${value.en}"< to be compliant with WebLate translation.`,
+					),
+				);
 			} else {
 				if (value.title || value.tooltip || value.label || value.text) {
 					const logText =
@@ -234,15 +251,32 @@ async function loopJSON(content: object): Promise<object> {
 						value.tooltip ||
 						value.label ||
 						value.text;
-					if (typeof logText === "string")
-						console.log(
-							gray(
-								`No english language-tag found for text "${logText}". You'll need to provide an english text to use automated translation.`,
-							),
-						);
+					if (typeof logText === "string") {
+						for (let n = 0; n < baseContent.length; n++) {
+							// @ts-ignore
+							if (!baseContent[n][logText]) {
+								baseContentChanged = true;
+								// @ts-ignore
+								baseContent[n][logText] = logText;
+								console.log(
+									gray(
+										`Added (${logText}) to english language file to get translated in the next step.`,
+									),
+								);
+							}
+						}
+					}
 				}
 			}
 			await loopJSON(value);
+		}
+	}
+	if (baseContentChanged) {
+		for (let n = 0; n < baseContent.length; n++) {
+			await writeJson(i18nBases[n], baseContent[n], { spaces: 4, EOL });
+			console.log(
+				`Successfully updated english base file (${i18nBases[n]}).`,
+			);
 		}
 	}
 	return content;
