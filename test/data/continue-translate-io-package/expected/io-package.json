@@ -11,6 +11,7 @@
                 "it": "Mock translation of 'Next version' to 'it'",
                 "es": "Mock translation of 'Next version' to 'es'",
                 "pl": "Mock translation of 'Next version' to 'pl'",
+                "uk": "Mock translation of 'Next version' to 'uk'",
                 "zh-cn": "Mock translation of 'Next version' to 'zh-cn'"
             },
             "1.0.0": {
@@ -23,7 +24,8 @@
                 "it": "My translation of 'Initial version' to 'it'",
                 "es": "My translation of 'Initial version' to 'es'",
                 "pl": "My translation of 'Initial version' to 'pl'",
-                "zh-cn": "My translation of 'Initial version' to 'zh-cn'"
+                "zh-cn": "My translation of 'Initial version' to 'zh-cn'",
+                "uk": "Mock translation of 'Initial version' to 'uk'"
             }
         },
         "titleLang": {
@@ -36,7 +38,8 @@
             "it": "My translation of 'My title' to 'it'",
             "es": "My translation of 'My title' to 'es'",
             "pl": "My translation of 'My title' to 'pl'",
-            "zh-cn": "My translation of 'My title' to 'zh-cn'"
+            "zh-cn": "My translation of 'My title' to 'zh-cn'",
+            "uk": "Mock translation of 'My title' to 'uk'"
         },
         "desc": {
             "en": "My description",
@@ -48,7 +51,8 @@
             "it": "My translation of 'My description' to 'it'",
             "es": "My translation of 'My description' to 'es'",
             "pl": "My translation of 'My description' to 'pl'",
-            "zh-cn": "My translation of 'My description' to 'zh-cn'"
+            "zh-cn": "My translation of 'My description' to 'zh-cn'",
+            "uk": "Mock translation of 'My description' to 'uk'"
         }
     }
 }

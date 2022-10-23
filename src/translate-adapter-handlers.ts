@@ -32,6 +32,7 @@ const _languages: Record<ioBroker.Languages, any> = {
 	it: {},
 	es: {},
 	pl: {},
+	uk: {},
 	"zh-cn": {},
 };
 export const allLanguages = Object.keys(_languages) as ioBroker.Languages[];
@@ -197,7 +198,9 @@ async function translateIoPackage(): Promise<void> {
 			console.log(`   Message: ${message.title.en}`);
 			await translateNotExisting(message.title);
 			await translateNotExisting(message.text);
-			await translateNotExisting(message.linkText);
+			if (message.linkText) {
+				await translateNotExisting(message.linkText);
+			}
 		}
 	}
 	await writeJson(ioPackage, content, { spaces: 4, EOL });

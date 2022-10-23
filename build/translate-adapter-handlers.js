@@ -27,6 +27,7 @@ const _languages = {
     it: {},
     es: {},
     pl: {},
+    uk: {},
     "zh-cn": {},
 };
 exports.allLanguages = Object.keys(_languages);
@@ -159,7 +160,9 @@ async function translateIoPackage() {
             console.log(`   Message: ${message.title.en}`);
             await translateNotExisting(message.title);
             await translateNotExisting(message.text);
-            await translateNotExisting(message.linkText);
+            if (message.linkText) {
+                await translateNotExisting(message.linkText);
+            }
         }
     }
     await (0, fs_extra_1.writeJson)(ioPackage, content, { spaces: 4, EOL: os_1.EOL });

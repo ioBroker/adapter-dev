@@ -230,6 +230,11 @@ module.exports = {
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### __WORK IN PROGRESS__
+-   (Grizzlebee) only translate linkText from messages if existent
+-   (Apollon77) Add ukrainian as language for translations
+
 ### 1.1.0 (2022-09-14)
 -	(Grizzelbee) Also translate admin messages in io-package.json
 -   (AlCalzone) support specifying raw esbuild options, like loaders/plugins

@@ -11,6 +11,7 @@
                 "it": "Mock translation of 'Initial version' to 'it'",
                 "es": "Mock translation of 'Initial version' to 'es'",
                 "pl": "Mock translation of 'Initial version' to 'pl'",
+                "uk": "Mock translation of 'Initial version' to 'uk'",
                 "zh-cn": "Mock translation of 'Initial version' to 'zh-cn'"
             }
         },
@@ -24,6 +25,7 @@
             "it": "Mock translation of 'My title' to 'it'",
             "es": "Mock translation of 'My title' to 'es'",
             "pl": "Mock translation of 'My title' to 'pl'",
+            "uk": "Mock translation of 'My title' to 'uk'",
             "zh-cn": "Mock translation of 'My title' to 'zh-cn'"
         },
         "desc": {
@@ -36,6 +38,7 @@
             "it": "Mock translation of 'My description' to 'it'",
             "es": "Mock translation of 'My description' to 'es'",
             "pl": "Mock translation of 'My description' to 'pl'",
+            "uk": "Mock translation of 'My description' to 'uk'",
             "zh-cn": "Mock translation of 'My description' to 'zh-cn'"
         }
     }

@@ -12,6 +12,7 @@ systemDictionary = {
 		it: "Esempio",
 		es: "Ejemplo",
 		pl: "Przykład",
+		uk: "Приклад",
 		"zh-cn": "例子",
 	},
 };
