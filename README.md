@@ -230,8 +230,7 @@ module.exports = {
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### __WORK IN PROGRESS__
+### 1.2.0 (2022-10-23)
 -   (Grizzlebee) only translate linkText from messages if existent
 -   (Apollon77) Add ukrainian as language for translations
 
