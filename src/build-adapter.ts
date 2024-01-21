@@ -127,7 +127,9 @@ const tsOptions = {
 	},
 } as const;
 
-const parser = yargs(process.argv.slice(2));
+const parser = yargs(process.argv.slice(2)).parserConfiguration({
+	"dot-notation": false,
+});
 parser
 	.env("IOBROKER_BUILD")
 	.strict()
