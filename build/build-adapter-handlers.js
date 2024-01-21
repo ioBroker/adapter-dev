@@ -90,7 +90,7 @@ function getReactBuildOptions(watch, reactOptions, entryPoints, tsConfigPath) {
         ...reactOptions.raw,
     };
 }
-function getTypeScriptBuildOptions(typescriptOptions, entryPoints, tsConfigPath) {
+function getTypeScriptBuildOptions(watch, typescriptOptions, entryPoints, tsConfigPath) {
     return {
         entryPoints,
         tsconfig: tsConfigPath,
@@ -102,6 +102,9 @@ function getTypeScriptBuildOptions(typescriptOptions, entryPoints, tsConfigPath)
         platform: "node",
         format: typescriptOptions.format || "cjs",
         target: typescriptOptions.compileTarget,
+        define: {
+            "process.env.NODE_ENV": watch ? '"development"' : '"production"',
+        },
         ...typescriptOptions.raw,
     };
 }
@@ -125,7 +128,7 @@ async function buildTypeScript(options) {
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling TypeScript with ESBuild..."));
-    await (0, esbuild_1.build)(getTypeScriptBuildOptions(options, entryPoints, tsConfigPath));
+    await (0, esbuild_1.build)(getTypeScriptBuildOptions(false, options, entryPoints, tsConfigPath));
     // 2. type-check with TypeScript
     if (!(await typeCheck(tsConfigPath))) {
         process.exit(1);
@@ -143,19 +146,18 @@ async function watchReact(options) {
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling React with ESBuild in watch mode..."));
-    const buildProcess = await (0, esbuild_1.build)({
+    const buildCtx = await (0, esbuild_1.context)({
         ...getReactBuildOptions(true, options, entryPoints, tsConfigPath),
         // We could run a separate type checking process after each successful
-        // watch build, but keeping the process alive decreases the check time
-        watch: true,
     });
+    buildCtx.watch();
     // 2. type-check with TypeScript (if there are TSX entry points)
     let checkProcess;
     if (entryPoints.some((e) => e.endsWith(".tsx"))) {
         checkProcess = typeCheckWatch(tsConfigPath);
     }
     return {
-        build: buildProcess,
+        ctx: buildCtx,
         check: checkProcess,
     };
 }
@@ -165,16 +167,15 @@ async function watchTypeScript(options) {
     // 1. fast compile with ESBuild
     console.log();
     console.log((0, ansi_colors_1.gray)("Compiling TypeScript with ESBuild..."));
-    const buildProcess = await (0, esbuild_1.build)({
-        ...getTypeScriptBuildOptions(options, entryPoints, tsConfigPath),
+    const buildCtx = await (0, esbuild_1.context)({
+        ...getTypeScriptBuildOptions(true, options, entryPoints, tsConfigPath),
         // We could run a separate type checking process after each successful
-        // watch build, but keeping the process alive decreases the check time
-        watch: true,
     });
+    buildCtx.watch();
     // 2. type-check with TypeScript
     const checkProcess = typeCheckWatch(tsConfigPath);
     return {
-        build: buildProcess,
+        ctx: buildCtx,
         check: checkProcess,
     };
 }
@@ -182,14 +183,13 @@ async function watchTypeScript(options) {
 async function handleBuildReactCommand(watch, options) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
-        const { build, check } = await watchReact(options);
+        const { ctx, check } = await watchReact(options);
         return new Promise((resolve) => {
             check === null || check === void 0 ? void 0 : check.then(() => resolve()).catch(() => resolve());
             process.on("SIGINT", () => {
-                var _a;
                 console.log();
                 console.log((0, ansi_colors_1.gray)("SIGINT received, shutting down..."));
-                (_a = build.stop) === null || _a === void 0 ? void 0 : _a.call(build);
+                ctx.dispose();
                 if (check) {
                     check.kill("SIGINT");
                 }
@@ -207,14 +207,13 @@ exports.handleBuildReactCommand = handleBuildReactCommand;
 async function handleBuildTypeScriptCommand(watch, options) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
-        const { build, check } = await watchTypeScript(options);
+        const { ctx, check } = await watchTypeScript(options);
         return new Promise((resolve) => {
             check.then(() => resolve()).catch(() => resolve());
             process.on("SIGINT", () => {
-                var _a;
                 console.log();
                 console.log((0, ansi_colors_1.gray)("SIGINT received, shutting down..."));
-                (_a = build.stop) === null || _a === void 0 ? void 0 : _a.call(build);
+                ctx.dispose();
                 check.kill("SIGINT");
             });
         });
@@ -227,18 +226,17 @@ exports.handleBuildTypeScriptCommand = handleBuildTypeScriptCommand;
 async function handleBuildAllCommand(watch, reactOptions, typescriptOptions) {
     if (watch) {
         // In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
-        const { build: buildReact, check: checkReact } = await watchReact(reactOptions);
-        const { build: buildTS, check: checkTS } = await watchTypeScript(typescriptOptions);
+        const { ctx: ctxReact, check: checkReact } = await watchReact(reactOptions);
+        const { ctx: ctxTS, check: checkTS } = await watchTypeScript(typescriptOptions);
         return new Promise((resolve) => {
             Promise.all([checkReact, checkTS].filter(Boolean))
                 .then(() => resolve())
                 .catch(() => resolve());
             process.on("SIGINT", () => {
-                var _a, _b;
                 console.log();
                 console.log((0, ansi_colors_1.gray)("SIGINT received, shutting down..."));
-                (_a = buildReact.stop) === null || _a === void 0 ? void 0 : _a.call(buildReact);
-                (_b = buildTS.stop) === null || _b === void 0 ? void 0 : _b.call(buildTS);
+                ctxReact.dispose();
+                ctxTS.dispose();
                 checkReact === null || checkReact === void 0 ? void 0 : checkReact.kill("SIGINT");
                 checkTS.kill("SIGINT");
             });
