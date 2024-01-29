@@ -17,22 +17,17 @@
 		"removeComments": false,
 
 		// Avoid runtime imports that are unnecessary
-		"importsNotUsedAsValues": "error",
+		// "importsNotUsedAsValues": "error",
+		"verbatimModuleSyntax": false,
 
 		// Required for TS debugging
 		"sourceMap": true,
 		"inlineSourceMap": false,
 
 		// watch=true breaks CI build steps
-		"watch": false,
+		// "watch": false,
 		"newLine": "lf"
 	},
-	"include": [
-		"**/*.ts",
-		"**/*.d.ts"
-	],
-	"exclude": [
-		"build/**",
-		"node_modules/**",
-	]
+	"include": ["**/*.ts", "**/*.d.ts"],
+	"exclude": ["build/**", "node_modules/**"]
 }
