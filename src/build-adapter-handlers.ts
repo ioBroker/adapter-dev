@@ -2,11 +2,11 @@
 import { ExecaChildProcess, execaNode } from "@esm2cjs/execa";
 import { gray, green, red } from "ansi-colors";
 import type {
+	BuildContext,
 	BuildOptions as ESBuildOptions,
-	BuildResult,
 	Format,
 } from "esbuild";
-import { build } from "esbuild";
+import { build, context } from "esbuild";
 import path from "path";
 import glob from "tiny-glob";
 import { die } from "./util";
@@ -140,6 +140,7 @@ function getReactBuildOptions(
 }
 
 function getTypeScriptBuildOptions(
+	watch: boolean,
 	typescriptOptions: BuildOptions,
 	entryPoints: string[],
 	tsConfigPath: string,
@@ -155,6 +156,9 @@ function getTypeScriptBuildOptions(
 		platform: "node",
 		format: typescriptOptions.format || "cjs",
 		target: typescriptOptions.compileTarget,
+		define: {
+			"process.env.NODE_ENV": watch ? '"development"' : '"production"',
+		},
 		...typescriptOptions.raw,
 	};
 }
@@ -185,7 +189,9 @@ async function buildTypeScript(options: BuildOptions): Promise<void> {
 	// 1. fast compile with ESBuild
 	console.log();
 	console.log(gray("Compiling TypeScript with ESBuild..."));
-	await build(getTypeScriptBuildOptions(options, entryPoints, tsConfigPath));
+	await build(
+		getTypeScriptBuildOptions(false, options, entryPoints, tsConfigPath),
+	);
 
 	// 2. type-check with TypeScript
 	if (!(await typeCheck(tsConfigPath))) {
@@ -204,7 +210,7 @@ async function buildAll(
 }
 
 async function watchReact(options: BuildOptions): Promise<{
-	build: BuildResult;
+	ctx: BuildContext;
 	check?: ExecaChildProcess;
 }> {
 	const { entryPoints, tsConfigPath } = await getReactFilePaths(options);
@@ -213,12 +219,12 @@ async function watchReact(options: BuildOptions): Promise<{
 	// 1. fast compile with ESBuild
 	console.log();
 	console.log(gray("Compiling React with ESBuild in watch mode..."));
-	const buildProcess = await build({
+	const buildCtx = await context({
 		...getReactBuildOptions(true, options, entryPoints, tsConfigPath),
 		// We could run a separate type checking process after each successful
-		// watch build, but keeping the process alive decreases the check time
-		watch: true,
 	});
+
+	buildCtx.watch();
 
 	// 2. type-check with TypeScript (if there are TSX entry points)
 	let checkProcess: ExecaChildProcess | undefined;
@@ -226,13 +232,13 @@ async function watchReact(options: BuildOptions): Promise<{
 		checkProcess = typeCheckWatch(tsConfigPath);
 	}
 	return {
-		build: buildProcess,
+		ctx: buildCtx,
 		check: checkProcess,
 	};
 }
 
 async function watchTypeScript(options: BuildOptions): Promise<{
-	build: BuildResult;
+	ctx: BuildContext;
 	check: ExecaChildProcess;
 }> {
 	const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths(options);
@@ -241,17 +247,17 @@ async function watchTypeScript(options: BuildOptions): Promise<{
 	// 1. fast compile with ESBuild
 	console.log();
 	console.log(gray("Compiling TypeScript with ESBuild..."));
-	const buildProcess = await build({
-		...getTypeScriptBuildOptions(options, entryPoints, tsConfigPath),
+	const buildCtx = await context({
+		...getTypeScriptBuildOptions(true, options, entryPoints, tsConfigPath),
 		// We could run a separate type checking process after each successful
-		// watch build, but keeping the process alive decreases the check time
-		watch: true,
 	});
+
+	buildCtx.watch();
 
 	// 2. type-check with TypeScript
 	const checkProcess = typeCheckWatch(tsConfigPath);
 	return {
-		build: buildProcess,
+		ctx: buildCtx,
 		check: checkProcess,
 	};
 }
@@ -264,14 +270,14 @@ export async function handleBuildReactCommand(
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		const { build, check } = await watchReact(options);
+		const { ctx, check } = await watchReact(options);
 
 		return new Promise((resolve) => {
 			check?.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				build.stop?.();
+				ctx.dispose();
 				if (check) {
 					check.kill("SIGINT");
 				} else {
@@ -291,14 +297,14 @@ export async function handleBuildTypeScriptCommand(
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		const { build, check } = await watchTypeScript(options);
+		const { ctx, check } = await watchTypeScript(options);
 
 		return new Promise((resolve) => {
 			check.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				build.stop?.();
+				ctx.dispose();
 				check.kill("SIGINT");
 			});
 		});
@@ -315,10 +321,10 @@ export async function handleBuildAllCommand(
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		const { build: buildReact, check: checkReact } = await watchReact(
+		const { ctx: ctxReact, check: checkReact } = await watchReact(
 			reactOptions,
 		);
-		const { build: buildTS, check: checkTS } = await watchTypeScript(
+		const { ctx: ctxTS, check: checkTS } = await watchTypeScript(
 			typescriptOptions,
 		);
 
@@ -330,8 +336,8 @@ export async function handleBuildAllCommand(
 			process.on("SIGINT", () => {
 				console.log();
 				console.log(gray("SIGINT received, shutting down..."));
-				buildReact.stop?.();
-				buildTS.stop?.();
+				ctxReact.dispose();
+				ctxTS.dispose();
 				checkReact?.kill("SIGINT");
 				checkTS.kill("SIGINT");
 			});

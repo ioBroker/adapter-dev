@@ -109,7 +109,9 @@ const tsOptions = {
         description: "Set additional raw esbuild options for TypeScript. Needs to be specified in the config file.",
     },
 };
-const parser = (0, yargs_1.default)(process.argv.slice(2));
+const parser = (0, yargs_1.default)(process.argv.slice(2)).parserConfiguration({
+    "dot-notation": false,
+});
 parser
     .env("IOBROKER_BUILD")
     .strict()
