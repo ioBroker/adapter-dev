@@ -18,6 +18,17 @@ export function die(message: string): never {
 	process.exit(1);
 }
 
+export function getIndentation(text: string): number {
+	const lines = text.split(/\r?\n/);
+	if (lines.length >= 2) {
+		const matches = lines[1].match(/^\s*/);
+		if (matches && matches.length >= 1) {
+			return matches[0].length;
+		}
+	}
+	return 4;
+}
+
 export function interceptErrors(
 	func: () => Promise<void>,
 ): () => Promise<void> {
