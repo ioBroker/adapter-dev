@@ -321,12 +321,10 @@ export async function handleBuildAllCommand(
 	if (watch) {
 		// In watch mode, we start the ESBuild and TSC processes in parallel and wait until they end
 
-		const { ctx: ctxReact, check: checkReact } = await watchReact(
-			reactOptions,
-		);
-		const { ctx: ctxTS, check: checkTS } = await watchTypeScript(
-			typescriptOptions,
-		);
+		const { ctx: ctxReact, check: checkReact } =
+			await watchReact(reactOptions);
+		const { ctx: ctxTS, check: checkTS } =
+			await watchTypeScript(typescriptOptions);
 
 		return new Promise((resolve) => {
 			Promise.all([checkReact, checkTS].filter(Boolean))

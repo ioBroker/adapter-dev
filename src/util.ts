@@ -20,8 +20,9 @@ export function die(message: string): never {
 
 export function getIndentation(text: string): number {
 	const lines = text.split(/\r?\n/);
-	if (lines.length >= 2) {
-		const matches = lines[1].match(/^\s*/);
+	const fileStartLine = lines.findIndex((line) => line.startsWith("{"));
+	if (fileStartLine !== -1 && lines.length > fileStartLine) {
+		const matches = lines[fileStartLine + 1].match(/^\s*/);
 		if (matches && matches.length >= 1) {
 			return matches[0].length;
 		}

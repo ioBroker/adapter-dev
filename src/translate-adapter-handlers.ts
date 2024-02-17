@@ -283,7 +283,7 @@ async function adminWords2languages(
 ): Promise<void> {
 	const filePattern = createFilePattern(i18nBase);
 	const data = parseWordJs(await readFile(words, "utf-8"));
-	const langs = createEmptyLangObject(() => ({} as Record<string, string>));
+	const langs = createEmptyLangObject(() => ({}) as Record<string, string>);
 	for (const [word, translations] of Object.entries(data)) {
 		for (const [lang, translation] of Object.entries(translations)) {
 			const language = lang as ioBroker.Languages;
