@@ -12,7 +12,7 @@ import { EOL } from "os";
 import path from "path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
-import { die, escapeRegExp, padRight } from "./util";
+import { die, escapeRegExp, getIndentation, padRight } from "./util";
 
 let ioPackage: string;
 let admin: string;
@@ -172,7 +172,10 @@ export async function handleAllCommand(): Promise<void> {
 /****************************** Implementation ********************************/
 
 async function translateIoPackage(): Promise<void> {
-	const content = await readJson(ioPackage);
+	const ioPackageFile = await readFile(ioPackage, "utf-8");
+	const indentation = getIndentation(ioPackageFile);
+	const content = JSON.parse(ioPackageFile);
+
 	if (content.common.news) {
 		console.log("Translate News");
 		for (const [k, nw] of Object.entries(content.common.news)) {
@@ -203,7 +206,7 @@ async function translateIoPackage(): Promise<void> {
 			}
 		}
 	}
-	await writeJson(ioPackage, content, { spaces: 4, EOL });
+	await writeJson(ioPackage, content, { spaces: indentation, EOL });
 	console.log(`Successfully updated ${path.relative(".", ioPackage)}`);
 }
 
