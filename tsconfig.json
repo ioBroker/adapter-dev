@@ -27,16 +27,6 @@
 		// watch=true breaks CI build steps
 		// "watch": false,
 		"newLine": "lf",
-		"typeRoots": [
-			"node_modules/@types",
-			"packages"
-		],
-		"types": [
-			"@iobroker/types",
-			"@types/rimraf",
-			"node",
-			"mocha"
-		]
 	},
 	"include": ["**/*.ts", "**/*.d.ts"],
 	"exclude": ["build/**", "node_modules/**"]
