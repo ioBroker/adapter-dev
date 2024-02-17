@@ -15,6 +15,11 @@
 
 		"outDir": "./build/",
 		"removeComments": false,
+		"types": [
+			"@iobroker/types",
+			"node",
+			"mocha"
+		],
 
 		// Avoid runtime imports that are unnecessary
 		// "importsNotUsedAsValues": "error",
