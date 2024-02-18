@@ -1,4 +1,5 @@
 /** Build script to use esbuild without specifying 1000 CLI options */
+// @ts-expect-error esm2cjs/execa needs to be fixed to allow cjs import with types
 import { ExecaChildProcess, execaNode } from "@esm2cjs/execa";
 import { gray, green, red } from "ansi-colors";
 import type {
