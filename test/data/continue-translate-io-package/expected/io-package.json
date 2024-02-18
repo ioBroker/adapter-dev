@@ -1,58 +1,58 @@
 {
-    "common": {
-        "news": {
-            "1.0.1": {
-                "en": "Next version",
-                "de": "Mock translation of 'Next version' to 'de'",
-                "ru": "Mock translation of 'Next version' to 'ru'",
-                "pt": "Mock translation of 'Next version' to 'pt'",
-                "nl": "Mock translation of 'Next version' to 'nl'",
-                "fr": "Mock translation of 'Next version' to 'fr'",
-                "it": "Mock translation of 'Next version' to 'it'",
-                "es": "Mock translation of 'Next version' to 'es'",
-                "pl": "Mock translation of 'Next version' to 'pl'",
-                "uk": "Mock translation of 'Next version' to 'uk'",
-                "zh-cn": "Mock translation of 'Next version' to 'zh-cn'"
-            },
-            "1.0.0": {
-                "en": "Initial version",
-                "de": "My translation of 'Initial version' to 'de'",
-                "ru": "My translation of 'Initial version' to 'ru'",
-                "pt": "My translation of 'Initial version' to 'pt'",
-                "nl": "My translation of 'Initial version' to 'nl'",
-                "fr": "My translation of 'Initial version' to 'fr'",
-                "it": "My translation of 'Initial version' to 'it'",
-                "es": "My translation of 'Initial version' to 'es'",
-                "pl": "My translation of 'Initial version' to 'pl'",
-                "zh-cn": "My translation of 'Initial version' to 'zh-cn'",
-                "uk": "Mock translation of 'Initial version' to 'uk'"
-            }
-        },
-        "titleLang": {
-            "en": "My title",
-            "de": "My translation of 'My title' to 'de'",
-            "ru": "My translation of 'My title' to 'ru'",
-            "pt": "My translation of 'My title' to 'pt'",
-            "nl": "My translation of 'My title' to 'nl'",
-            "fr": "My translation of 'My title' to 'fr'",
-            "it": "My translation of 'My title' to 'it'",
-            "es": "My translation of 'My title' to 'es'",
-            "pl": "My translation of 'My title' to 'pl'",
-            "zh-cn": "My translation of 'My title' to 'zh-cn'",
-            "uk": "Mock translation of 'My title' to 'uk'"
-        },
-        "desc": {
-            "en": "My description",
-            "de": "My translation of 'My description' to 'de'",
-            "ru": "My translation of 'My description' to 'ru'",
-            "pt": "My translation of 'My description' to 'pt'",
-            "nl": "My translation of 'My description' to 'nl'",
-            "fr": "My translation of 'My description' to 'fr'",
-            "it": "My translation of 'My description' to 'it'",
-            "es": "My translation of 'My description' to 'es'",
-            "pl": "My translation of 'My description' to 'pl'",
-            "zh-cn": "My translation of 'My description' to 'zh-cn'",
-            "uk": "Mock translation of 'My description' to 'uk'"
-        }
+  "common": {
+    "news": {
+      "1.0.1": {
+        "en": "Next version",
+        "de": "Mock translation of 'Next version' to 'de'",
+        "ru": "Mock translation of 'Next version' to 'ru'",
+        "pt": "Mock translation of 'Next version' to 'pt'",
+        "nl": "Mock translation of 'Next version' to 'nl'",
+        "fr": "Mock translation of 'Next version' to 'fr'",
+        "it": "Mock translation of 'Next version' to 'it'",
+        "es": "Mock translation of 'Next version' to 'es'",
+        "pl": "Mock translation of 'Next version' to 'pl'",
+        "uk": "Mock translation of 'Next version' to 'uk'",
+        "zh-cn": "Mock translation of 'Next version' to 'zh-cn'"
+      },
+      "1.0.0": {
+        "en": "Initial version",
+        "de": "My translation of 'Initial version' to 'de'",
+        "ru": "My translation of 'Initial version' to 'ru'",
+        "pt": "My translation of 'Initial version' to 'pt'",
+        "nl": "My translation of 'Initial version' to 'nl'",
+        "fr": "My translation of 'Initial version' to 'fr'",
+        "it": "My translation of 'Initial version' to 'it'",
+        "es": "My translation of 'Initial version' to 'es'",
+        "pl": "My translation of 'Initial version' to 'pl'",
+        "zh-cn": "My translation of 'Initial version' to 'zh-cn'",
+        "uk": "Mock translation of 'Initial version' to 'uk'"
+      }
+    },
+    "titleLang": {
+      "en": "My title",
+      "de": "My translation of 'My title' to 'de'",
+      "ru": "My translation of 'My title' to 'ru'",
+      "pt": "My translation of 'My title' to 'pt'",
+      "nl": "My translation of 'My title' to 'nl'",
+      "fr": "My translation of 'My title' to 'fr'",
+      "it": "My translation of 'My title' to 'it'",
+      "es": "My translation of 'My title' to 'es'",
+      "pl": "My translation of 'My title' to 'pl'",
+      "zh-cn": "My translation of 'My title' to 'zh-cn'",
+      "uk": "Mock translation of 'My title' to 'uk'"
+    },
+    "desc": {
+      "en": "My description",
+      "de": "My translation of 'My description' to 'de'",
+      "ru": "My translation of 'My description' to 'ru'",
+      "pt": "My translation of 'My description' to 'pt'",
+      "nl": "My translation of 'My description' to 'nl'",
+      "fr": "My translation of 'My description' to 'fr'",
+      "it": "My translation of 'My description' to 'it'",
+      "es": "My translation of 'My description' to 'es'",
+      "pl": "My translation of 'My description' to 'pl'",
+      "zh-cn": "My translation of 'My description' to 'zh-cn'",
+      "uk": "Mock translation of 'My description' to 'uk'"
     }
+  }
 }

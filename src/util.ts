@@ -22,7 +22,8 @@ export function getIndentation(text: string): number {
 	const lines = text.split(/\r?\n/);
 	const fileStartLine = lines.findIndex((line) => line.startsWith("{"));
 	if (fileStartLine !== -1 && lines.length > fileStartLine) {
-		const matches = lines[fileStartLine + 1].match(/^\s*/);
+		const matches = lines[fileStartLine + 1].match(/^[ ]+/);
+		console.log(matches);
 		if (matches && matches.length >= 1) {
 			return matches[0].length;
 		}
