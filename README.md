@@ -230,13 +230,13 @@ module.exports = {
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### __WORK IN PROGRESS__
+### 1.3.0 (2024-02-18)
 -	(kleinOr/Apollon77) Detects and keeps space indentation of io-package
 -   (Steiger04) Fix handling of dot keys for esbuild
 -   (Steiger04) Update esbuild and adjust watch mode
 -   (Steiger04) process.env.NODE_ENV is now also available server side
-- 
+-
+
 ### 1.2.0 (2022-10-23)
 -   (Grizzlebee) only translate linkText from messages if existent
 -   (Apollon77) Add ukrainian as language for translations
