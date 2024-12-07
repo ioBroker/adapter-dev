@@ -57,7 +57,7 @@
     "@types/rimraf": "^3.0.2",
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
-    "@typescript-eslint/parser": "^7.11.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "chai": "^4.4.1",
     "chai-as-promised": "^7.1.1",
     "dir-compare": "^5.0.0",
