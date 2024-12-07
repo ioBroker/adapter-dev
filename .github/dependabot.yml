@@ -4,6 +4,7 @@
 # https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 version: 2
 updates:
+
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -22,4 +23,3 @@ updates:
       time: "04:00"
       timezone: Europe/Berlin
     open-pull-requests-limit: 10
-    versioning-strategy: increase
