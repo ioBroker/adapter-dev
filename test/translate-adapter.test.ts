@@ -3,7 +3,6 @@ import * as dircompare from "dir-compare";
 import { copy } from "fs-extra";
 import path from "path";
 import { rimraf } from "rimraf";
-//import { promisify } from "util"; // promisify not needed with rimraf ^4.0.0, rimraf has promise
 import {
 	handleToJsonCommand,
 	handleToWordsCommand,
@@ -19,7 +18,6 @@ async function runTranslation(
 	const baseDir = path.resolve(__dirname, "data", name);
 	const inputDir = path.join(baseDir, "input");
 	const outputDir = path.join(baseDir, "output");
-	//await promisify(rimraf)(outputDir); // promisify not needed with rimraf ^4.0.0, rimraf has promise
 	await rimraf(outputDir);
 	await copy(inputDir, outputDir);
 
