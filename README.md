@@ -233,7 +233,7 @@ module.exports = {
 
 ### **WORK IN PROGRESS**
 
-- (hombach) Bump dependecies - fix vulnerability
+- (hombach) Bump dev dependencies
 - (hombach) add tests for node.js 22, remove node 16 tests
 
 ### 1.3.0 (2024-02-18)
