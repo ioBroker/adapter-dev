@@ -2,8 +2,7 @@ import { expect } from "chai";
 import * as dircompare from "dir-compare";
 import { copy } from "fs-extra";
 import path from "path";
-import rimraf from "rimraf";
-import { promisify } from "util";
+import { rimraf } from "rimraf";
 import {
 	handleToJsonCommand,
 	handleToWordsCommand,
@@ -19,7 +18,7 @@ async function runTranslation(
 	const baseDir = path.resolve(__dirname, "data", name);
 	const inputDir = path.join(baseDir, "input");
 	const outputDir = path.join(baseDir, "output");
-	await promisify(rimraf)(outputDir);
+	await rimraf(outputDir);
 	await copy(inputDir, outputDir);
 
 	const adminDir = path.join(outputDir, "admin");

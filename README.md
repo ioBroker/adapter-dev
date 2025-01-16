@@ -35,15 +35,15 @@ npm run translate to-json
 
 ## TL;DR
 
--   You should only update i18n JSON files and you shouldn't touch words.js anymore.
--   Add new strings only to the English JSON file.
--   Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
-    -   If you have an HTML/JavaScript admin UI: `npm run translate all`
-    -   If you have a React admin UI: `npm run translate`
--   Run the following commands to (re)compile your adapter:
-    -   If you are using TypeScript: `npm run build-adapter typescript`
-    -   If you have a React admin UI: `npm run build-adapter react`
-    -   If you have both: `npm run build-adapter all`
+- You should only update i18n JSON files and you shouldn't touch words.js anymore.
+- Add new strings only to the English JSON file.
+- Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
+    - If you have an HTML/JavaScript admin UI: `npm run translate all`
+    - If you have a React admin UI: `npm run translate`
+- Run the following commands to (re)compile your adapter:
+    - If you are using TypeScript: `npm run build-adapter typescript`
+    - If you have a React admin UI: `npm run build-adapter react`
+    - If you have both: `npm run build-adapter all`
 
 ## Manage Translations
 
@@ -55,9 +55,9 @@ npm run translate <command>
 
 The commands exist in three forms (all three will be shown as examples below):
 
--   full name: a self-explaining name
--   short code: a one-character command
--   legacy name: the same name as previously used in gulp
+- full name: a self-explaining name
+- short code: a one-character command
+- legacy name: the same name as previously used in gulp
 
 In most cases, you don't need to specify any additional arguments as the defaults should match most adapters.
 
@@ -71,11 +71,11 @@ npm run translate <command> -- <args>
 
 The following command line arguments can be passed to all commands:
 
--   `--io-package`: Path to the io-package.json file. Short: `-p`. Default: `./io-package.json`
--   `--admin`: Path to the admin directory. Short: `-a`. Default: `./admin`
--   `--words`: Path to the words.js file. Short: `-w`. Default: searches it in the admin directory, either `<admin-dir>/words.js` or `<admin-dir>/js/words.js`.
--   `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`
--   `--languages`: Specify a subset of languages to be translated. Short `-l`. Default: all languages.
+- `--io-package`: Path to the io-package.json file. Short: `-p`. Default: `./io-package.json`
+- `--admin`: Path to the admin directory. Short: `-a`. Default: `./admin`
+- `--words`: Path to the words.js file. Short: `-w`. Default: searches it in the admin directory, either `<admin-dir>/words.js` or `<admin-dir>/js/words.js`.
+- `--base`: Path to the english i18n file, multiple files are possible. Short: `-b`. Default: searches it in the admin directory, it will be `<admin-dir>/i18n/en/translations.json` or/and `<admin-dir>/src/i18n/en.json`
+- `--languages`: Specify a subset of languages to be translated. Short `-l`. Default: all languages.
 
 ### `translate` Command
 
@@ -134,11 +134,11 @@ Previously known as `gulp translateAndUpdateWordsJS`.
 
 All command line arguments can also be provided as environment variables. Just prefix any argument with `IOBROKER_TRANSLATE_`:
 
--   `--io-package` becomes `IOBROKER_TRANSLATE_IO_PACKAGE`
--   `--admin` becomes `IOBROKER_TRANSLATE_ADMIN`
--   `--words` becomes `IOBROKER_TRANSLATE_WORDS`
--   `--base` becomes `IOBROKER_TRANSLATE_BASE`
--   `--languages` becomes `IOBROKER_TRANSLATE_LANGUAGES`
+- `--io-package` becomes `IOBROKER_TRANSLATE_IO_PACKAGE`
+- `--admin` becomes `IOBROKER_TRANSLATE_ADMIN`
+- `--words` becomes `IOBROKER_TRANSLATE_WORDS`
+- `--base` becomes `IOBROKER_TRANSLATE_BASE`
+- `--languages` becomes `IOBROKER_TRANSLATE_LANGUAGES`
 
 #### Translate with Google Translate Credentials
 
@@ -174,30 +174,30 @@ npm run build all        [options]      # Everything (at the moment this is Type
 
 These options are available for all commands:
 
--   `--watch`, short `-w`: Watch for changes and recompile
+- `--watch`, short `-w`: Watch for changes and recompile
 
 These only have an effect for the `ts/typescript` and `all` commands:
 
--   `--typescriptRootDir`: Directory where the TypeScript part of the adapter is located. Default: `.`
--   `--typescriptOutDir`: Directory where the compiled TypeScript output will be placed, relative to `typescriptRootDir`. Default: `build`
--   `--typescriptPattern`: Glob pattern for TypeScript source files, relative to typescriptRootDir. Should not be changed unless bundling is enabled. Each match will result in a separate bundle. Default: `src/**/*.ts`
--   `--typescriptTsConfig`: Path to the tsconfig.json file used for building TypeScript, relative to `typescriptRootDir`. Default: `tsconfig.build.json`
--   `--typescriptBundle`: Bundle compiled TypeScript output into one file per entry point. Default: `false`
--   `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Only CommonJS (`cjs`) is supported at the moment.
--   `--typescriptCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker. Default: `node12`
--   `--typescriptRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for TypeScript. This has to be specified in a config file (see below). Default: (none)
+- `--typescriptRootDir`: Directory where the TypeScript part of the adapter is located. Default: `.`
+- `--typescriptOutDir`: Directory where the compiled TypeScript output will be placed, relative to `typescriptRootDir`. Default: `build`
+- `--typescriptPattern`: Glob pattern for TypeScript source files, relative to typescriptRootDir. Should not be changed unless bundling is enabled. Each match will result in a separate bundle. Default: `src/**/*.ts`
+- `--typescriptTsConfig`: Path to the tsconfig.json file used for building TypeScript, relative to `typescriptRootDir`. Default: `tsconfig.build.json`
+- `--typescriptBundle`: Bundle compiled TypeScript output into one file per entry point. Default: `false`
+- `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Only CommonJS (`cjs`) is supported at the moment.
+- `--typescriptCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker. Default: `node12`
+- `--typescriptRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for TypeScript. This has to be specified in a config file (see below). Default: (none)
 
 These only have an effect for the `react` and `all` commands:
 
--   `--reactRootDir`: Directory where the React part of the adapter is located. Default: `admin`
--   `--reactOutDir`: Directory where the compiled React output will be placed, relative to `reactRootDir`. Default: `build`
--   `--reactPattern`: Glob pattern for React source files, relative to reactRootDir. Each match will result in a separate bundle. Default: `src/{index,tab}.{tsx,jsx}`
--   `--reactTsConfig`: Path to the tsconfig.json file used for building React, relative to `reactRootDir`. Default: `tsconfig.json`
--   `--reactBundle`: Bundle compiled React output into one file per entry point. Default: `true`
--   `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
--   `--reactSplitting`: Moves common code from multiple entry points into separate files, so they only have to be loaded once. Only relevant when `reactBundle` is `true`, `reactFormat` is `"esm"` and there are multiple entry points. If this is the case and there are [unexpected differences](https://esbuild.github.io/api/#splitting) between the watch mode and a normal build, try turning this off. Default: `true`
--   `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
--   `--reactRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for React. This has to be specified in a config file (see below). Default: (none)
+- `--reactRootDir`: Directory where the React part of the adapter is located. Default: `admin`
+- `--reactOutDir`: Directory where the compiled React output will be placed, relative to `reactRootDir`. Default: `build`
+- `--reactPattern`: Glob pattern for React source files, relative to reactRootDir. Each match will result in a separate bundle. Default: `src/{index,tab}.{tsx,jsx}`
+- `--reactTsConfig`: Path to the tsconfig.json file used for building React, relative to `reactRootDir`. Default: `tsconfig.json`
+- `--reactBundle`: Bundle compiled React output into one file per entry point. Default: `true`
+- `--reactFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Supports `iife` and `esm`, but ESM should only be selected when targeting modern browsers exclusively.
+- `--reactSplitting`: Moves common code from multiple entry points into separate files, so they only have to be loaded once. Only relevant when `reactBundle` is `true`, `reactFormat` is `"esm"` and there are multiple entry points. If this is the case and there are [unexpected differences](https://esbuild.github.io/api/#splitting) between the watch mode and a normal build, try turning this off. Default: `true`
+- `--reactCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for React. Determines which JS features will be used in the output file. Default: `es2018`
+- `--reactRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for React. This has to be specified in a config file (see below). Default: (none)
 
 ### Using a config file
 
@@ -238,44 +238,50 @@ npm run clean-dir <directory>                         # directory to remove
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
 ### **WORK IN PROGRESS**
--   (ticaki) rimraf replaced by by internal tool.
+- (ticaki) rimraf replaced by by internal tool.
+- (hombach) Bump dev dependencies
+- (hombach) add tests for node.js 22, remove node 16 tests
 
 ### 1.3.0 (2024-02-18)
--	(kleinOr/Apollon77) Detects and keeps space indentation of io-package
--   (Steiger04) Fix handling of dot keys for esbuild
--   (Steiger04) Update esbuild and adjust watch mode
--   (Steiger04) process.env.NODE_ENV is now also available server side
--
+
+- (kleinOr/Apollon77) Detects and keeps space indentation of io-package
+- (Steiger04) Fix handling of dot keys for esbuild
+- (Steiger04) Update esbuild and adjust watch mode
+- (Steiger04) process.env.NODE_ENV is now also available server side
 
 ### 1.2.0 (2022-10-23)
--   (Grizzlebee) only translate linkText from messages if existent
--   (Apollon77) Add ukrainian as language for translations
+
+- (Grizzlebee) only translate linkText from messages if existent
+- (Apollon77) Add ukrainian as language for translations
 
 ### 1.1.0 (2022-09-14)
--	(Grizzelbee) Also translate admin messages in io-package.json
--   (AlCalzone) support specifying raw esbuild options, like loaders/plugins
+
+- (Grizzelbee) Also translate admin messages in io-package.json
+- (AlCalzone) support specifying raw esbuild options, like loaders/plugins
 
 ### 1.0.1 (2022-08-17)
--   (Apollon77) make sure that also texts with multiple sentences are correctly translated via Google Translate
+
+- (Apollon77) make sure that also texts with multiple sentences are correctly translated via Google Translate
 
 ### 1.0.0 (2022-02-15)
 
--   (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
+- (AlCalzone) Add build script to compile TypeScript and React using the blazing fast esbuild
 
 ### 0.1.0 (2021-09-21)
 
--   (UncleSamSwiss) Removed dependency on gulp
--   (UncleSamSwiss) Rewrote translation management as a regular Node.js application
+- (UncleSamSwiss) Removed dependency on gulp
+- (UncleSamSwiss) Rewrote translation management as a regular Node.js application
 
 ### 0.0.4 (2021-05-26)
 
--   (UncleSamSwiss) Implemented gulp tasks very similar to the existing tasks
+- (UncleSamSwiss) Implemented gulp tasks very similar to the existing tasks
 
 ### 0.0.3 (2021-05-06)
 
--   (UncleSamSwiss) Fixed npm publishing
+- (UncleSamSwiss) Fixed npm publishing
 
 ### 0.0.2 (2021-05-06)
 
--   (UncleSamSwiss) Initial repository setup
+- (UncleSamSwiss) Initial repository setup
