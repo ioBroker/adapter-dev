@@ -6,13 +6,14 @@
     "types": "build/index.d.ts",
     "bin": {
         "build-adapter": "bin/build-adapter.js",
-        "translate-adapter": "bin/translate-adapter.js"
+        "translate-adapter": "bin/translate-adapter.js",
+        "clean-dir": "bin/clean-dir.js"
     },
     "files": [
         "/build"
     ],
     "scripts": {
-        "prebuild": "node ./bin/clean-dir.js ./build",
+        "prebuild": "clean-dir ./build",
         "build": "tsc -p tsconfig.build.json",
         "check": "tsc -p tsconfig.build.json --noEmit",
         "watch": "npm run build -- --watch",

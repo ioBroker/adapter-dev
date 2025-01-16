@@ -224,12 +224,23 @@ module.exports = {
 };
 ```
 
+## clean-dir 
+This tool deletes a directory to be specified recursively.
+
+```bash
+npm run clean-dir <directory>                         # directory to remove
+```
+
+
 ## Changelog
 
 <!--
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+-   (ticaki) rimraf replaced by by internal tool.
+
 ### 1.3.0 (2024-02-18)
 -	(kleinOr/Apollon77) Detects and keeps space indentation of io-package
 -   (Steiger04) Fix handling of dot keys for esbuild
