@@ -224,6 +224,14 @@ module.exports = {
 };
 ```
 
+## clean-dir 
+This tool deletes a directory to be specified recursively.
+
+```bash
+npm run clean-dir <directory>                         # directory to remove
+```
+
+
 ## Changelog
 
 <!--
@@ -232,7 +240,7 @@ module.exports = {
 -->
 
 ### **WORK IN PROGRESS**
-
+- (ticaki) rimraf replaced by by internal tool.
 - (hombach) Bump dev dependencies
 - (hombach) add tests for node.js 22, remove node 16 tests
 
