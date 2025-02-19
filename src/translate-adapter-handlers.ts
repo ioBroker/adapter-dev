@@ -116,9 +116,10 @@ export async function parseOptions(options: {
 	if (options.base) {
 		i18nBases = options.base.map((p) => path.resolve(p));
 	} else {
-		const defaultPath = path.join(admin, "i18n", "en", "translations.json");
+		const defaultPath = path.join(admin, "i18n", "en.json");
 		i18nBases = [
 			defaultPath,
+			path.join(admin, "i18n", "en", "translations.json"),
 			path.join(admin, "src", "i18n", "en.json"),
 		].filter(existsSync);
 		if (i18nBases.length === 0) {
