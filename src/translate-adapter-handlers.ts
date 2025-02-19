@@ -346,7 +346,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 					console.warn(yellow(`Missing "${lang}": ${key}`)),
 				);
 		}
-	} catch (error) {
+	} catch {
 		// ignore error, we just use the strings from the translation files
 		//console.log(error);
 	}
