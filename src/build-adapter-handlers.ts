@@ -1,4 +1,4 @@
-/** Build script to use esbuild without specifying 1000 CLI options */
+/** The build script to use esbuild without specifying 1000 CLI options */
 // @ts-expect-error esm2cjs/execa needs to be fixed to allow cjs import with types
 import { ExecaChildProcess, execaNode } from "@esm2cjs/execa";
 import { gray, green, red } from "ansi-colors";
@@ -11,6 +11,7 @@ import { build, context } from "esbuild";
 import path from "path";
 import glob from "tiny-glob";
 import { die } from "./util";
+import { readJson } from "fs-extra";
 
 interface BuildOptions {
 	pattern: string;
@@ -25,11 +26,10 @@ interface BuildOptions {
 	raw?: Record<string, any>;
 }
 
-function findTsc(): string {
+async function findTsc(): Promise<string> {
 	try {
 		const packageJsonPath = require.resolve("typescript/package.json");
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const packageJson = require(packageJsonPath);
+		const packageJson = await readJson(packageJsonPath);
 		const binPath = packageJson.bin.tsc;
 		return path.join(path.dirname(packageJsonPath), binPath);
 	} catch (e: any) {
@@ -73,7 +73,7 @@ async function getTypeScriptFilePaths(
 async function typeCheck(tsConfigPath: string): Promise<boolean> {
 	console.log();
 	console.log(gray(`Type-checking ${tsConfigPath} with tsc...`));
-	const tscPath = findTsc();
+	const tscPath = await findTsc();
 	try {
 		await execaNode(tscPath, `-p ${tsConfigPath} --noEmit`.split(" "), {
 			stdout: "inherit",
@@ -87,12 +87,14 @@ async function typeCheck(tsConfigPath: string): Promise<boolean> {
 	}
 }
 
-function typeCheckWatch(tsConfigPath: string): ExecaChildProcess {
+async function typeCheckWatch(
+	tsConfigPath: string,
+): Promise<ExecaChildProcess> {
 	console.log();
 	console.log(
 		gray(`Type-checking ${tsConfigPath} with tsc in watch mode...`),
 	);
-	const tscPath = findTsc();
+	const tscPath = await findTsc();
 	return execaNode(
 		tscPath,
 		`-p ${tsConfigPath} --noEmit --watch --preserveWatchOutput`.split(" "),
@@ -217,12 +219,12 @@ async function watchReact(
 		// We could run a separate type checking process after each successful
 	});
 
-	buildCtx.watch();
+	void buildCtx.watch();
 
 	// 2. type-check with TypeScript (if there are TSX entry points)
 	let checkProcess: ExecaChildProcess | undefined;
 	if (entryPoints.some((e) => e.endsWith(".tsx"))) {
-		checkProcess = typeCheckWatch(tsConfigPath);
+		checkProcess = await typeCheckWatch(tsConfigPath);
 	}
 	return { ctx: buildCtx, check: checkProcess };
 }
@@ -241,10 +243,10 @@ async function watchTypeScript(
 		// We could run a separate type checking process after each successful
 	});
 
-	buildCtx.watch();
+	void buildCtx.watch();
 
 	// 2. type-check with TypeScript
-	const checkProcess = typeCheckWatch(tsConfigPath);
+	const checkProcess = await typeCheckWatch(tsConfigPath);
 	return { ctx: buildCtx, check: checkProcess };
 }
 

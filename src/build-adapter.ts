@@ -130,6 +130,8 @@ const tsOptions = {
 const parser = yargs(process.argv.slice(2)).parserConfiguration({
 	"dot-notation": false,
 });
+
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 parser
 	.env("IOBROKER_BUILD")
 	.strict()

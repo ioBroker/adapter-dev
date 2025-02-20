@@ -2,11 +2,11 @@ import { gray, yellow } from "ansi-colors";
 import {
 	ensureDir,
 	existsSync,
-	readFile,
 	readJson,
 	stat,
 	writeFile,
 	writeJson,
+	readFileSync,
 } from "fs-extra";
 import { EOL } from "os";
 import path from "path";
@@ -119,6 +119,8 @@ export async function parseOptions(options: {
 			defaultPath,
 			path.join(admin, "i18n", "en", "translations.json"),
 			path.join(admin, "src", "i18n", "en.json"),
+			path.join(admin, "..", "src", "src", "i18n", "en.json"),
+			path.join(admin, "..", "src-admin", "src", "i18n", "en.json"),
 		].filter(existsSync);
 		if (i18nBases.length === 0) {
 			// if no path exists, we are most likely using words.js and
@@ -171,7 +173,7 @@ export async function handleAllCommand(): Promise<void> {
 /****************************** Implementation ********************************/
 
 async function translateIoPackage(): Promise<void> {
-	const ioPackageFile = await readFile(ioPackage, "utf-8");
+	const ioPackageFile = readFileSync(ioPackage, "utf-8");
 	const indentation = getIndentation(ioPackageFile);
 	const content = JSON.parse(ioPackageFile);
 
@@ -278,7 +280,7 @@ async function adminWords2languages(
 	i18nBase: string,
 ): Promise<void> {
 	const filePattern = createFilePattern(i18nBase);
-	const data = parseWordJs(await readFile(words, "utf-8"));
+	const data = parseWordJs(readFileSync(words, "utf-8"));
 	const langs = createEmptyLangObject(() => ({}) as Record<string, string>);
 	for (const [word, translations] of Object.entries(data)) {
 		for (const [lang, translation] of Object.entries(translations)) {
@@ -335,7 +337,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 
 	try {
 		// merge existing and new words together (and check for missing translations)
-		const existingWords = parseWordJs(await readFile(words, "utf-8"));
+		const existingWords = parseWordJs(readFileSync(words, "utf-8"));
 		for (const [key, translations] of Object.entries(existingWords)) {
 			if (!newWords[key]) {
 				console.warn(yellow(`Take from current words.js: ${key}`));
