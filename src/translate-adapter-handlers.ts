@@ -7,8 +7,10 @@ import {
 	writeFile,
 	writeJson,
 	readFileSync,
+	readdirSync,
+	unlinkSync,
+	rmdirSync,
 } from "fs-extra";
-import { EOL } from "os";
 import path from "path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
@@ -19,6 +21,7 @@ let admin: string;
 let words: string;
 let i18nBases: string[];
 let translateLanguages: ioBroker.Languages[];
+const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
 
@@ -80,6 +83,26 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 	});
 }
 
+/** Convert the "LANG/translation.json" files to "LANG.json" files */
+async function convertTranslationJson2LanguageJson(
+	basePath: string,
+): Promise<void> {
+	const dirs = readdirSync(basePath, { withFileTypes: true })
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
+
+	for (const dir of dirs) {
+		const langPath = path.join(basePath, dir, "translations.json");
+		const text: Record<string, string> = await readJson(langPath);
+		await writeJson(path.join(basePath, `${dir}.json`), text, {
+			spaces: 4,
+			EOL,
+		});
+		unlinkSync(langPath);
+		rmdirSync(path.join(basePath, dir));
+	}
+}
+
 /******************************** Middlewares *********************************/
 
 export async function parseOptions(options: {
@@ -108,6 +131,10 @@ export async function parseOptions(options: {
 		words = path.join(admin, "js", "words.js");
 	} else {
 		words = path.join(admin, "words.js");
+	}
+
+	if (existsSync(path.join(admin, "i18n", "en", "translations.json"))) {
+		await convertTranslationJson2LanguageJson(path.join(admin, "i18n"));
 	}
 
 	// i18n base file
