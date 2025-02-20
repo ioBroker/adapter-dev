@@ -67,9 +67,7 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 	const filePattern = createFilePattern(baseFile);
 	const allJsonFiles = await glob(
 		path.join(admin, "**", "*.json").replace(/\\/g, "/"),
-		{
-			absolute: true,
-		},
+		{ absolute: true },
 	);
 
 	return allJsonFiles.filter((file) => {
@@ -251,10 +249,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 		await translateI18nJson(translation, lang, baseContent);
 		const filename = baseFile.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, translation, {
-			spaces: 4,
-			EOL,
-		});
+		await writeJson(filename, translation, { spaces: 4, EOL });
 		console.log(`Successfully created ${path.relative(".", filename)}`);
 	}
 }
@@ -307,10 +302,7 @@ async function adminWords2languages(
 		}
 		const filename = i18nBase.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, obj, {
-			spaces: 4,
-			EOL,
-		});
+		await writeJson(filename, obj, { spaces: 4, EOL });
 		console.log(`Successfully updated ${path.relative(".", filename)}`);
 	}
 }
@@ -355,7 +347,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 					console.warn(yellow(`Missing "${lang}": ${key}`)),
 				);
 		}
-	} catch (error) {
+	} catch {
 		// ignore error, we just use the strings from the translation files
 		//console.log(error);
 	}

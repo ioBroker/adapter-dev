@@ -38,10 +38,9 @@ function findTsc(): string {
 }
 
 /** Helper function to determine file paths that serve as input for React builds */
-async function getReactFilePaths(reactOptions: BuildOptions): Promise<{
-	entryPoints: string[];
-	tsConfigPath: string;
-}> {
+async function getReactFilePaths(
+	reactOptions: BuildOptions,
+): Promise<{ entryPoints: string[]; tsConfigPath: string }> {
 	let entryPoints = await glob(
 		`${reactOptions.rootDir}/${reactOptions.pattern}`,
 	);
@@ -59,10 +58,7 @@ async function getReactFilePaths(reactOptions: BuildOptions): Promise<{
 /** Helper function to determine file paths that serve as input for TypeScript builds */
 async function getTypeScriptFilePaths(
 	typescriptOptions: BuildOptions,
-): Promise<{
-	entryPoints: string[];
-	tsConfigPath: string;
-}> {
+): Promise<{ entryPoints: string[]; tsConfigPath: string }> {
 	let entryPoints = await glob(
 		`${typescriptOptions.rootDir}/${typescriptOptions.pattern}`,
 	);
@@ -85,7 +81,7 @@ async function typeCheck(tsConfigPath: string): Promise<boolean> {
 		});
 		console.error(green(`✔ Type-checking ${tsConfigPath} succeeded!`));
 		return true;
-	} catch (e) {
+	} catch {
 		console.error(red(`❌ Type-checking ${tsConfigPath} failed!`));
 		return false;
 	}
@@ -100,10 +96,7 @@ function typeCheckWatch(tsConfigPath: string): ExecaChildProcess {
 	return execaNode(
 		tscPath,
 		`-p ${tsConfigPath} --noEmit --watch --preserveWatchOutput`.split(" "),
-		{
-			stdout: "inherit",
-			stderr: "inherit",
-		},
+		{ stdout: "inherit", stderr: "inherit" },
 	);
 }
 
@@ -210,10 +203,9 @@ async function buildAll(
 	]);
 }
 
-async function watchReact(options: BuildOptions): Promise<{
-	ctx: BuildContext;
-	check?: ExecaChildProcess;
-}> {
+async function watchReact(
+	options: BuildOptions,
+): Promise<{ ctx: BuildContext; check?: ExecaChildProcess }> {
 	const { entryPoints, tsConfigPath } = await getReactFilePaths(options);
 
 	// Building React happens in one or two steps:
@@ -232,16 +224,12 @@ async function watchReact(options: BuildOptions): Promise<{
 	if (entryPoints.some((e) => e.endsWith(".tsx"))) {
 		checkProcess = typeCheckWatch(tsConfigPath);
 	}
-	return {
-		ctx: buildCtx,
-		check: checkProcess,
-	};
+	return { ctx: buildCtx, check: checkProcess };
 }
 
-async function watchTypeScript(options: BuildOptions): Promise<{
-	ctx: BuildContext;
-	check: ExecaChildProcess;
-}> {
+async function watchTypeScript(
+	options: BuildOptions,
+): Promise<{ ctx: BuildContext; check: ExecaChildProcess }> {
 	const { entryPoints, tsConfigPath } = await getTypeScriptFilePaths(options);
 
 	// Building TS happens in two steps:
@@ -257,10 +245,7 @@ async function watchTypeScript(options: BuildOptions): Promise<{
 
 	// 2. type-check with TypeScript
 	const checkProcess = typeCheckWatch(tsConfigPath);
-	return {
-		ctx: buildCtx,
-		check: checkProcess,
-	};
+	return { ctx: buildCtx, check: checkProcess };
 }
 
 // Entry points for the CLI
