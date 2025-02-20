@@ -10,7 +10,7 @@ All dependencies an ioBroker adapter developer needs.
 
 ## Installation
 
-To use this library add it to your dev dependencies:
+To use this library, add it to your dev dependencies:
 
 ```bash
 npm install --save-dev @iobroker/adapter-dev
@@ -35,7 +35,7 @@ npm run translate to-json
 
 ## TL;DR
 
-- You should only update i18n JSON files and you shouldn't touch words.js anymore.
+- You should only update i18n JSON files, and you shouldn't touch words.js anymore.
 - Add new strings only to the English JSON file.
 - Call the following command whenever you add any text in JSON files (inside the admin i18n folder or in `io-package.json`).
     - If you have an HTML/JavaScript admin UI: `npm run translate all`
@@ -142,7 +142,7 @@ All command line arguments can also be provided as environment variables. Just p
 
 #### Translate with Google Translate Credentials
 
-If you wish to use the Google Translate V3 API, you can set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to point to a credentials file, so the translations can use larger quota for translations (which may result in costs).
+If you wish to use the Google Translate V3 API, you can set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to point to a credential file, so the translations can use larger quota for translations (which may result in costs).
 
 The file can be generated on the Google Cloud Platform by creating a Service Account for Google Translate V3. See [here](https://cloud.google.com/translate/docs/setup) for additional information. The expected format looks something like this:
 
