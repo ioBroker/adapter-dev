@@ -2,13 +2,15 @@ import { gray, yellow } from "ansi-colors";
 import {
 	ensureDir,
 	existsSync,
-	readFile,
 	readJson,
 	stat,
 	writeFile,
 	writeJson,
+	readFileSync,
+	readdirSync,
+	unlinkSync,
+	rmdirSync,
 } from "fs-extra";
-import { EOL } from "os";
 import path from "path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
@@ -19,6 +21,7 @@ let admin: string;
 let words: string;
 let i18nBases: string[];
 let translateLanguages: ioBroker.Languages[];
+const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
 
@@ -67,9 +70,7 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 	const filePattern = createFilePattern(baseFile);
 	const allJsonFiles = await glob(
 		path.join(admin, "**", "*.json").replace(/\\/g, "/"),
-		{
-			absolute: true,
-		},
+		{ absolute: true },
 	);
 
 	return allJsonFiles.filter((file) => {
@@ -80,6 +81,26 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 		const lang = match[2] as ioBroker.Languages;
 		return translateLanguages.includes(lang);
 	});
+}
+
+/** Convert the "LANG/translation.json" files to "LANG.json" files */
+async function convertTranslationJson2LanguageJson(
+	basePath: string,
+): Promise<void> {
+	const dirs = readdirSync(basePath, { withFileTypes: true })
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
+
+	for (const dir of dirs) {
+		const langPath = path.join(basePath, dir, "translations.json");
+		const text: Record<string, string> = await readJson(langPath);
+		await writeJson(path.join(basePath, `${dir}.json`), text, {
+			spaces: 4,
+			EOL,
+		});
+		unlinkSync(langPath);
+		rmdirSync(path.join(basePath, dir));
+	}
 }
 
 /******************************** Middlewares *********************************/
@@ -112,14 +133,21 @@ export async function parseOptions(options: {
 		words = path.join(admin, "words.js");
 	}
 
+	if (existsSync(path.join(admin, "i18n", "en", "translations.json"))) {
+		await convertTranslationJson2LanguageJson(path.join(admin, "i18n"));
+	}
+
 	// i18n base file
 	if (options.base) {
 		i18nBases = options.base.map((p) => path.resolve(p));
 	} else {
-		const defaultPath = path.join(admin, "i18n", "en", "translations.json");
+		const defaultPath = path.join(admin, "i18n", "en.json");
 		i18nBases = [
 			defaultPath,
+			path.join(admin, "i18n", "en", "translations.json"),
 			path.join(admin, "src", "i18n", "en.json"),
+			path.join(admin, "..", "src", "src", "i18n", "en.json"),
+			path.join(admin, "..", "src-admin", "src", "i18n", "en.json"),
 		].filter(existsSync);
 		if (i18nBases.length === 0) {
 			// if no path exists, we are most likely using words.js and
@@ -165,14 +193,17 @@ export function handleToWordsCommand(): Promise<void> {
 
 export async function handleAllCommand(): Promise<void> {
 	await handleTranslateCommand();
-	await handleToWordsCommand();
-	await handleToJsonCommand();
+	// execute it only if words.js exists, but now we do not need it
+	if (existsSync(words)) {
+		await handleToWordsCommand();
+		await handleToJsonCommand();
+	}
 }
 
 /****************************** Implementation ********************************/
 
 async function translateIoPackage(): Promise<void> {
-	const ioPackageFile = await readFile(ioPackage, "utf-8");
+	const ioPackageFile = readFileSync(ioPackage, "utf-8");
 	const indentation = getIndentation(ioPackageFile);
 	const content = JSON.parse(ioPackageFile);
 
@@ -250,10 +281,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 		await translateI18nJson(translation, lang, baseContent);
 		const filename = baseFile.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, translation, {
-			spaces: 4,
-			EOL,
-		});
+		await writeJson(filename, translation, { spaces: 4, EOL });
 		console.log(`Successfully created ${path.relative(".", filename)}`);
 	}
 }
@@ -282,7 +310,7 @@ async function adminWords2languages(
 	i18nBase: string,
 ): Promise<void> {
 	const filePattern = createFilePattern(i18nBase);
-	const data = parseWordJs(await readFile(words, "utf-8"));
+	const data = parseWordJs(readFileSync(words, "utf-8"));
 	const langs = createEmptyLangObject(() => ({}) as Record<string, string>);
 	for (const [word, translations] of Object.entries(data)) {
 		for (const [lang, translation] of Object.entries(translations)) {
@@ -306,10 +334,7 @@ async function adminWords2languages(
 		}
 		const filename = i18nBase.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, obj, {
-			spaces: 4,
-			EOL,
-		});
+		await writeJson(filename, obj, { spaces: 4, EOL });
 		console.log(`Successfully updated ${path.relative(".", filename)}`);
 	}
 }
@@ -342,7 +367,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 
 	try {
 		// merge existing and new words together (and check for missing translations)
-		const existingWords = parseWordJs(await readFile(words, "utf-8"));
+		const existingWords = parseWordJs(readFileSync(words, "utf-8"));
 		for (const [key, translations] of Object.entries(existingWords)) {
 			if (!newWords[key]) {
 				console.warn(yellow(`Take from current words.js: ${key}`));
@@ -354,7 +379,7 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 					console.warn(yellow(`Missing "${lang}": ${key}`)),
 				);
 		}
-	} catch (error) {
+	} catch {
 		// ignore error, we just use the strings from the translation files
 		//console.log(error);
 	}

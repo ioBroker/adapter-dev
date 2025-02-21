@@ -204,10 +204,7 @@ These only have an effect for the `react` and `all` commands:
 By default, the build script looks for a `.buildconfig.json` file where the above options can be saved (without leading `--`), so they don't have to be specified on the command line. Example:
 
 ```json
-{
-	"typescriptBundle": true,
-	"typescriptCompileTarget": "node16"
-}
+{ "typescriptBundle": true, "typescriptCompileTarget": "node16" }
 ```
 
 This path can be changed with the `--config` option, short `-c`.
@@ -217,11 +214,7 @@ When using a `.js` file instead, this can be used to specify additional [esbuild
 ```js
 const { html } = require("@esbuilder/html");
 
-module.exports = {
-	reactRaw: {
-		plugins: [html()],
-	},
-};
+module.exports = { reactRaw: { plugins: [html()] } };
 ```
 
 ## clean-dir 
@@ -241,6 +234,8 @@ npm run clean-dir <directory>                         # directory to remove
 
 ### **WORK IN PROGRESS**
 - (ticaki) rimraf replaced by by internal tool.
+- (hombach) change year to 2025
+- (hombach) Fix two vulnerabilities
 - (hombach) Bump dev dependencies
 - (hombach) add tests for node.js 22, remove node 16 tests
 

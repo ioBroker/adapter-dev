@@ -105,8 +105,11 @@ describe("translate-adapter to-words", () => {
 	it("generates a new words.js if it doesn't exist", () => {
 		return runTranslation("no-words-yet", false, handleToWordsCommand);
 	});
-	it("updates words.js if new strings were added to the JSON files", () => {
+	it("updates words.js if new strings were added to the JSON files in i18n/<lang>/translations.json", () => {
 		return runTranslation("update-words", false, handleToWordsCommand);
+	});
+	it("updates words.js if new strings were added to the JSON files in i18n/<lang>.json", () => {
+		return runTranslation("update-words-v2", false, handleToWordsCommand);
 	});
 });
 
