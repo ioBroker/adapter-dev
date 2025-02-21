@@ -11,7 +11,7 @@ import {
 	unlinkSync,
 	rmdirSync,
 } from "fs-extra";
-import path from "path";
+import path from "node:path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
 import { die, escapeRegExp, getIndentation, padRight } from "./util";
@@ -94,12 +94,36 @@ async function convertTranslationJson2LanguageJson(
 	for (const dir of dirs) {
 		const langPath = path.join(basePath, dir, "translations.json");
 		const text: Record<string, string> = await readJson(langPath);
+		// Write the new file
 		await writeJson(path.join(basePath, `${dir}.json`), text, {
 			spaces: 4,
 			EOL,
 		});
 		unlinkSync(langPath);
 		rmdirSync(path.join(basePath, dir));
+	}
+
+	// Try to sort the files
+	const files = readdirSync(basePath).filter((file) =>
+		file.endsWith(".json"),
+	);
+
+	// Read a file, sort the keys and write it back
+	for (const file of files) {
+		const filePath = path.join(basePath, file);
+		const text: Record<string, string> = await readJson(filePath);
+		// Sort the keys
+		const sortedText: Record<string, string> = {};
+		Object.keys(text)
+			.sort()
+			.forEach((key) => {
+				sortedText[key] = text[key];
+			});
+		// Write the new file
+		await writeJson(filePath, sortedText, {
+			spaces: 4,
+			EOL,
+		});
 	}
 }
 

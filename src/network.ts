@@ -1,9 +1,9 @@
 import type { AxiosRequestConfig } from "axios";
-import { URL } from "url";
+import { URL } from "node:url";
 
 /**
  * Adds https proxy options to an axios request if they were defined as an env variable
- * @param options The options object passed to axios
+ * @param options The option object passed to axios
  */
 export function applyHttpsProxy(
 	options: AxiosRequestConfig,

@@ -125,6 +125,8 @@ npm run translate c                           # short code
 
 Converts old structure of i18n files, like `i18n/LANG/translations.json` to new one `i18n/LANG.json`. The new structure is preferred.
 
+Additionally, it will convert the indent to 4 spaces, line endings to LF and sort the keys.
+
 ### `all` Command
 
 ```bash

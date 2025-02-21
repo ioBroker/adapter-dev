@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as dircompare from "dir-compare";
-import { copy } from "fs-extra";
+import { copy, readFileSync } from "fs-extra";
 import path from "path";
 import { rimraf } from "rimraf";
 import {
@@ -91,12 +91,24 @@ describe("translate-adapter translate", () => {
 			handleTranslateCommand,
 		);
 	});
-	it("converts old structure to new one ", () => {
-		return runTranslation(
+	it("converts old structure to new one ", async () => {
+		const result = await runTranslation(
 			"convert-translations",
 			true,
 			handleConvertCommand,
 		);
+
+		// Check that the CR and indentation were set to 4 spaces
+		const enFile = readFileSync(
+			`${__dirname}/data/convert-translations/output/admin/i18n/en.json`,
+			"utf8",
+		);
+
+		const keys = Object.keys(JSON.parse(enFile));
+		const sortKeys = [...keys].sort();
+		expect(JSON.stringify(keys)).to.equal(JSON.stringify(sortKeys));
+
+		return result;
 	});
 });
 

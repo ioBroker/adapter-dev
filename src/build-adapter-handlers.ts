@@ -8,7 +8,7 @@ import type {
 	Format,
 } from "esbuild";
 import { build, context } from "esbuild";
-import path from "path";
+import path from "node:path";
 import glob from "tiny-glob";
 import { die } from "./util";
 import { readJson } from "fs-extra";
