@@ -4,6 +4,7 @@ import {
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
+	handleConvertCommand,
 	parseOptions,
 } from "./translate-adapter-handlers";
 import { interceptErrors } from "./util";
@@ -40,6 +41,12 @@ parser
 		"Sequence of translate, to-words, to-json",
 		{},
 		interceptErrors(handleAllCommand),
+	)
+	.command(
+		["convert", "c"],
+		"Convert old file structure i18n/en/translations.json to new structure i18n/en.json",
+		{},
+		interceptErrors(handleConvertCommand),
 	)
 	/*
 	translateAndUpdateWordsJS: TaskFunction;*/

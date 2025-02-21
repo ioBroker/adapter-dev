@@ -105,6 +105,10 @@ async function convertTranslationJson2LanguageJson(
 
 /******************************** Middlewares *********************************/
 
+export async function handleConvertCommand(): Promise<void> {
+	await convertTranslationJson2LanguageJson(path.join(admin, "i18n"));
+}
+
 export async function parseOptions(options: {
 	"io-package": string;
 	admin: string;
@@ -131,10 +135,6 @@ export async function parseOptions(options: {
 		words = path.join(admin, "js", "words.js");
 	} else {
 		words = path.join(admin, "words.js");
-	}
-
-	if (existsSync(path.join(admin, "i18n", "en", "translations.json"))) {
-		await convertTranslationJson2LanguageJson(path.join(admin, "i18n"));
 	}
 
 	// i18n base file
