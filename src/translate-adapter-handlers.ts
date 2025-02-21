@@ -193,8 +193,11 @@ export function handleToWordsCommand(): Promise<void> {
 
 export async function handleAllCommand(): Promise<void> {
 	await handleTranslateCommand();
-	await handleToWordsCommand();
-	await handleToJsonCommand();
+	// execute it only if words.js exists, but now we do not need it
+	if (existsSync(words)) {
+		await handleToWordsCommand();
+		await handleToJsonCommand();
+	}
 }
 
 /****************************** Implementation ********************************/
