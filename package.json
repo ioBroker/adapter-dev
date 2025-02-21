@@ -6,13 +6,14 @@
   "types": "build/index.d.ts",
   "bin": {
     "build-adapter": "bin/build-adapter.js",
-    "translate-adapter": "bin/translate-adapter.js"
+    "translate-adapter": "bin/translate-adapter.js",
+    "clean-dir": "bin/clean-dir.js"
   },
   "files": [
     "/build"
   ],
   "scripts": {
-    "prebuild": "rimraf ./build",
+    "prebuild": "clean-dir ./build",
     "build": "tsc -p tsconfig.build.json",
     "check": "tsc -p tsconfig.build.json --noEmit",
     "watch": "npm run build -- --watch",
@@ -68,7 +69,6 @@
     "mocha": "^11.1.0",
     "prettier": "^3.5.1",
     "prettier-plugin-organize-imports": "^4.1.0",
-    "rimraf": "^6.0.1",
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",

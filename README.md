@@ -217,6 +217,14 @@ const { html } = require("@esbuilder/html");
 module.exports = { reactRaw: { plugins: [html()] } };
 ```
 
+## clean-dir 
+This tool deletes a directory to be specified recursively.
+
+```bash
+npm run clean-dir <directory>                         # directory to remove
+```
+
+
 ## Changelog
 
 <!--
@@ -225,7 +233,7 @@ module.exports = { reactRaw: { plugins: [html()] } };
 -->
 
 ### **WORK IN PROGRESS**
-
+- (ticaki) rimraf replaced by by internal tool.
 - (hombach) change year to 2025
 - (hombach) Fix two vulnerabilities
 - (hombach) Bump dev dependencies
