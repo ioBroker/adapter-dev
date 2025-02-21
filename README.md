@@ -116,6 +116,16 @@ Updates `words.js` from the different i18n JSON files; call this whenever you mo
 
 Previously known as `gulp adminLanguages2words`.
 
+### `convert` Command
+
+```bash
+npm run translate to-words                    # full name
+npm run translate w                           # short code
+npm run translate adminLanguages2words        # legacy
+```
+
+Converts old structure of i18n files, like `i18n/LANG/translations.json` to new one `i18n/LANG.json`. The new structure is preferred.
+
 ### `all` Command
 
 ```bash

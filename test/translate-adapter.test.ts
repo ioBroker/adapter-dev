@@ -4,6 +4,7 @@ import { copy } from "fs-extra";
 import path from "path";
 import { rimraf } from "rimraf";
 import {
+	handleConvertCommand,
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
@@ -88,6 +89,13 @@ describe("translate-adapter translate", () => {
 			"continue-translate-io-package",
 			true,
 			handleTranslateCommand,
+		);
+	});
+	it("converts old structure to new one ", () => {
+		return runTranslation(
+			"convert-translations",
+			true,
+			handleConvertCommand,
 		);
 	});
 });
