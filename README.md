@@ -249,6 +249,8 @@ npm run clean-dir <directory>                         # directory to remove
 - (hombach) Fix two vulnerabilities
 - (hombach) Bump dev dependencies
 - (hombach) add tests for node.js 22, remove node 16 tests
+- (@GermanBluefox) Added `convert` command to convert old i18n structure to new one
+- (@GermanBluefox) Packages were updated
 
 ### 1.3.0 (2024-02-18)
 
