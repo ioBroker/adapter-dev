@@ -119,9 +119,8 @@ Previously known as `gulp adminLanguages2words`.
 ### `convert` Command
 
 ```bash
-npm run translate to-words                    # full name
-npm run translate w                           # short code
-npm run translate adminLanguages2words        # legacy
+npm run translate convert                     # full name
+npm run translate c                           # short code
 ```
 
 Converts old structure of i18n files, like `i18n/LANG/translations.json` to new one `i18n/LANG.json`. The new structure is preferred.
