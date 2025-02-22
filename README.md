@@ -251,6 +251,7 @@ npm run clean-dir <directory>                         # directory to remove
 - (hombach) add tests for node.js 22, remove node 16 tests
 - (@GermanBluefox) Added `convert` command to convert old i18n structure to new one
 - (@GermanBluefox) Packages were updated
+- (@UncleSamSwiss) Change default path for translation JSON files to `admin/i18n/en.json`; the old path is still supported for existing repositories
 
 ### 1.3.0 (2024-02-18)
 
