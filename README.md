@@ -10,7 +10,7 @@ All dependencies an ioBroker adapter developer needs.
 
 ## Installation
 
-To use this library add it to your dev dependencies:
+To use this library, add it to your dev dependencies:
 
 ```bash
 npm install --save-dev @iobroker/adapter-dev
@@ -18,7 +18,7 @@ npm install --save-dev @iobroker/adapter-dev
 
 Add the following to the `scripts` section of your `package.json`:
 
-```json
+```json5
   "scripts": {
 	// ... other scripts before this
 	"translate": "translate-adapter",
