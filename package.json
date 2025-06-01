@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@esm2cjs/execa": "^6.1.1-cjs.1",
-    "@google-cloud/translate": "^8.5.0",
+    "@google-cloud/translate": "^9.1.0",
     "ansi-colors": "^4.1.3",
     "axios": "^1.7.9",
     "esbuild": "^0.25.0",
