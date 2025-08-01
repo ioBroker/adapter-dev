@@ -58,7 +58,7 @@
     "@types/node": "^22.13.4",
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
-    "@typescript-eslint/parser": "^8.24.1",
+    "@typescript-eslint/parser": "^8.38.0",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "cross-spawn": ">=7.0.6",
