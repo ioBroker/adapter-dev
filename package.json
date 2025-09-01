@@ -59,7 +59,7 @@
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
-    "chai": "^4.5.0",
+    "chai": "^6.0.1",
     "chai-as-promised": "^7.1.2",
     "cross-spawn": ">=7.0.6",
     "dir-compare": "^5.0.0",
