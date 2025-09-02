@@ -26,7 +26,8 @@ parser
 				type: "boolean",
 				alias: "r",
 				default: false,
-				description: "Delete all existing translation files and rebuild everything",
+				description:
+					"Delete all existing translation files and rebuild everything",
 			},
 		},
 		interceptErrors(handleTranslateCommand),
