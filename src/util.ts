@@ -1,4 +1,5 @@
 import { bold, red } from "ansi-colors";
+import { readFile } from "node:fs/promises";
 
 export function escapeRegExp(value: string): string {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -41,9 +42,7 @@ export async function getFileIndentation(
 	filePath: string,
 ): Promise<string | number> {
 	try {
-		// Use Node.js fs module instead of fs-extra for simpler import
-		const fs = await import("node:fs/promises");
-		const content = await fs.readFile(filePath, "utf-8");
+		const content = await readFile(filePath, "utf-8");
 		return getIndentation(content);
 	} catch {
 		// If file doesn't exist or can't be read, use default (4 spaces)
