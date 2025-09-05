@@ -112,6 +112,7 @@ describe("translate-adapter translate", () => {
 
 		return result;
 	});
+
 	it("rebuilds all translation files when --rebuild is used", async () => {
 		// Setup test directory 
 		const baseDir = path.resolve(__dirname, "data", "rebuild-test");
