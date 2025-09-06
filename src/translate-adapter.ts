@@ -21,7 +21,15 @@ parser
 	.command(
 		["translate", "t", "$0"],
 		"Translate io-package.json and all admin language files",
-		{},
+		{
+			rebuild: {
+				type: "boolean",
+				alias: "r",
+				default: false,
+				description:
+					"Delete all existing translation files and rebuild everything",
+			},
+		},
 		interceptErrors(handleTranslateCommand),
 	)
 	.command(
