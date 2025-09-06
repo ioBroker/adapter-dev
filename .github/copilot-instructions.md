@@ -190,6 +190,7 @@ npm run check              # TypeScript type check without emit
 - **Always update README.md changelog section** for user and developer facing changes
 - **Use project format**: Follow the existing changelog format in README.md
 - **Add to WORK IN PROGRESS section**: New changes go under the `### **WORK IN PROGRESS**` placeholder
+- **Include author attribution**: Start each changelog entry with "(@copilot)" for Copilot contributions
 - **Include issue references**: Link to GitHub issues when applicable (e.g., "fixes #60")
 - **User-facing changes include**: CLI behavior changes, new commands, changed output format, API changes
 - **Developer-facing changes include**: Build process changes, new dependencies, breaking API changes

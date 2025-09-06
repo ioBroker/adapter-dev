@@ -243,7 +243,7 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- Sort JSON keys alphabetically in all generated translation files (fixes #60)
+- (@copilot) Sort JSON keys alphabetically in all generated translation files (fixes #60)
 
 ### 1.4.0 (2025-02-22)
 - (ticaki) rimraf replaced by by internal tool.
