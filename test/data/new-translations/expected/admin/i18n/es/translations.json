@@ -1,3 +1,5 @@
 {
-    "Example": "Mock translation of 'Example' to 'es'"
+    "Example": "Mock translation of 'Example' to 'es'",
+    "apple": "Mock translation of 'Apple example' to 'es'",
+    "zebra": "Mock translation of 'Zebra example' to 'es'"
 }
