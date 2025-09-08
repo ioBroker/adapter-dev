@@ -194,7 +194,7 @@ These only have an effect for the `ts/typescript` and `all` commands:
 - `--typescriptPattern`: Glob pattern for TypeScript source files, relative to typescriptRootDir. Should not be changed unless bundling is enabled. Each match will result in a separate bundle. Default: `src/**/*.ts`
 - `--typescriptTsConfig`: Path to the tsconfig.json file used for building TypeScript, relative to `typescriptRootDir`. Default: `tsconfig.build.json`
 - `--typescriptBundle`: Bundle compiled TypeScript output into one file per entry point. Default: `false`
-- `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). Only CommonJS (`cjs`) is supported at the moment.
+- `--typescriptFormat`: [Format](https://esbuild.github.io/api/#format) of the output file(s). CommonJS (`cjs`) or ES modules (`esm`).
 - `--typescriptCompileTarget`: [Compilation target](https://esbuild.github.io/api/#target) for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker. Default: `node12`
 - `--typescriptRaw`: An object of raw [esbuild options](https://esbuild.github.io/api/#simple-options) that are passed to the build process for TypeScript. This has to be specified in a config file (see below). Default: (none)
 
