@@ -242,6 +242,9 @@ npm run clean-dir <directory>                         # directory to remove
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats, allowing developers to build TypeScript adapters targeting modern Node.js environments that support ES modules.
+
 ### 1.4.0 (2025-02-22)
 - (ticaki) rimraf replaced by by internal tool.
 - (hombach) change year to 2025
