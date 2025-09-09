@@ -1,5 +1,5 @@
 import { TranslationServiceClient } from "@google-cloud/translate";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { readJson } from "fs-extra";
 import { applyHttpsProxy, getRequestTimeout } from "./network";
 import { error } from "./util";
@@ -8,6 +8,7 @@ const translationCache = new Map<string, Map<string, string>>();
 
 /**
  * Translates text using the Google Translate API.
+ *
  * @param text The text to translate
  * @param targetLang The target language code
  * @returns The translated text or the same text if translation failed.
@@ -16,11 +17,14 @@ export async function translateText(
 	text: string,
 	targetLang: string,
 ): Promise<string> {
-	if (targetLang === "en") return text;
+	if (targetLang === "en") {
+		return text;
+	}
 
 	// Try to read the translation from the translation cache
-	if (!translationCache.has(targetLang))
+	if (!translationCache.has(targetLang)) {
 		translationCache.set(targetLang, new Map());
+	}
 	const langCache = translationCache.get(targetLang)!;
 
 	// or fall back to an online translation
@@ -46,12 +50,12 @@ interface Translator {
 }
 
 async function createTranslator(): Promise<Translator> {
-	if (!!process.env.TESTING) {
+	if (process.env.TESTING) {
 		console.log("Using dummy testing translation");
 		return new TestingTranslator();
 	}
 
-	if (!!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+	if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 		const v3 = new GoogleV3Translator();
 		try {
 			await v3.init();
@@ -79,8 +83,10 @@ function getTranslator(): Promise<Translator> {
  * It returns a mock text.
  */
 class TestingTranslator implements Translator {
-	async translate(text: string, targetLang: string): Promise<string> {
-		return `Mock translation of '${text}' to '${targetLang}'`;
+	translate(text: string, targetLang: string): Promise<string> {
+		return Promise.resolve(
+			`Mock translation of '${text}' to '${targetLang}'`,
+		);
 	}
 }
 

@@ -1,27 +1,42 @@
 import { bold, red } from "ansi-colors";
 import { readFile } from "node:fs/promises";
 
+/**
+ *
+ */
 export function escapeRegExp(value: string): string {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
+/**
+ *
+ */
 export function padRight(text: string, totalLength: number): string {
 	return text.padEnd(totalLength, " ");
 }
 
+/**
+ *
+ */
 export function error(message: string): void {
 	console.error(bold.red(message));
 	console.error();
 }
 
+/**
+ *
+ */
 export function die(message: string): never {
 	console.error(red(message));
 	process.exit(1);
 }
 
+/**
+ *
+ */
 export function getIndentation(text: string): string | number {
 	const lines = text.split(/\r?\n/);
-	const fileStartLine = lines.findIndex((line) => line.startsWith("{"));
+	const fileStartLine = lines.findIndex(line => line.startsWith("{"));
 	if (fileStartLine !== -1 && lines.length > fileStartLine + 1) {
 		// Check for tabs first
 		const tabMatches = lines[fileStartLine + 1].match(/^\t+/);
@@ -38,6 +53,9 @@ export function getIndentation(text: string): string | number {
 	return 4;
 }
 
+/**
+ *
+ */
 export async function getFileIndentation(
 	filePath: string,
 ): Promise<string | number> {
@@ -50,6 +68,9 @@ export async function getFileIndentation(
 	}
 }
 
+/**
+ *
+ */
 export function interceptErrors(
 	func: () => Promise<void>,
 ): () => Promise<void> {

@@ -1,13 +1,14 @@
 /** The build script to use esbuild without specifying 1000 CLI options */
 // @ts-expect-error esm2cjs/execa needs to be fixed to allow cjs import with types
-import { ExecaChildProcess, execaNode } from "@esm2cjs/execa";
+import { execaNode, type ExecaChildProcess } from "@esm2cjs/execa";
 import { gray, green, red } from "ansi-colors";
-import type {
-	BuildContext,
-	BuildOptions as ESBuildOptions,
-	Format,
+import {
+	build,
+	context,
+	type BuildContext,
+	type BuildOptions as ESBuildOptions,
+	type Format,
 } from "esbuild";
-import { build, context } from "esbuild";
 import path from "node:path";
 import glob from "tiny-glob";
 import { die } from "./util";
@@ -37,7 +38,11 @@ async function findTsc(): Promise<string> {
 	}
 }
 
-/** Helper function to determine file paths that serve as input for React builds */
+/**
+ * Helper function to determine file paths that serve as input for React builds
+ *
+ * @param reactOptions
+ */
 async function getReactFilePaths(
 	reactOptions: BuildOptions,
 ): Promise<{ entryPoints: string[]; tsConfigPath: string }> {
@@ -45,7 +50,7 @@ async function getReactFilePaths(
 		`${reactOptions.rootDir}/${reactOptions.pattern}`,
 	);
 	entryPoints = entryPoints.filter(
-		(ep) =>
+		ep =>
 			!ep.endsWith(".d.ts") &&
 			!ep.endsWith(".test.ts") &&
 			!ep.endsWith(".test.tsx"),
@@ -55,7 +60,11 @@ async function getReactFilePaths(
 	return { entryPoints, tsConfigPath };
 }
 
-/** Helper function to determine file paths that serve as input for TypeScript builds */
+/**
+ * Helper function to determine file paths that serve as input for TypeScript builds
+ *
+ * @param typescriptOptions
+ */
 async function getTypeScriptFilePaths(
 	typescriptOptions: BuildOptions,
 ): Promise<{ entryPoints: string[]; tsConfigPath: string }> {
@@ -63,13 +72,17 @@ async function getTypeScriptFilePaths(
 		`${typescriptOptions.rootDir}/${typescriptOptions.pattern}`,
 	);
 	entryPoints = entryPoints.filter(
-		(ep) => !ep.endsWith(".d.ts") && !ep.endsWith(".test.ts"),
+		ep => !ep.endsWith(".d.ts") && !ep.endsWith(".test.ts"),
 	);
 	const tsConfigPath = `${typescriptOptions.rootDir}/${typescriptOptions.tsConfig}`;
 	return { entryPoints, tsConfigPath };
 }
 
-/** Type-checks the project with the given tsconfig path */
+/**
+ * Type-checks the project with the given tsconfig path
+ *
+ * @param tsConfigPath
+ */
 async function typeCheck(tsConfigPath: string): Promise<boolean> {
 	console.log();
 	console.log(gray(`Type-checking ${tsConfigPath} with tsc...`));
@@ -171,7 +184,7 @@ async function buildReact(options: BuildOptions): Promise<void> {
 	);
 
 	// 2. type-check with TypeScript (if there are TSX entry points)
-	if (entryPoints.some((e) => e.endsWith(".tsx"))) {
+	if (entryPoints.some(e => e.endsWith(".tsx"))) {
 		if (!(await typeCheck(tsConfigPath))) {
 			process.exit(1);
 		}
@@ -223,7 +236,7 @@ async function watchReact(
 
 	// 2. type-check with TypeScript (if there are TSX entry points)
 	let checkProcess: ExecaChildProcess | undefined;
-	if (entryPoints.some((e) => e.endsWith(".tsx"))) {
+	if (entryPoints.some(e => e.endsWith(".tsx"))) {
 		checkProcess = await typeCheckWatch(tsConfigPath);
 	}
 	return { ctx: buildCtx, check: checkProcess };
@@ -260,7 +273,7 @@ export async function handleBuildReactCommand(
 
 		const { ctx, check } = await watchReact(options);
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			check?.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
@@ -273,9 +286,8 @@ export async function handleBuildReactCommand(
 				}
 			});
 		});
-	} else {
-		await buildReact(options);
 	}
+	await buildReact(options);
 }
 
 export async function handleBuildTypeScriptCommand(
@@ -287,7 +299,7 @@ export async function handleBuildTypeScriptCommand(
 
 		const { ctx, check } = await watchTypeScript(options);
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			check.then(() => resolve()).catch(() => resolve());
 			process.on("SIGINT", () => {
 				console.log();
@@ -296,9 +308,8 @@ export async function handleBuildTypeScriptCommand(
 				check.kill("SIGINT");
 			});
 		});
-	} else {
-		await buildTypeScript(options);
 	}
+	await buildTypeScript(options);
 }
 
 export async function handleBuildAllCommand(
@@ -314,7 +325,7 @@ export async function handleBuildAllCommand(
 		const { ctx: ctxTS, check: checkTS } =
 			await watchTypeScript(typescriptOptions);
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			Promise.all([checkReact, checkTS].filter(Boolean))
 				.then(() => resolve())
 				.catch(() => resolve());
@@ -328,7 +339,6 @@ export async function handleBuildAllCommand(
 				checkTS.kill("SIGINT");
 			});
 		});
-	} else {
-		await buildAll(reactOptions, typescriptOptions);
 	}
+	await buildAll(reactOptions, typescriptOptions);
 }

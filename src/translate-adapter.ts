@@ -11,7 +11,7 @@ import { interceptErrors } from "./util";
 import yargs from "yargs";
 
 const parser = yargs(process.argv.slice(2));
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+
 parser
 	.env("IOBROKER_TRANSLATE")
 	.strict()

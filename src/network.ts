@@ -3,6 +3,7 @@ import { URL } from "node:url";
 
 /**
  * Adds https proxy options to an axios request if they were defined as an env variable
+ *
  * @param options The option object passed to axios
  */
 export function applyHttpsProxy(
@@ -26,11 +27,16 @@ export function applyHttpsProxy(
 	return options;
 }
 
+/**
+ *
+ */
 export function getRequestTimeout(): number {
 	let ret: number | undefined;
 	if (process.env.REQUEST_TIMEOUT) {
 		ret = parseInt(process.env.REQUEST_TIMEOUT, 10);
 	}
-	if (ret == undefined || Number.isNaN(ret)) return 5000;
+	if (ret == undefined || Number.isNaN(ret)) {
+		return 5000;
+	}
 	return ret;
 }
