@@ -42,8 +42,8 @@ async function runTranslation(
 	});
 
 	const differences = result.diffSet
-		?.filter((d) => d.state !== "equal")
-		.map((d) => {
+		?.filter(d => d.state !== "equal")
+		.map(d => {
 			switch (d.state) {
 				case "left":
 					return `- ${path.join(d.relativePath, d.name1 || "")}`;
@@ -56,7 +56,7 @@ async function runTranslation(
 					)}`;
 			}
 		})
-		.map((d) => `          ${d}`)
+		.map(d => `          ${d}`)
 		.join("\n");
 	expect(
 		result.same,
@@ -79,13 +79,19 @@ describe("translate-adapter translate", () => {
 		);
 		const deKeys = Object.keys(JSON.parse(deFile));
 		const sortedDeKeys = [...deKeys].sort();
-		expect(JSON.stringify(deKeys)).to.equal(JSON.stringify(sortedDeKeys), "German translation keys should be sorted");
+		expect(JSON.stringify(deKeys)).to.equal(
+			JSON.stringify(sortedDeKeys),
+			"German translation keys should be sorted",
+		);
 
 		const enDir = `${__dirname}/data/new-translations/input/admin/i18n/en/translations.json`;
 		const enFile = readFileSync(enDir, "utf8");
 		const enKeys = Object.keys(JSON.parse(enFile));
 		// Verify that our test input has intentionally unsorted keys
-		expect(enKeys[0]).to.equal("zebra", "Test input should start with 'zebra' to verify sorting works");
+		expect(enKeys[0]).to.equal(
+			"zebra",
+			"Test input should start with 'zebra' to verify sorting works",
+		);
 
 		return result;
 	});
@@ -131,7 +137,7 @@ describe("translate-adapter translate", () => {
 	});
 
 	it("rebuilds all translation files when --rebuild is used", async () => {
-		// Setup test directory 
+		// Setup test directory
 		const baseDir = path.resolve(__dirname, "data", "rebuild-test");
 		const inputDir = path.join(baseDir, "input");
 		const outputDir = path.join(baseDir, "output");
@@ -139,35 +145,35 @@ describe("translate-adapter translate", () => {
 		await copy(inputDir, outputDir);
 
 		const adminDir = path.join(outputDir, "admin");
-		
+
 		// First run normal translation to create files
 		await parseOptions({
 			"io-package": path.join(outputDir, "io-package.json"),
 			admin: adminDir,
 		});
 		await handleTranslateCommand();
-		
+
 		// Verify files exist
 		const deFilePath = path.join(outputDir, "admin", "i18n", "de.json");
 		const frFilePath = path.join(outputDir, "admin", "i18n", "fr.json");
-		
+
 		expect(existsSync(deFilePath)).to.be.true;
 		expect(existsSync(frFilePath)).to.be.true;
-		
+
 		// Manually modify the German file to have "OLD" content
 		const modifiedDeContent = {
-			"hello": "OLD German",
-			"world": "OLD World",
-			"new_key": "OLD New Key"
+			hello: "OLD German",
+			world: "OLD World",
+			new_key: "OLD New Key",
 		};
 		await writeJson(deFilePath, modifiedDeContent);
-		
+
 		// Verify the modified content
 		const deBefore = JSON.parse(readFileSync(deFilePath, "utf8"));
 		expect(deBefore.hello).to.equal("OLD German");
 		expect(deBefore.world).to.equal("OLD World");
 		expect(deBefore.new_key).to.equal("OLD New Key");
-		
+
 		// Now run with rebuild flag - this should delete and recreate
 		await parseOptions({
 			"io-package": path.join(outputDir, "io-package.json"),
@@ -175,21 +181,21 @@ describe("translate-adapter translate", () => {
 			rebuild: true,
 		});
 		await handleTranslateCommand();
-		
+
 		// Verify files were rebuilt with fresh translations (not the OLD content)
 		const deAfter = JSON.parse(readFileSync(deFilePath, "utf8"));
 		const frAfter = JSON.parse(readFileSync(frFilePath, "utf8"));
-		
+
 		// Should NOT have the "OLD" content anymore
 		expect(deAfter.hello).to.not.equal("OLD German");
 		expect(deAfter.world).to.not.equal("OLD World");
 		expect(deAfter.new_key).to.not.equal("OLD New Key");
-		
-		// Should have all required keys 
+
+		// Should have all required keys
 		expect(deAfter.hello).to.not.be.undefined;
 		expect(deAfter.world).to.not.be.undefined;
 		expect(deAfter.new_key).to.not.be.undefined;
-		
+
 		expect(frAfter.hello).to.not.be.undefined;
 		expect(frAfter.world).to.not.be.undefined;
 		expect(frAfter.new_key).to.not.be.undefined;

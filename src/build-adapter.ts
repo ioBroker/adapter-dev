@@ -131,7 +131,6 @@ const parser = yargs(process.argv.slice(2)).parserConfiguration({
 	"dot-notation": false,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 parser
 	.env("IOBROKER_BUILD")
 	.strict()
@@ -155,8 +154,8 @@ parser
 	.command(
 		["react"],
 		"Compile React sources",
-		(yargs) => yargs.options(reactOptions),
-		async (argv) => {
+		yargs => yargs.options(reactOptions),
+		async argv => {
 			const reactOptions = {
 				pattern: argv.reactPattern,
 				tsConfig: argv.reactTsConfig,
@@ -175,8 +174,8 @@ parser
 	.command(
 		["typescript", "ts"],
 		"Compile TypeScript sources",
-		(yargs) => yargs.options(tsOptions),
-		async (argv) => {
+		yargs => yargs.options(tsOptions),
+		async argv => {
 			const typescriptOptions = {
 				pattern: argv.typescriptPattern,
 				tsConfig: argv.typescriptTsConfig,
@@ -193,12 +192,12 @@ parser
 	.command(
 		["all"],
 		"Compile all of the above",
-		(yargs) =>
+		yargs =>
 			yargs.options({
 				...reactOptions,
 				...tsOptions,
 			}),
-		async (argv) => {
+		async argv => {
 			const reactOptions = {
 				pattern: argv.reactPattern,
 				tsConfig: argv.reactTsConfig,

@@ -34,12 +34,14 @@ const EOL = "\n"; // Use only LINUX line endings
 
 /**
  * Sorts object keys alphabetically and returns a new object with sorted keys
+ *
+ * @param obj
  */
 function sortObjectKeys<T extends Record<string, any>>(obj: T): T {
 	const sortedObj = {} as T;
 	Object.keys(obj)
 		.sort()
-		.forEach((key) => {
+		.forEach(key => {
 			sortedObj[key as keyof T] = obj[key];
 		});
 	return sortedObj;
@@ -72,6 +74,8 @@ function createEmptyLangObject<T>(
 /**
  * Creates a regexp pattern for an english base file name.
  * It matches file names and allows to find/replace the language code
+ *
+ * @param baseFile
  */
 function createFilePattern(baseFile: string): RegExp {
 	if (!baseFile.match(/\Wen\W/)) {
@@ -93,7 +97,7 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 		{ absolute: true },
 	);
 
-	return allJsonFiles.filter((file) => {
+	return allJsonFiles.filter(file => {
 		const match = file.match(filePattern);
 		if (!match) {
 			return false;
@@ -103,13 +107,17 @@ async function findAllLanguageFiles(baseFile: string): Promise<string[]> {
 	});
 }
 
-/** Convert the "LANG/translation.json" files to "LANG.json" files */
+/**
+ * Convert the "LANG/translation.json" files to "LANG.json" files
+ *
+ * @param basePath
+ */
 async function convertTranslationJson2LanguageJson(
 	basePath: string,
 ): Promise<void> {
 	const dirs = readdirSync(basePath, { withFileTypes: true })
-		.filter((dirent) => dirent.isDirectory())
-		.map((dirent) => dirent.name);
+		.filter(dirent => dirent.isDirectory())
+		.map(dirent => dirent.name);
 
 	for (const dir of dirs) {
 		const langPath = path.join(basePath, dir, "translations.json");
@@ -128,9 +136,7 @@ async function convertTranslationJson2LanguageJson(
 	}
 
 	// Try to sort the files that already exist
-	const files = readdirSync(basePath).filter((file) =>
-		file.endsWith(".json"),
-	);
+	const files = readdirSync(basePath).filter(file => file.endsWith(".json"));
 
 	// Read a file, sort the keys and write it back
 	for (const file of files) {
@@ -146,16 +152,40 @@ async function convertTranslationJson2LanguageJson(
 
 /******************************** Middlewares *********************************/
 
+/**
+ *
+ */
 export async function handleConvertCommand(): Promise<void> {
 	await convertTranslationJson2LanguageJson(path.join(admin, "i18n"));
 }
 
+/**
+ *
+ */
 export async function parseOptions(options: {
+	/**
+	 *
+	 */
 	"io-package": string;
+	/**
+	 *
+	 */
 	admin: string;
+	/**
+	 *
+	 */
 	words?: string;
+	/**
+	 *
+	 */
 	base?: string[];
+	/**
+	 *
+	 */
 	languages?: string[];
+	/**
+	 *
+	 */
 	rebuild?: boolean;
 }): Promise<void> {
 	// io-package.json
@@ -181,7 +211,7 @@ export async function parseOptions(options: {
 
 	// i18n base file
 	if (options.base) {
-		i18nBases = options.base.map((p) => path.resolve(p));
+		i18nBases = options.base.map(p => path.resolve(p));
 	} else {
 		const defaultPath = path.join(admin, "i18n", "en.json");
 		i18nBases = [
@@ -201,7 +231,7 @@ export async function parseOptions(options: {
 	if (options.languages?.length) {
 		// Check if an unknown language was specified
 		const unknownLanguages = options.languages.filter(
-			(l) => !allLanguages.includes(l as any),
+			l => !allLanguages.includes(l as any),
 		);
 		if (unknownLanguages.length > 0) {
 			return die(`Unknown language(s): ${unknownLanguages.join(", ")}`);
@@ -224,10 +254,14 @@ async function deleteExistingTranslationFiles(): Promise<void> {
 
 		for (const file of files) {
 			const match = file.match(filePattern);
-			if (!match) continue;
+			if (!match) {
+				continue;
+			}
 			const lang = match[2] as ioBroker.Languages;
 			// Don't delete the English base file
-			if (lang === "en") continue;
+			if (lang === "en") {
+				continue;
+			}
 
 			try {
 				unlinkSync(file);
@@ -259,6 +293,9 @@ async function deleteExistingTranslationFiles(): Promise<void> {
 	}
 }
 
+/**
+ *
+ */
 export async function handleTranslateCommand(): Promise<void> {
 	if (rebuildMode) {
 		console.log("Rebuild mode: Deleting existing translation files...");
@@ -271,6 +308,9 @@ export async function handleTranslateCommand(): Promise<void> {
 	}
 }
 
+/**
+ *
+ */
 export function handleToJsonCommand(): Promise<void> {
 	if (!existsSync(words)) {
 		return die(`Couldn't find words file ${words}`);
@@ -279,10 +319,16 @@ export function handleToJsonCommand(): Promise<void> {
 	return adminWords2languages(words, i18nBases[0]);
 }
 
+/**
+ *
+ */
 export function handleToWordsCommand(): Promise<void> {
 	return adminLanguages2words(i18nBases[0]);
 }
 
+/**
+ *
+ */
 export async function handleAllCommand(): Promise<void> {
 	await handleTranslateCommand();
 	// execute it only if words.js exists, but now we do not need it
@@ -360,10 +406,14 @@ async function translateI18n(baseFile: string): Promise<void> {
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		if (!match) continue;
+		if (!match) {
+			continue;
+		}
 		const lang = match[2] as ioBroker.Languages;
 		missingLanguages.delete(lang);
-		if (lang === "en") continue;
+		if (lang === "en") {
+			continue;
+		}
 		const translation = await readJson(file);
 		await translateI18nJson(translation, lang, baseContent);
 		await writeJson(file, sortObjectKeys(translation), {
@@ -418,7 +468,7 @@ async function adminWords2languages(
 			langs[language][word] = translation;
 			//  pre-fill all other languages
 			for (const j of translateLanguages) {
-				if (langs.hasOwnProperty(j)) {
+				if (Object.prototype.hasOwnProperty.call(langs, j)) {
 					langs[j][word] = langs[j][word] || "";
 				}
 			}
@@ -445,7 +495,7 @@ function parseWordJs(
 	words = words.substring(words.indexOf("{"), words.length);
 	words = words.substring(0, words.lastIndexOf(";"));
 
-	const resultFunc = new Function("return " + words + ";");
+	const resultFunc = new Function(`return ${words};`);
 
 	return resultFunc();
 }
@@ -456,7 +506,9 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 	const files = await findAllLanguageFiles(i18nBase);
 	for (const file of files) {
 		const match = file.match(filePattern);
-		if (!match) continue;
+		if (!match) {
+			continue;
+		}
 		const lang = match[2] as ioBroker.Languages;
 		const translations = await readJson(file);
 		for (const key of Object.keys(translations)) {
@@ -474,8 +526,8 @@ async function adminLanguages2words(i18nBase: string): Promise<void> {
 				newWords[key] = translations;
 			}
 			translateLanguages
-				.filter((lang) => !newWords[key][lang])
-				.forEach((lang) =>
+				.filter(lang => !newWords[key][lang])
+				.forEach(lang =>
 					console.warn(yellow(`Missing "${lang}": ${key}`)),
 				);
 		}
@@ -504,7 +556,7 @@ function createWordsJs(
 	for (const [word, translations] of Object.entries(data)) {
 		let line = "";
 		for (const [lang, item] of Object.entries(translations)) {
-			const text = padRight(item.replace(/"/g, '\\"') + '",', 50);
+			const text = padRight(`${item.replace(/"/g, '\\"')}",`, 50);
 			line += `"${lang}": "${text} `;
 		}
 		if (line) {

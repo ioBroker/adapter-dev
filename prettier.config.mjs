@@ -1,4 +1,9 @@
-module.exports = {
+// iobroker prettier configuration file
+import prettierConfig from '@iobroker/eslint-config/prettier.config.mjs';
+
+export default {
+	...prettierConfig,
+	// Keep the same configuration as the original .prettierrc.js for consistency
 	semi: true,
 	trailingComma: "all",
 	singleQuote: false,
