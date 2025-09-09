@@ -184,6 +184,16 @@ npm run check              # TypeScript type check without emit
 2. **Add tests**: Both unit and integration tests when appropriate
 3. **Update documentation**: README.md and inline comments
 4. **Type safety**: Maintain strict TypeScript compliance
+5. **Update changelog**: Add entries to README.md changelog section for all user and developer facing changes
+
+### Changelog Maintenance
+- **Always update README.md changelog section** for user and developer facing changes
+- **Use project format**: Follow the existing changelog format in README.md
+- **Add to WORK IN PROGRESS section**: New changes go under the `### **WORK IN PROGRESS**` placeholder
+- **Include author attribution**: Start each changelog entry with "(@copilot)" for Copilot contributions
+- **Include issue references**: Link to GitHub issues when applicable (e.g., "fixes #60")
+- **User-facing changes include**: CLI behavior changes, new commands, changed output format, API changes
+- **Developer-facing changes include**: Build process changes, new dependencies, breaking API changes
 
 ### Debugging
 - Use `npm run debug` for interactive debugging
