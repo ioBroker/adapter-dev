@@ -60,7 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "chai": "^4.5.0",
-    "chai-as-promised": "^7.1.2",
+    "chai-as-promised": "^8.0.2",
     "cross-spawn": ">=7.0.6",
     "dir-compare": "^5.0.0",
     "eslint": "^8.57.1",
@@ -83,6 +83,6 @@
     "fs-extra": "^11.3.1",
     "rimraf": "^5.0.10",
     "tiny-glob": "^0.2.9",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   }
 }

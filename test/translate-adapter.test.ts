@@ -63,12 +63,29 @@ async function runTranslation(
 }
 
 describe("translate-adapter translate", () => {
-	it("translates English to all other languages if they don't exist at all", () => {
-		return runTranslation(
+	it("translates English to all other languages if they don't exist at all", async () => {
+		const result = await runTranslation(
 			"new-translations",
 			false,
 			handleTranslateCommand,
 		);
+
+		// Check that all generated JSON files have sorted keys
+		const deFile = readFileSync(
+			`${__dirname}/data/new-translations/output/admin/i18n/de/translations.json`,
+			"utf8",
+		);
+		const deKeys = Object.keys(JSON.parse(deFile));
+		const sortedDeKeys = [...deKeys].sort();
+		expect(JSON.stringify(deKeys)).to.equal(JSON.stringify(sortedDeKeys), "German translation keys should be sorted");
+
+		const enDir = `${__dirname}/data/new-translations/input/admin/i18n/en/translations.json`;
+		const enFile = readFileSync(enDir, "utf8");
+		const enKeys = Object.keys(JSON.parse(enFile));
+		// Verify that our test input has intentionally unsorted keys
+		expect(enKeys[0]).to.equal("zebra", "Test input should start with 'zebra' to verify sorting works");
+
+		return result;
 	});
 	it("translates English to all other languages only if they don't exist already", () => {
 		return runTranslation(

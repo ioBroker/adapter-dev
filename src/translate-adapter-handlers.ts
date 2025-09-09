@@ -31,6 +31,19 @@ const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
 
+/**
+ * Sorts object keys alphabetically and returns a new object with sorted keys
+ */
+function sortObjectKeys<T extends Record<string, any>>(obj: T): T {
+	const sortedObj = {} as T;
+	Object.keys(obj)
+		.sort()
+		.forEach((key) => {
+			sortedObj[key as keyof T] = obj[key];
+		});
+	return sortedObj;
+}
+
 const _languages: Record<ioBroker.Languages, any> = {
 	en: {},
 	de: {},
@@ -100,16 +113,20 @@ async function convertTranslationJson2LanguageJson(
 	for (const dir of dirs) {
 		const langPath = path.join(basePath, dir, "translations.json");
 		const text: Record<string, string> = await readJson(langPath);
-		// Write the new file
-		await writeJson(path.join(basePath, `${dir}.json`), text, {
-			spaces: 4,
-			EOL,
-		});
+		// Write the new file with sorted keys
+		await writeJson(
+			path.join(basePath, `${dir}.json`),
+			sortObjectKeys(text),
+			{
+				spaces: 4,
+				EOL,
+			},
+		);
 		unlinkSync(langPath);
 		rmdirSync(path.join(basePath, dir));
 	}
 
-	// Try to sort the files
+	// Try to sort the files that already exist
 	const files = readdirSync(basePath).filter((file) =>
 		file.endsWith(".json"),
 	);
@@ -118,15 +135,8 @@ async function convertTranslationJson2LanguageJson(
 	for (const file of files) {
 		const filePath = path.join(basePath, file);
 		const text: Record<string, string> = await readJson(filePath);
-		// Sort the keys
-		const sortedText: Record<string, string> = {};
-		Object.keys(text)
-			.sort()
-			.forEach((key) => {
-				sortedText[key] = text[key];
-			});
-		// Write the new file
-		await writeJson(filePath, sortedText, {
+		// Write the new file with sorted keys
+		await writeJson(filePath, sortObjectKeys(text), {
 			spaces: 4,
 			EOL,
 		});
@@ -304,7 +314,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 		if (lang === "en") continue;
 		const translation = await readJson(file);
 		await translateI18nJson(translation, lang, baseContent);
-		await writeJson(file, translation, { spaces: baseIndentation, EOL });
+		await writeJson(file, sortObjectKeys(translation), { spaces: baseIndentation, EOL });
 		console.log(`Successfully updated ${path.relative(".", file)}`);
 	}
 	for (const lang of missingLanguages) {
@@ -312,7 +322,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 		await translateI18nJson(translation, lang, baseContent);
 		const filename = baseFile.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, translation, {
+		await writeJson(filename, sortObjectKeys(translation), {
 			spaces: baseIndentation,
 			EOL,
 		});
