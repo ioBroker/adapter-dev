@@ -202,6 +202,7 @@ These only have an effect for the `react` and `all` commands:
 
 - `--reactRootDir`: Directory where the React part of the adapter is located. Default: `admin`
 - `--reactOutDir`: Directory where the compiled React output will be placed, relative to `reactRootDir`. Default: `build`
+- `--reactWatchDir`: Directory where the compiled React output will be placed in watch mode, relative to `reactRootDir`. Default: `.watch`
 - `--reactPattern`: Glob pattern for React source files, relative to reactRootDir. Each match will result in a separate bundle. Default: `src/{index,tab}.{tsx,jsx}`
 - `--reactTsConfig`: Path to the tsconfig.json file used for building React, relative to `reactRootDir`. Default: `tsconfig.json`
 - `--reactBundle`: Bundle compiled React output into one file per entry point. Default: `true`
