@@ -6,6 +6,46 @@ import { error } from "./util";
 
 const translationCache = new Map<string, Map<string, string>>();
 
+// Rate limiting state
+let isRateLimited = false;
+let rateLimitRetryAfter: number | undefined;
+
+/**
+ * Resets the rate limiting state. Useful for testing or when starting a new translation session.
+ */
+export function resetRateLimitState(): void {
+	isRateLimited = false;
+	rateLimitRetryAfter = undefined;
+}
+
+/**
+ * Clears the translation cache. Useful for testing.
+ */
+export function clearTranslationCache(): void {
+	translationCache.clear();
+}
+
+/**
+ * Gets the current rate limiting state. Useful for testing.
+ */
+export function getRateLimitState(): {
+	isRateLimited: boolean;
+	rateLimitRetryAfter?: number;
+} {
+	return { isRateLimited, rateLimitRetryAfter };
+}
+
+/**
+ * Sets the rate limiting state. Useful for testing.
+ */
+export function setRateLimitState(
+	rateLimited: boolean,
+	retryAfter?: number,
+): void {
+	isRateLimited = rateLimited;
+	rateLimitRetryAfter = retryAfter;
+}
+
 /**
  * Translates text using the Google Translate API.
  *
@@ -21,25 +61,39 @@ export async function translateText(
 		return text;
 	}
 
-	// Try to read the translation from the translation cache
+	// Try to read the translation from the translation cache first
 	if (!translationCache.has(targetLang)) {
 		translationCache.set(targetLang, new Map());
 	}
 	const langCache = translationCache.get(targetLang)!;
 
-	// or fall back to an online translation
-	if (!langCache.has(text)) {
-		const translator = await getTranslator();
-		let translated;
-		try {
-			translated = await translator.translate(text, targetLang);
-		} catch (e: any) {
-			error(`Could not translate to "${targetLang}": ${e}`);
-			return text;
-		}
-		langCache.set(text, translated);
+	// Return cached translation if available
+	if (langCache.has(text)) {
+		return langCache.get(text)!;
 	}
-	return langCache.get(text)!;
+
+	// Skip new translation requests if we're rate limited
+	if (isRateLimited) {
+		const retryMessage = rateLimitRetryAfter
+			? ` (retry after ${rateLimitRetryAfter} seconds)`
+			: "";
+		error(
+			`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`,
+		);
+		return text;
+	}
+
+	// Fall back to an online translation
+	const translator = await getTranslator();
+	let translated;
+	try {
+		translated = await translator.translate(text, targetLang);
+	} catch (e: any) {
+		error(`Could not translate to "${targetLang}": ${e}`);
+		return text;
+	}
+	langCache.set(text, translated);
+	return translated;
 }
 
 /**
@@ -149,8 +203,20 @@ class LegacyTranslator implements Translator {
 			}
 		} catch (e: any) {
 			if (e.response?.status === 429) {
+				// Set rate limiting state
+				isRateLimited = true;
+
+				// Extract retry-after header if available
+				const retryAfter = e.response.headers["retry-after"];
+				if (retryAfter) {
+					rateLimitRetryAfter = parseInt(retryAfter, 10);
+				}
+
+				const retryMessage = rateLimitRetryAfter
+					? ` Retry after ${rateLimitRetryAfter} seconds.`
+					: "";
 				throw new Error(
-					`Could not translate to "${targetLang}": Rate-limited by Google Translate`,
+					`Could not translate to "${targetLang}": Rate-limited by Google Translate.${retryMessage}`,
 				);
 			} else {
 				throw e;

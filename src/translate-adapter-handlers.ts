@@ -13,7 +13,7 @@ import {
 } from "fs-extra";
 import path from "node:path";
 import glob from "tiny-glob";
-import { translateText } from "./translate";
+import { translateText, resetRateLimitState } from "./translate";
 import {
 	die,
 	escapeRegExp,
@@ -297,6 +297,9 @@ async function deleteExistingTranslationFiles(): Promise<void> {
  *
  */
 export async function handleTranslateCommand(): Promise<void> {
+	// Reset rate limiting state at the beginning of a new translation session
+	resetRateLimitState();
+
 	if (rebuildMode) {
 		console.log("Rebuild mode: Deleting existing translation files...");
 		await deleteExistingTranslationFiles();
