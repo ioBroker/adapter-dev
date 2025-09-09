@@ -243,7 +243,8 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
+- (@copilot) Sort JSON keys alphabetically in all generated translation files
+- (@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
 
 ### 1.4.0 (2025-02-22)
 - (ticaki) rimraf replaced by by internal tool.
