@@ -314,7 +314,10 @@ async function translateI18n(baseFile: string): Promise<void> {
 		if (lang === "en") continue;
 		const translation = await readJson(file);
 		await translateI18nJson(translation, lang, baseContent);
-		await writeJson(file, sortObjectKeys(translation), { spaces: baseIndentation, EOL });
+		await writeJson(file, sortObjectKeys(translation), {
+            spaces: baseIndentation,
+            EOL,
+        });
 		console.log(`Successfully updated ${path.relative(".", file)}`);
 	}
 	for (const lang of missingLanguages) {
