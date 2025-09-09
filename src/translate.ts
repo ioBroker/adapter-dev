@@ -11,13 +11,23 @@ const translationCache = new Map<string, Map<string, string>>();
  *
  * @param text The text to translate
  * @param targetLang The target language code
+ * @param key Optional key name for better error reporting
  * @returns The translated text or the same text if translation failed.
  */
 export async function translateText(
 	text: string,
 	targetLang: string,
+	key?: string,
 ): Promise<string> {
 	if (targetLang === "en") {
+		return text;
+	}
+
+	// Handle empty strings with specific error message
+	if (text.trim() === "") {
+		const keyInfo = key ? ` for key "${key}"` : "";
+		const message = `Could not translate to "${targetLang}"${keyInfo}: Empty source text. Consider providing default text or the UI can display the key name as fallback.`;
+		error(message);
 		return text;
 	}
 
@@ -34,7 +44,9 @@ export async function translateText(
 		try {
 			translated = await translator.translate(text, targetLang);
 		} catch (e: any) {
-			error(`Could not translate to "${targetLang}": ${e}`);
+			const keyInfo = key ? ` for key "${key}"` : "";
+			const message = `Could not translate to "${targetLang}"${keyInfo}: ${e.message || e}. The UI can display the original text or key name as fallback.`;
+			error(message);
 			return text;
 		}
 		langCache.set(text, translated);
