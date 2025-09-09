@@ -27,6 +27,7 @@ let admin: string;
 let words: string;
 let i18nBases: string[];
 let translateLanguages: ioBroker.Languages[];
+let rebuildMode: boolean;
 const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
@@ -155,6 +156,7 @@ export async function parseOptions(options: {
 	words?: string;
 	base?: string[];
 	languages?: string[];
+	rebuild?: boolean;
 }): Promise<void> {
 	// io-package.json
 	ioPackage = path.resolve(options["io-package"]);
@@ -208,11 +210,61 @@ export async function parseOptions(options: {
 	} else {
 		translateLanguages = allLanguages;
 	}
+
+	// Set rebuild mode
+	rebuildMode = options.rebuild || false;
 }
 
 /***************************** Command Handlers *******************************/
 
+async function deleteExistingTranslationFiles(): Promise<void> {
+	for (const i18nBase of i18nBases) {
+		const files = await findAllLanguageFiles(i18nBase);
+		const filePattern = createFilePattern(i18nBase);
+
+		for (const file of files) {
+			const match = file.match(filePattern);
+			if (!match) continue;
+			const lang = match[2] as ioBroker.Languages;
+			// Don't delete the English base file
+			if (lang === "en") continue;
+
+			try {
+				unlinkSync(file);
+				console.log(`Deleted ${path.relative(".", file)}`);
+
+				// Try to remove the directory if it's empty (for old structure like i18n/de/translations.json)
+				const dirPath = path.dirname(file);
+				const baseDirPath = path.dirname(i18nBase);
+				// Only try to remove language directories (not the base i18n directory)
+				if (
+					dirPath !== baseDirPath &&
+					path.basename(dirPath).length === 2
+				) {
+					try {
+						rmdirSync(dirPath);
+						console.log(
+							`Removed empty directory ${path.relative(".", dirPath)}`,
+						);
+					} catch {
+						// Directory not empty or doesn't exist, ignore
+					}
+				}
+			} catch {
+				console.log(
+					`Could not delete ${path.relative(".", file)}: file may not exist`,
+				);
+			}
+		}
+	}
+}
+
 export async function handleTranslateCommand(): Promise<void> {
+	if (rebuildMode) {
+		console.log("Rebuild mode: Deleting existing translation files...");
+		await deleteExistingTranslationFiles();
+	}
+
 	await translateIoPackage();
 	for (const i18nBase of i18nBases) {
 		await translateI18n(i18nBase);

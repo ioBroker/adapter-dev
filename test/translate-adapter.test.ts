@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as dircompare from "dir-compare";
-import { copy, readFileSync } from "fs-extra";
+import { copy, readFileSync, existsSync, writeJson } from "fs-extra";
 import path from "path";
 import { rimraf } from "rimraf";
 import {
@@ -15,6 +15,7 @@ async function runTranslation(
 	name: string,
 	ignoreAdmin: boolean,
 	commandHandler: () => Promise<void>,
+	rebuild?: boolean,
 ) {
 	const baseDir = path.resolve(__dirname, "data", name);
 	const inputDir = path.join(baseDir, "input");
@@ -27,6 +28,7 @@ async function runTranslation(
 		"io-package": path.join(outputDir, "io-package.json"),
 		admin: adminDir,
 		base: ignoreAdmin ? [] : undefined, // don't do admin translations if the directory doesn't exist
+		rebuild,
 	});
 	await commandHandler();
 
@@ -126,6 +128,71 @@ describe("translate-adapter translate", () => {
 		expect(JSON.stringify(keys)).to.equal(JSON.stringify(sortKeys));
 
 		return result;
+	});
+
+	it("rebuilds all translation files when --rebuild is used", async () => {
+		// Setup test directory 
+		const baseDir = path.resolve(__dirname, "data", "rebuild-test");
+		const inputDir = path.join(baseDir, "input");
+		const outputDir = path.join(baseDir, "output");
+		await rimraf(outputDir);
+		await copy(inputDir, outputDir);
+
+		const adminDir = path.join(outputDir, "admin");
+		
+		// First run normal translation to create files
+		await parseOptions({
+			"io-package": path.join(outputDir, "io-package.json"),
+			admin: adminDir,
+		});
+		await handleTranslateCommand();
+		
+		// Verify files exist
+		const deFilePath = path.join(outputDir, "admin", "i18n", "de.json");
+		const frFilePath = path.join(outputDir, "admin", "i18n", "fr.json");
+		
+		expect(existsSync(deFilePath)).to.be.true;
+		expect(existsSync(frFilePath)).to.be.true;
+		
+		// Manually modify the German file to have "OLD" content
+		const modifiedDeContent = {
+			"hello": "OLD German",
+			"world": "OLD World",
+			"new_key": "OLD New Key"
+		};
+		await writeJson(deFilePath, modifiedDeContent);
+		
+		// Verify the modified content
+		const deBefore = JSON.parse(readFileSync(deFilePath, "utf8"));
+		expect(deBefore.hello).to.equal("OLD German");
+		expect(deBefore.world).to.equal("OLD World");
+		expect(deBefore.new_key).to.equal("OLD New Key");
+		
+		// Now run with rebuild flag - this should delete and recreate
+		await parseOptions({
+			"io-package": path.join(outputDir, "io-package.json"),
+			admin: adminDir,
+			rebuild: true,
+		});
+		await handleTranslateCommand();
+		
+		// Verify files were rebuilt with fresh translations (not the OLD content)
+		const deAfter = JSON.parse(readFileSync(deFilePath, "utf8"));
+		const frAfter = JSON.parse(readFileSync(frFilePath, "utf8"));
+		
+		// Should NOT have the "OLD" content anymore
+		expect(deAfter.hello).to.not.equal("OLD German");
+		expect(deAfter.world).to.not.equal("OLD World");
+		expect(deAfter.new_key).to.not.equal("OLD New Key");
+		
+		// Should have all required keys 
+		expect(deAfter.hello).to.not.be.undefined;
+		expect(deAfter.world).to.not.be.undefined;
+		expect(deAfter.new_key).to.not.be.undefined;
+		
+		expect(frAfter.hello).to.not.be.undefined;
+		expect(frAfter.world).to.not.be.undefined;
+		expect(frAfter.new_key).to.not.be.undefined;
 	});
 });
 

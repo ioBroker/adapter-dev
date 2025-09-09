@@ -86,9 +86,23 @@ npm run translate                             # (default)
 npm run translate translate                   # full name/legacy
 npm run translate t                           # short code
 npm run translate t -- -l de fr it            # Only translate into german, french and italian
+npm run translate t -- --rebuild              # Delete all translation files and rebuild from scratch
 ```
 
 Translates all not yet translated strings in `io-package.json` and the i18n JSON files to all supported languages using Google Translate.
+
+#### Rebuild Option
+
+```bash
+npm run translate --rebuild                   # Delete all translation files and rebuild
+npm run translate -r                          # Short form
+```
+
+The `--rebuild` option deletes all existing translation files (except English base files) and regenerates everything new. This is useful when:
+
+- English source text has changed and you want fresh translations
+- You want to ensure structural consistency across all translation files  
+- You've modified the English keys and want to clean up old translations
 
 Previously known as `gulp translate`.
 
@@ -244,6 +258,7 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
 - (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation. (#79)
 - (@copilot) Sort JSON keys alphabetically in all generated translation files
 - (@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
