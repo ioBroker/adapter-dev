@@ -14,7 +14,13 @@ import {
 import path from "node:path";
 import glob from "tiny-glob";
 import { translateText } from "./translate";
-import { die, escapeRegExp, getIndentation, padRight } from "./util";
+import {
+	die,
+	escapeRegExp,
+	getIndentation,
+	getFileIndentation,
+	padRight,
+} from "./util";
 
 let ioPackage: string;
 let admin: string;
@@ -297,6 +303,7 @@ async function translateNotExisting(
 async function translateI18n(baseFile: string): Promise<void> {
 	const filePattern = createFilePattern(baseFile);
 	const baseContent = await readJson(baseFile);
+	const baseIndentation = await getFileIndentation(baseFile);
 	const missingLanguages = new Set<ioBroker.Languages>(translateLanguages);
 	const files = await findAllLanguageFiles(baseFile);
 	for (const file of files) {
@@ -307,7 +314,10 @@ async function translateI18n(baseFile: string): Promise<void> {
 		if (lang === "en") continue;
 		const translation = await readJson(file);
 		await translateI18nJson(translation, lang, baseContent);
-		await writeJson(file, sortObjectKeys(translation), { spaces: 4, EOL });
+		await writeJson(file, sortObjectKeys(translation), {
+			spaces: baseIndentation,
+			EOL,
+		});
 		console.log(`Successfully updated ${path.relative(".", file)}`);
 	}
 	for (const lang of missingLanguages) {
@@ -316,7 +326,7 @@ async function translateI18n(baseFile: string): Promise<void> {
 		const filename = baseFile.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
 		await writeJson(filename, sortObjectKeys(translation), {
-			spaces: 4,
+			spaces: baseIndentation,
 			EOL,
 		});
 		console.log(`Successfully created ${path.relative(".", filename)}`);
@@ -347,6 +357,7 @@ async function adminWords2languages(
 	i18nBase: string,
 ): Promise<void> {
 	const filePattern = createFilePattern(i18nBase);
+	const baseIndentation = await getFileIndentation(i18nBase);
 	const data = parseWordJs(await readFile(words, "utf-8"));
 	const langs = createEmptyLangObject(() => ({}) as Record<string, string>);
 	for (const [word, translations] of Object.entries(data)) {
@@ -371,7 +382,7 @@ async function adminWords2languages(
 		}
 		const filename = i18nBase.replace(filePattern, `$1${lang}$3`);
 		await ensureDir(path.dirname(filename));
-		await writeJson(filename, obj, { spaces: 4, EOL });
+		await writeJson(filename, obj, { spaces: baseIndentation, EOL });
 		console.log(`Successfully updated ${path.relative(".", filename)}`);
 	}
 }
