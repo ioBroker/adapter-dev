@@ -110,9 +110,9 @@ const tsOptions = {
 	},
 	typescriptFormat: {
 		alias: "tsf",
-		choices: ["cjs"],
+		choices: ["cjs", "esm"],
 		description:
-			"Format of the output file(s). Only CommonJS (cjs) is supported at the moment.",
+			"Format of the output file(s). CommonJS (cjs) or ES modules (esm).",
 	},
 	typescriptCompileTarget: {
 		type: "string",
