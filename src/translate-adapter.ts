@@ -5,6 +5,8 @@ import {
 	handleToWordsCommand,
 	handleTranslateCommand,
 	handleConvertCommand,
+	handleRemoveTranslationsCommand,
+	handleRemoveKeyCommand,
 	parseOptions,
 } from "./translate-adapter-handlers";
 import { interceptErrors } from "./util";
@@ -55,6 +57,31 @@ parser
 		"Convert old file structure i18n/en/translations.json to new structure i18n/en.json",
 		{},
 		interceptErrors(handleConvertCommand),
+	)
+	.command(
+		["remove-translations", "rt"],
+		"Remove translation for a key from all language files except English",
+		{
+			key: {
+				type: "string",
+				demandOption: true,
+				description:
+					"The translation key to remove from non-English files",
+			},
+		},
+		interceptErrors(handleRemoveTranslationsCommand),
+	)
+	.command(
+		["remove-key", "rk"],
+		"Remove a key from all language files including English and words.js",
+		{
+			key: {
+				type: "string",
+				demandOption: true,
+				description: "The translation key to remove from all files",
+			},
+		},
+		interceptErrors(handleRemoveKeyCommand),
 	)
 	/*
 	translateAndUpdateWordsJS: TaskFunction;*/

@@ -28,6 +28,7 @@ let words: string;
 let i18nBases: string[];
 let translateLanguages: ioBroker.Languages[];
 let rebuildMode: boolean;
+let removeKeyValue: string | undefined;
 const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
@@ -187,6 +188,10 @@ export async function parseOptions(options: {
 	 *
 	 */
 	rebuild?: boolean;
+	/**
+	 *
+	 */
+	key?: string;
 }): Promise<void> {
 	// io-package.json
 	ioPackage = path.resolve(options["io-package"]);
@@ -243,6 +248,9 @@ export async function parseOptions(options: {
 
 	// Set rebuild mode
 	rebuildMode = options.rebuild || false;
+
+	// Set key value for remove commands
+	removeKeyValue = options.key;
 }
 
 /***************************** Command Handlers *******************************/
@@ -335,6 +343,149 @@ export async function handleAllCommand(): Promise<void> {
 	if (existsSync(words)) {
 		await handleToWordsCommand();
 		await handleToJsonCommand();
+	}
+}
+
+/**
+ *
+ */
+export async function handleRemoveTranslationsCommand(): Promise<void> {
+	if (!removeKeyValue) {
+		return die("No key specified for removal");
+	}
+
+	const keyToRemove = removeKeyValue;
+	console.log(
+		`Removing translations for key "${keyToRemove}" from all non-English files...`,
+	);
+
+	let removedCount = 0;
+	for (const i18nBase of i18nBases) {
+		const files = await findAllLanguageFiles(i18nBase);
+		const filePattern = createFilePattern(i18nBase);
+
+		for (const file of files) {
+			const match = file.match(filePattern);
+			if (!match) {
+				continue;
+			}
+			const lang = match[2] as ioBroker.Languages;
+			// Skip English base file
+			if (lang === "en") {
+				continue;
+			}
+
+			try {
+				const content = await readJson(file);
+				if (content[keyToRemove] !== undefined) {
+					delete content[keyToRemove];
+					const baseIndentation = await getFileIndentation(file);
+					await writeJson(file, sortObjectKeys(content), {
+						spaces: baseIndentation,
+						EOL,
+					});
+					console.log(
+						`Removed "${keyToRemove}" from ${path.relative(".", file)}`,
+					);
+					removedCount++;
+				}
+			} catch (error) {
+				console.log(
+					`Could not process ${path.relative(".", file)}: ${error instanceof Error ? error.message : "unknown error"}`,
+				);
+			}
+		}
+	}
+
+	if (removedCount === 0) {
+		console.log(
+			`Key "${keyToRemove}" was not found in any translation files.`,
+		);
+	} else {
+		console.log(
+			`Removed "${keyToRemove}" from ${removedCount} translation file(s).`,
+		);
+		console.log(
+			`Tip: Use the translate command to re-translate the updated English text for this key.`,
+		);
+	}
+}
+
+/**
+ *
+ */
+export async function handleRemoveKeyCommand(): Promise<void> {
+	if (!removeKeyValue) {
+		return die("No key specified for removal");
+	}
+
+	const keyToRemove = removeKeyValue;
+	console.log(
+		`Removing key "${keyToRemove}" from all files including English and words.js...`,
+	);
+
+	let removedCount = 0;
+
+	// Remove from all i18n JSON files (including English)
+	for (const i18nBase of i18nBases) {
+		const files = await findAllLanguageFiles(i18nBase);
+
+		// Add the English base file to the list
+		files.push(i18nBase);
+
+		for (const file of files) {
+			try {
+				if (!existsSync(file)) {
+					continue;
+				}
+				const content = await readJson(file);
+				if (content[keyToRemove] !== undefined) {
+					delete content[keyToRemove];
+					const baseIndentation = await getFileIndentation(file);
+					await writeJson(file, sortObjectKeys(content), {
+						spaces: baseIndentation,
+						EOL,
+					});
+					console.log(
+						`Removed "${keyToRemove}" from ${path.relative(".", file)}`,
+					);
+					removedCount++;
+				}
+			} catch (error) {
+				console.log(
+					`Could not process ${path.relative(".", file)}: ${error instanceof Error ? error.message : "unknown error"}`,
+				);
+			}
+		}
+	}
+
+	// Remove from words.js if it exists
+	if (existsSync(words)) {
+		try {
+			const wordsContent = await readFile(words, "utf-8");
+			const wordsData = parseWordJs(wordsContent);
+
+			if (wordsData[keyToRemove] !== undefined) {
+				delete wordsData[keyToRemove];
+
+				// Convert back to words.js format
+				await adminLanguages2words(i18nBases[0]);
+				console.log(
+					`Removed "${keyToRemove}" from ${path.relative(".", words)}`,
+				);
+				removedCount++;
+			}
+		} catch (error) {
+			console.log(
+				`Could not process ${path.relative(".", words)}: ${error instanceof Error ? error.message : "unknown error"}`,
+			);
+		}
+	}
+
+	if (removedCount === 0) {
+		console.log(`Key "${keyToRemove}" was not found in any files.`);
+	} else {
+		console.log(`Removed "${keyToRemove}" from ${removedCount} file(s).`);
 	}
 }
 

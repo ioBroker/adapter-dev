@@ -1,0 +1,5 @@
+{
+    "hello": "Hello World",
+    "goodbye": "Goodbye World",
+    "removeMe": "This key will be completely removed"
+}
