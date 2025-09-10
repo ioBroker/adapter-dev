@@ -546,7 +546,11 @@ async function translateNotExisting(
 			if (!obj[lang]) {
 				const time = new Date().getTime();
 				try {
-					const translation = await translateText(text, lang, context);
+					const translation = await translateText(
+						text,
+						lang,
+						context,
+					);
 					obj[lang] = translation;
 					console.log(
 						gray(`en -> ${lang} ${new Date().getTime() - time} ms`),

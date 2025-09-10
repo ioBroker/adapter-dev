@@ -17,8 +17,12 @@ export class TranslationSkippedError extends Error {
 	public readonly retryAfter?: number;
 
 	constructor(targetLang: string, retryAfter?: number) {
-		const retryMessage = retryAfter ? ` (retry after ${retryAfter} seconds)` : "";
-		super(`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`);
+		const retryMessage = retryAfter
+			? ` (retry after ${retryAfter} seconds)`
+			: "";
+		super(
+			`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`,
+		);
 		this.name = "TranslationSkippedError";
 		this.retryAfter = retryAfter;
 	}
@@ -224,26 +228,21 @@ class GoogleV3Translator implements Translator {
  */
 class LegacyTranslator implements Translator {
 	async translate(text: string, targetLang: string): Promise<string> {
-		try {
-			const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
-				text,
-			)}&ie=UTF-8&oe=UTF-8`;
-			let options: AxiosRequestConfig = {
-				url,
-				timeout: getRequestTimeout(),
-			};
+		const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
+			text,
+		)}&ie=UTF-8&oe=UTF-8`;
+		let options: AxiosRequestConfig = {
+			url,
+			timeout: getRequestTimeout(),
+		};
 
-			// If an https-proxy is defined as an env variable, use it
-			options = applyHttpsProxy(options);
+		// If an https-proxy is defined as an env variable, use it
+		options = applyHttpsProxy(options);
 
-			const response = await axios(options);
-			if (Array.isArray(response.data)) {
-				// we got a valid response
-				return response.data[0].map((t: string[]) => t[0]).join("");
-			}
-		} catch (e: any) {
-			// Just throw the original error, let the caller handle rate limiting
-			throw e;
+		const response = await axios(options);
+		if (Array.isArray(response.data)) {
+			// we got a valid response
+			return response.data[0].map((t: string[]) => t[0]).join("");
 		}
 
 		throw new Error(`Invalid response for translate request`);
