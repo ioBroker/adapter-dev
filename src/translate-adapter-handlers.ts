@@ -348,16 +348,20 @@ export async function handleAllCommand(): Promise<void> {
 
 /**
  * Shared function to remove keys from i18n JSON files
+ *
  * @param keyToRemove - The key to remove
  * @param includeEnglish - Whether to include English files in the removal
  * @returns Number of files that had the key removed
  */
-async function removeKeyFromI18nFiles(keyToRemove: string, includeEnglish: boolean): Promise<number> {
+async function removeKeyFromI18nFiles(
+	keyToRemove: string,
+	includeEnglish: boolean,
+): Promise<number> {
 	let removedCount = 0;
-	
+
 	for (const i18nBase of i18nBases) {
 		const files = await findAllLanguageFiles(i18nBase);
-		
+
 		if (includeEnglish) {
 			// Add the English base file to the list
 			files.push(i18nBase);
@@ -400,7 +404,7 @@ async function removeKeyFromI18nFiles(keyToRemove: string, includeEnglish: boole
 			}
 		}
 	}
-	
+
 	return removedCount;
 }
 

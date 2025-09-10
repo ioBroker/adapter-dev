@@ -338,7 +338,7 @@ describe("translate-adapter remove-key", () => {
 		expect(frContent.removeMe).to.be.undefined;
 
 		return result;
-  });
+	});
 });
 
 describe("translate-adapter error messages", () => {
