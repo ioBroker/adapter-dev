@@ -123,12 +123,8 @@ export async function translateText(
 				rateLimitRetryAfter = parseInt(retryAfter, 10);
 			}
 
-			const retryMessage = rateLimitRetryAfter
-				? ` Retry after ${rateLimitRetryAfter} seconds.`
-				: "";
-			throw new Error(
-				`Could not translate to "${targetLang}": Rate-limited by Google Translate.${retryMessage}`,
-			);
+			// Throw TranslationSkippedError for rate limiting
+			throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
 		}
 
 		const keyInfo = key ? ` for key "${key}"` : "";
