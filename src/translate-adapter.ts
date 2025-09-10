@@ -64,6 +64,7 @@ parser
 		{
 			key: {
 				type: "string",
+				alias: "k",
 				demandOption: true,
 				description:
 					"The translation key to remove from non-English files",
@@ -77,6 +78,7 @@ parser
 		{
 			key: {
 				type: "string",
+				alias: "k",
 				demandOption: true,
 				description: "The translation key to remove from all files",
 			},

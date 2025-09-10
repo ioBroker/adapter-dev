@@ -347,35 +347,39 @@ export async function handleAllCommand(): Promise<void> {
 }
 
 /**
- *
+ * Shared function to remove keys from i18n JSON files
+ * @param keyToRemove - The key to remove
+ * @param includeEnglish - Whether to include English files in the removal
+ * @returns Number of files that had the key removed
  */
-export async function handleRemoveTranslationsCommand(): Promise<void> {
-	if (!removeKeyValue) {
-		return die("No key specified for removal");
-	}
-
-	const keyToRemove = removeKeyValue;
-	console.log(
-		`Removing translations for key "${keyToRemove}" from all non-English files...`,
-	);
-
+async function removeKeyFromI18nFiles(keyToRemove: string, includeEnglish: boolean): Promise<number> {
 	let removedCount = 0;
+	
 	for (const i18nBase of i18nBases) {
 		const files = await findAllLanguageFiles(i18nBase);
-		const filePattern = createFilePattern(i18nBase);
+		
+		if (includeEnglish) {
+			// Add the English base file to the list
+			files.push(i18nBase);
+		}
 
 		for (const file of files) {
-			const match = file.match(filePattern);
-			if (!match) {
-				continue;
-			}
-			const lang = match[2] as ioBroker.Languages;
-			// Skip English base file
-			if (lang === "en") {
-				continue;
+			if (!includeEnglish) {
+				// Skip English files when not including them
+				const filePattern = createFilePattern(i18nBase);
+				const match = file.match(filePattern);
+				if (match) {
+					const lang = match[2] as ioBroker.Languages;
+					if (lang === "en") {
+						continue;
+					}
+				}
 			}
 
 			try {
+				if (!existsSync(file)) {
+					continue;
+				}
 				const content = await readJson(file);
 				if (content[keyToRemove] !== undefined) {
 					delete content[keyToRemove];
@@ -396,6 +400,24 @@ export async function handleRemoveTranslationsCommand(): Promise<void> {
 			}
 		}
 	}
+	
+	return removedCount;
+}
+
+/**
+ *
+ */
+export async function handleRemoveTranslationsCommand(): Promise<void> {
+	if (!removeKeyValue) {
+		return die("No key specified for removal");
+	}
+
+	const keyToRemove = removeKeyValue;
+	console.log(
+		`Removing translations for key "${keyToRemove}" from all non-English files...`,
+	);
+
+	const removedCount = await removeKeyFromI18nFiles(keyToRemove, false);
 
 	if (removedCount === 0) {
 		console.log(
@@ -424,40 +446,7 @@ export async function handleRemoveKeyCommand(): Promise<void> {
 		`Removing key "${keyToRemove}" from all files including English and words.js...`,
 	);
 
-	let removedCount = 0;
-
-	// Remove from all i18n JSON files (including English)
-	for (const i18nBase of i18nBases) {
-		const files = await findAllLanguageFiles(i18nBase);
-
-		// Add the English base file to the list
-		files.push(i18nBase);
-
-		for (const file of files) {
-			try {
-				if (!existsSync(file)) {
-					continue;
-				}
-				const content = await readJson(file);
-				if (content[keyToRemove] !== undefined) {
-					delete content[keyToRemove];
-					const baseIndentation = await getFileIndentation(file);
-					await writeJson(file, sortObjectKeys(content), {
-						spaces: baseIndentation,
-						EOL,
-					});
-					console.log(
-						`Removed "${keyToRemove}" from ${path.relative(".", file)}`,
-					);
-					removedCount++;
-				}
-			} catch (error) {
-				console.log(
-					`Could not process ${path.relative(".", file)}: ${error instanceof Error ? error.message : "unknown error"}`,
-				);
-			}
-		}
-	}
+	let removedCount = await removeKeyFromI18nFiles(keyToRemove, true);
 
 	// Remove from words.js if it exists
 	if (existsSync(words)) {
