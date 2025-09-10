@@ -258,9 +258,10 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
 - (@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
 - (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
-- (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation. (#79)
+- (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation.
 - (@copilot) Sort JSON keys alphabetically in all generated translation files
 - (@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
 

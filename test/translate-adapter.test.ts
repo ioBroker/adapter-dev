@@ -8,6 +8,8 @@ import {
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
+	handleRemoveTranslationsCommand,
+	handleRemoveKeyCommand,
 	parseOptions,
 } from "../src/translate-adapter-handlers";
 
@@ -225,6 +227,118 @@ describe("translate-adapter to-words", () => {
 
 describe("translate-adapter all", () => {
 	// TODO
+});
+
+describe("translate-adapter remove-translations", () => {
+	it("removes translation keys from non-English files only", async () => {
+		const result = await runTranslation(
+			"remove-translations-test",
+			false,
+			async () => {
+				// We need to call parseOptions with the key parameter
+				await parseOptions({
+					"io-package": path.join(
+						__dirname,
+						"data",
+						"remove-translations-test",
+						"output",
+						"io-package.json",
+					),
+					admin: path.join(
+						__dirname,
+						"data",
+						"remove-translations-test",
+						"output",
+						"admin",
+					),
+					key: "testKey",
+				});
+				await handleRemoveTranslationsCommand();
+			},
+		);
+
+		// Check that the English file still has the key
+		const enFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/en.json`,
+			"utf8",
+		);
+		const enContent = JSON.parse(enFile);
+		expect(enContent.testKey).to.equal("This key will be removed");
+
+		// Check that the German file no longer has the key
+		const deFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/de.json`,
+			"utf8",
+		);
+		const deContent = JSON.parse(deFile);
+		expect(deContent.testKey).to.be.undefined;
+
+		// Check that the French file no longer has the key
+		const frFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/fr.json`,
+			"utf8",
+		);
+		const frContent = JSON.parse(frFile);
+		expect(frContent.testKey).to.be.undefined;
+
+		return result;
+	});
+});
+
+describe("translate-adapter remove-key", () => {
+	it("removes keys from all files including English", async () => {
+		const result = await runTranslation(
+			"remove-key-test",
+			false,
+			async () => {
+				// We need to call parseOptions with the key parameter
+				await parseOptions({
+					"io-package": path.join(
+						__dirname,
+						"data",
+						"remove-key-test",
+						"output",
+						"io-package.json",
+					),
+					admin: path.join(
+						__dirname,
+						"data",
+						"remove-key-test",
+						"output",
+						"admin",
+					),
+					key: "removeMe",
+				});
+				await handleRemoveKeyCommand();
+			},
+		);
+
+		// Check that the English file no longer has the key
+		const enFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/en.json`,
+			"utf8",
+		);
+		const enContent = JSON.parse(enFile);
+		expect(enContent.removeMe).to.be.undefined;
+
+		// Check that the German file no longer has the key
+		const deFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/de.json`,
+			"utf8",
+		);
+		const deContent = JSON.parse(deFile);
+		expect(deContent.removeMe).to.be.undefined;
+
+		// Check that the French file no longer has the key
+		const frFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/fr.json`,
+			"utf8",
+		);
+		const frContent = JSON.parse(frFile);
+		expect(frContent.removeMe).to.be.undefined;
+
+		return result;
+	});
 });
 
 describe("translate-adapter error messages", () => {
