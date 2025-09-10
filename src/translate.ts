@@ -10,6 +10,9 @@ const translationCache = new Map<string, Map<string, string>>();
 let isRateLimited = false;
 let rateLimitRetryAfter: number | undefined;
 
+// Special symbol to indicate translation was skipped due to rate limiting
+export const TRANSLATION_SKIPPED = Symbol("TRANSLATION_SKIPPED");
+
 /**
  * Resets the rate limiting state. Useful for testing or when starting a new translation session.
  */
@@ -51,12 +54,12 @@ export function setRateLimitState(
  *
  * @param text The text to translate
  * @param targetLang The target language code
- * @returns The translated text or the same text if translation failed.
+ * @returns The translated text, or TRANSLATION_SKIPPED symbol if translation was skipped due to rate limiting.
  */
 export async function translateText(
 	text: string,
 	targetLang: string,
-): Promise<string> {
+): Promise<string | typeof TRANSLATION_SKIPPED> {
 	if (targetLang === "en") {
 		return text;
 	}
@@ -80,7 +83,7 @@ export async function translateText(
 		error(
 			`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`,
 		);
-		return text;
+		return TRANSLATION_SKIPPED;
 	}
 
 	// Fall back to an online translation

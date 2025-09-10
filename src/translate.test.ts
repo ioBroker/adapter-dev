@@ -5,6 +5,7 @@ import {
 	getRateLimitState,
 	setRateLimitState,
 	clearTranslationCache,
+	TRANSLATION_SKIPPED,
 } from "./translate";
 
 describe("translate rate limiting", () => {
@@ -44,18 +45,18 @@ describe("translate rate limiting", () => {
 		// Set rate limiting state
 		setRateLimitState(true);
 
-		// Translation should be skipped and return original text
+		// Translation should be skipped and return TRANSLATION_SKIPPED symbol
 		const result = await translateText("Hello", "de");
-		expect(result).to.equal("Hello");
+		expect(result).to.equal(TRANSLATION_SKIPPED);
 	});
 
 	it("should skip translation when rate limited with retry after", async () => {
 		// Set rate limiting state with retry after
 		setRateLimitState(true, 60);
 
-		// Translation should be skipped and return original text
+		// Translation should be skipped and return TRANSLATION_SKIPPED symbol
 		const result = await translateText("Hello", "de");
-		expect(result).to.equal("Hello");
+		expect(result).to.equal(TRANSLATION_SKIPPED);
 	});
 
 	it("should allow translation after rate limit is reset", async () => {
@@ -64,7 +65,7 @@ describe("translate rate limiting", () => {
 
 		// Translation should be skipped
 		const result1 = await translateText("Hello", "de");
-		expect(result1).to.equal("Hello");
+		expect(result1).to.equal(TRANSLATION_SKIPPED);
 
 		// Reset rate limiting
 		resetRateLimitState();
@@ -83,9 +84,9 @@ describe("translate rate limiting", () => {
 		const result2 = await translateText("World", "fr");
 		const result3 = await translateText("Test", "es");
 
-		expect(result1).to.equal("Hello");
-		expect(result2).to.equal("World");
-		expect(result3).to.equal("Test");
+		expect(result1).to.equal(TRANSLATION_SKIPPED);
+		expect(result2).to.equal(TRANSLATION_SKIPPED);
+		expect(result3).to.equal(TRANSLATION_SKIPPED);
 
 		// State should still be rate limited
 		const state = getRateLimitState();
@@ -106,7 +107,7 @@ describe("translate rate limiting", () => {
 
 		// But new translation should be skipped
 		const result3 = await translateText("World", "de");
-		expect(result3).to.equal("World");
+		expect(result3).to.equal(TRANSLATION_SKIPPED);
 	});
 
 	it("should reset state correctly", () => {
@@ -123,5 +124,44 @@ describe("translate rate limiting", () => {
 		state = getRateLimitState();
 		expect(state.isRateLimited).to.be.false;
 		expect(state.rateLimitRetryAfter).to.be.undefined;
+	});
+
+	it("should return TRANSLATION_SKIPPED symbol when rate limited", async () => {
+		// Set rate limiting state
+		setRateLimitState(true);
+
+		// Translation should return the special symbol
+		const result = await translateText("Hello", "de");
+		expect(result).to.equal(TRANSLATION_SKIPPED);
+		expect(typeof result).to.equal("symbol");
+	});
+
+	it("should demonstrate rate limiting prevents writing to translation objects", () => {
+		// This test demonstrates the key behavior change:
+		// When rate limited, translations don't get written to objects,
+		// so they remain missing and can be retried later
+		
+		const translationObject: Record<string, string> = {};
+		
+		// Simulate the logic from translateNotExisting and translateI18nJson
+		const simulateTranslation = (translation: string | typeof TRANSLATION_SKIPPED) => {
+			if (translation !== TRANSLATION_SKIPPED) {
+				translationObject["hello"] = translation;
+			}
+			// If translation was skipped, don't set the value - leave it missing
+		};
+		
+		// Simulate a normal translation
+		simulateTranslation("Hallo"); // Normal case
+		expect(translationObject["hello"]).to.equal("Hallo");
+		
+		// Reset for rate-limited case
+		delete translationObject["hello"];
+		
+		// Simulate a rate-limited translation
+		simulateTranslation(TRANSLATION_SKIPPED);
+		expect(translationObject["hello"]).to.be.undefined; // Key remains missing
+		
+		// This means on the next run, the missing key will be retried
 	});
 });

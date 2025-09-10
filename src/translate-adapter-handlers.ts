@@ -13,7 +13,11 @@ import {
 } from "fs-extra";
 import path from "node:path";
 import glob from "tiny-glob";
-import { translateText, resetRateLimitState } from "./translate";
+import {
+	translateText,
+	resetRateLimitState,
+	TRANSLATION_SKIPPED,
+} from "./translate";
 import {
 	die,
 	escapeRegExp,
@@ -392,10 +396,14 @@ async function translateNotExisting(
 		for (const lang of translateLanguages) {
 			if (!obj[lang]) {
 				const time = new Date().getTime();
-				obj[lang] = await translateText(text, lang);
-				console.log(
-					gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
-				);
+				const translation = await translateText(text, lang);
+				if (translation !== TRANSLATION_SKIPPED) {
+					obj[lang] = translation;
+					console.log(
+						gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
+					);
+				}
+				// If translation was skipped, don't set obj[lang] - leave it missing
 			}
 		}
 	}
@@ -449,7 +457,11 @@ async function translateI18nJson(
 	const time = new Date().getTime();
 	for (const [t, base] of Object.entries(baseContent)) {
 		if (!content[t]) {
-			content[t] = await translateText(base, lang);
+			const translation = await translateText(base, lang);
+			if (translation !== TRANSLATION_SKIPPED) {
+				content[t] = translation;
+			}
+			// If translation was skipped, don't set content[t] - leave it missing
 		}
 	}
 	console.log(
