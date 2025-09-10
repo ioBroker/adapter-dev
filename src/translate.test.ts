@@ -51,7 +51,9 @@ describe("translate rate limiting", () => {
 			expect.fail("Expected TranslationSkippedError to be thrown");
 		} catch (err) {
 			expect(err).to.be.instanceOf(TranslationSkippedError);
-			expect(err.message).to.include('Skipping translation to "de" due to rate limiting');
+			expect((err as TranslationSkippedError).message).to.include(
+				'Skipping translation to "de" due to rate limiting',
+			);
 		}
 	});
 
@@ -65,7 +67,9 @@ describe("translate rate limiting", () => {
 			expect.fail("Expected TranslationSkippedError to be thrown");
 		} catch (err) {
 			expect(err).to.be.instanceOf(TranslationSkippedError);
-			expect(err.message).to.include('Skipping translation to "de" due to rate limiting (retry after 60 seconds)');
+			expect((err as TranslationSkippedError).message).to.include(
+				'Skipping translation to "de" due to rate limiting (retry after 60 seconds)',
+			);
 			expect((err as TranslationSkippedError).retryAfter).to.equal(60);
 		}
 	});
@@ -168,8 +172,12 @@ describe("translate rate limiting", () => {
 			expect.fail("Expected TranslationSkippedError to be thrown");
 		} catch (err) {
 			expect(err).to.be.instanceOf(TranslationSkippedError);
-			expect(err.name).to.equal("TranslationSkippedError");
-			expect(err.message).to.include('Skipping translation to "de" due to rate limiting');
+			expect((err as TranslationSkippedError).name).to.equal(
+				"TranslationSkippedError",
+			);
+			expect((err as TranslationSkippedError).message).to.include(
+				'Skipping translation to "de" due to rate limiting',
+			);
 		}
 	});
 
@@ -177,31 +185,31 @@ describe("translate rate limiting", () => {
 		// This test demonstrates the key behavior change:
 		// When rate limited, translations throw errors and don't get written to objects,
 		// so they remain missing and can be retried later
-		
+
 		const translationObject: Record<string, string> = {};
-		
+
 		// Simulate the logic from translateNotExisting and translateI18nJson
-		const simulateTranslation = (result: string | Error) => {
+		const simulateTranslation = (result: string | Error): void => {
 			if (result instanceof TranslationSkippedError) {
 				// Translation was skipped due to rate limiting, don't set the value - leave it missing
 				return;
 			}
 			if (typeof result === "string") {
-				translationObject["hello"] = result;
+				translationObject.hello = result;
 			}
 		};
-		
+
 		// Simulate a normal translation
 		simulateTranslation("Hallo"); // Normal case
-		expect(translationObject["hello"]).to.equal("Hallo");
-		
+		expect(translationObject.hello).to.equal("Hallo");
+
 		// Reset for rate-limited case
-		delete translationObject["hello"];
-		
+		delete translationObject.hello;
+
 		// Simulate a rate-limited translation
 		simulateTranslation(new TranslationSkippedError("de"));
-		expect(translationObject["hello"]).to.be.undefined; // Key remains missing
-		
+		expect(translationObject.hello).to.be.undefined; // Key remains missing
+
 		// This means on the next run, the missing key will be retried
 	});
 });
