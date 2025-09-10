@@ -489,29 +489,33 @@ async function translateIoPackage(): Promise<void> {
 		console.log("Translate News");
 		for (const [k, nw] of Object.entries(content.common.news)) {
 			console.log(`News: ${k}`);
-			await translateNotExisting(nw as any);
+			await translateNotExisting(nw as any, `news.${k}`);
 		}
 	}
 	if (content.common.titleLang) {
 		console.log("Translate Title");
 		await translateNotExisting(
 			content.common.titleLang,
+			"titleLang",
 			content.common.title,
 		);
 	}
 	if (content.common.desc) {
 		console.log("Translate Description");
-		await translateNotExisting(content.common.desc);
+		await translateNotExisting(content.common.desc, "desc");
 	}
 	// https://github.com/ioBroker/adapter-dev/issues/138
 	if (content.common.messages) {
 		console.log("Translate Messages");
 		for (const message of content.common.messages) {
 			console.log(`   Message: ${message.title.en}`);
-			await translateNotExisting(message.title);
-			await translateNotExisting(message.text);
+			await translateNotExisting(message.title, "message.title");
+			await translateNotExisting(message.text, "message.text");
 			if (message.linkText) {
-				await translateNotExisting(message.linkText);
+				await translateNotExisting(
+					message.linkText,
+					"message.linkText",
+				);
 			}
 		}
 	}
@@ -521,6 +525,7 @@ async function translateIoPackage(): Promise<void> {
 
 async function translateNotExisting(
 	obj: Partial<Record<ioBroker.Languages, string>>,
+	context?: string,
 	baseText?: string,
 ): Promise<void> {
 	const text = obj.en || baseText;
@@ -529,7 +534,7 @@ async function translateNotExisting(
 		for (const lang of translateLanguages) {
 			if (!obj[lang]) {
 				const time = new Date().getTime();
-				obj[lang] = await translateText(text, lang);
+				obj[lang] = await translateText(text, lang, context);
 				console.log(
 					gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
 				);
@@ -586,7 +591,7 @@ async function translateI18nJson(
 	const time = new Date().getTime();
 	for (const [t, base] of Object.entries(baseContent)) {
 		if (!content[t]) {
-			content[t] = await translateText(base, lang);
+			content[t] = await translateText(base, lang, t);
 		}
 	}
 	console.log(

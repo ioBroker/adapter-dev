@@ -338,5 +338,59 @@ describe("translate-adapter remove-key", () => {
 		expect(frContent.removeMe).to.be.undefined;
 
 		return result;
+  });
+});
+
+describe("translate-adapter error messages", () => {
+	it("provides enhanced error messages for empty string translations", async () => {
+		// Use our test data with empty strings
+		const baseDir = path.resolve(__dirname, "data", "empty-string-error");
+		const inputDir = path.join(baseDir, "input");
+		const outputDir = path.join(baseDir, "output");
+		await rimraf(outputDir);
+		await copy(inputDir, outputDir);
+
+		const adminDir = path.join(outputDir, "admin");
+		await parseOptions({
+			"io-package": path.join(outputDir, "io-package.json"),
+			admin: adminDir,
+		});
+
+		// Capture console output to verify error messages
+		const originalConsoleError = console.error;
+		const errorMessages: string[] = [];
+		console.error = (...args: any[]) => {
+			const message = args.join(" ");
+			errorMessages.push(message);
+		};
+
+		try {
+			await handleTranslateCommand();
+		} finally {
+			// Restore console.error
+			console.error = originalConsoleError;
+		}
+
+		// Check that we got enhanced error messages for empty string keys
+		const emptyStringErrors = errorMessages.filter(
+			msg =>
+				msg &&
+				typeof msg === "string" &&
+				msg.includes("Empty source text") &&
+				(msg.includes("lblOptNoRawStates") ||
+					msg.includes("lblOptNoValStates")),
+		);
+
+		expect(emptyStringErrors.length).to.be.greaterThan(0);
+
+		// Verify the error message contains key information and helpful text
+		const errorWithKey = emptyStringErrors.find(msg =>
+			msg.includes("lblOptNoRawStates"),
+		);
+		expect(errorWithKey).to.include('for key "lblOptNoRawStates"');
+		expect(errorWithKey).to.include("Empty source text");
+		expect(errorWithKey).to.include(
+			"UI can display the key name as fallback",
+		);
 	});
 });
