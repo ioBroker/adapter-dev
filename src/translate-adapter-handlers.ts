@@ -16,7 +16,7 @@ import glob from "tiny-glob";
 import {
 	translateText,
 	resetRateLimitState,
-	TRANSLATION_SKIPPED,
+	TranslationSkippedError,
 } from "./translate";
 import {
 	die,
@@ -396,14 +396,21 @@ async function translateNotExisting(
 		for (const lang of translateLanguages) {
 			if (!obj[lang]) {
 				const time = new Date().getTime();
-				const translation = await translateText(text, lang);
-				if (translation !== TRANSLATION_SKIPPED) {
+				try {
+					const translation = await translateText(text, lang);
 					obj[lang] = translation;
 					console.log(
 						gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
 					);
+				} catch (err) {
+					if (err instanceof TranslationSkippedError) {
+						// Translation was skipped due to rate limiting, don't set obj[lang] - leave it missing
+						console.log(gray(err.message));
+					} else {
+						// Re-throw other errors
+						throw err;
+					}
 				}
-				// If translation was skipped, don't set obj[lang] - leave it missing
 			}
 		}
 	}
@@ -457,11 +464,18 @@ async function translateI18nJson(
 	const time = new Date().getTime();
 	for (const [t, base] of Object.entries(baseContent)) {
 		if (!content[t]) {
-			const translation = await translateText(base, lang);
-			if (translation !== TRANSLATION_SKIPPED) {
+			try {
+				const translation = await translateText(base, lang);
 				content[t] = translation;
+			} catch (err) {
+				if (err instanceof TranslationSkippedError) {
+					// Translation was skipped due to rate limiting, don't set content[t] - leave it missing
+					console.log(gray(err.message));
+				} else {
+					// Re-throw other errors
+					throw err;
+				}
 			}
-			// If translation was skipped, don't set content[t] - leave it missing
 		}
 	}
 	console.log(
