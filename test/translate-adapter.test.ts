@@ -8,6 +8,8 @@ import {
 	handleToJsonCommand,
 	handleToWordsCommand,
 	handleTranslateCommand,
+	handleRemoveTranslationsCommand,
+	handleRemoveKeyCommand,
 	parseOptions,
 } from "../src/translate-adapter-handlers";
 
@@ -225,4 +227,170 @@ describe("translate-adapter to-words", () => {
 
 describe("translate-adapter all", () => {
 	// TODO
+});
+
+describe("translate-adapter remove-translations", () => {
+	it("removes translation keys from non-English files only", async () => {
+		const result = await runTranslation(
+			"remove-translations-test",
+			false,
+			async () => {
+				// We need to call parseOptions with the key parameter
+				await parseOptions({
+					"io-package": path.join(
+						__dirname,
+						"data",
+						"remove-translations-test",
+						"output",
+						"io-package.json",
+					),
+					admin: path.join(
+						__dirname,
+						"data",
+						"remove-translations-test",
+						"output",
+						"admin",
+					),
+					key: "testKey",
+				});
+				await handleRemoveTranslationsCommand();
+			},
+		);
+
+		// Check that the English file still has the key
+		const enFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/en.json`,
+			"utf8",
+		);
+		const enContent = JSON.parse(enFile);
+		expect(enContent.testKey).to.equal("This key will be removed");
+
+		// Check that the German file no longer has the key
+		const deFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/de.json`,
+			"utf8",
+		);
+		const deContent = JSON.parse(deFile);
+		expect(deContent.testKey).to.be.undefined;
+
+		// Check that the French file no longer has the key
+		const frFile = readFileSync(
+			`${__dirname}/data/remove-translations-test/output/admin/i18n/fr.json`,
+			"utf8",
+		);
+		const frContent = JSON.parse(frFile);
+		expect(frContent.testKey).to.be.undefined;
+
+		return result;
+	});
+});
+
+describe("translate-adapter remove-key", () => {
+	it("removes keys from all files including English", async () => {
+		const result = await runTranslation(
+			"remove-key-test",
+			false,
+			async () => {
+				// We need to call parseOptions with the key parameter
+				await parseOptions({
+					"io-package": path.join(
+						__dirname,
+						"data",
+						"remove-key-test",
+						"output",
+						"io-package.json",
+					),
+					admin: path.join(
+						__dirname,
+						"data",
+						"remove-key-test",
+						"output",
+						"admin",
+					),
+					key: "removeMe",
+				});
+				await handleRemoveKeyCommand();
+			},
+		);
+
+		// Check that the English file no longer has the key
+		const enFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/en.json`,
+			"utf8",
+		);
+		const enContent = JSON.parse(enFile);
+		expect(enContent.removeMe).to.be.undefined;
+
+		// Check that the German file no longer has the key
+		const deFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/de.json`,
+			"utf8",
+		);
+		const deContent = JSON.parse(deFile);
+		expect(deContent.removeMe).to.be.undefined;
+
+		// Check that the French file no longer has the key
+		const frFile = readFileSync(
+			`${__dirname}/data/remove-key-test/output/admin/i18n/fr.json`,
+			"utf8",
+		);
+		const frContent = JSON.parse(frFile);
+		expect(frContent.removeMe).to.be.undefined;
+
+		return result;
+	});
+});
+
+describe("translate-adapter error messages", () => {
+	it("provides enhanced error messages for empty string translations", async () => {
+		// Use our test data with empty strings
+		const baseDir = path.resolve(__dirname, "data", "empty-string-error");
+		const inputDir = path.join(baseDir, "input");
+		const outputDir = path.join(baseDir, "output");
+		await rimraf(outputDir);
+		await copy(inputDir, outputDir);
+
+		const adminDir = path.join(outputDir, "admin");
+		await parseOptions({
+			"io-package": path.join(outputDir, "io-package.json"),
+			admin: adminDir,
+		});
+
+		// Capture console output to verify error messages
+		const originalConsoleError = console.error;
+		const errorMessages: string[] = [];
+		console.error = (...args: any[]) => {
+			const message = args.join(" ");
+			errorMessages.push(message);
+		};
+
+		try {
+			await handleTranslateCommand();
+		} finally {
+			// Restore console.error
+			console.error = originalConsoleError;
+		}
+
+		// Check that we got enhanced error messages for empty string keys
+		const emptyStringErrors = errorMessages.filter(
+			msg =>
+				msg &&
+				typeof msg === "string" &&
+				msg.includes("Empty source text") &&
+				(msg.includes("lblOptNoRawStates") ||
+					msg.includes("lblOptNoValStates")),
+		);
+
+		expect(emptyStringErrors.length).to.be.greaterThan(0);
+
+		// Verify the error message contains key information and helpful text
+		const errorWithKey = emptyStringErrors.find(msg =>
+			msg.includes("lblOptNoRawStates"),
+		);
+		expect(errorWithKey).to.include('for key "lblOptNoRawStates"');
+		expect(errorWithKey).to.include("Empty source text");
+		expect(errorWithKey).to.include(
+			"UI can display the key name as fallback",
+		);
+	});
 });

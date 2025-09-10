@@ -1,0 +1,12 @@
+{
+	"name": "test-adapter",
+	"version": "1.0.0",
+	"common": {
+		"name": "test-adapter",
+		"title": "Test Adapter",
+		"desc": "Test adapter for empty string translation",
+		"type": "general",
+		"mode": "daemon",
+		"platform": "Javascript/Node.js"
+	}
+}

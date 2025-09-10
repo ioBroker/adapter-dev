@@ -1,0 +1,12 @@
+{
+    "common": {
+        "name": "test-adapter",
+        "title": "Test Adapter",
+        "titleLang": {
+            "en": "Test Adapter"
+        },
+        "desc": {
+            "en": "Test adapter for translations"
+        }
+    }
+}
