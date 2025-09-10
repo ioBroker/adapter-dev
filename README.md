@@ -258,6 +258,7 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
 - (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
 - (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation. (#79)
 - (@copilot) Sort JSON keys alphabetically in all generated translation files
