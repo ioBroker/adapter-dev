@@ -13,7 +13,11 @@ import {
 } from "fs-extra";
 import path from "node:path";
 import glob from "tiny-glob";
-import { translateText } from "./translate";
+import {
+	translateText,
+	resetRateLimitState,
+	TranslationSkippedError,
+} from "./translate";
 import {
 	die,
 	escapeRegExp,
@@ -305,6 +309,9 @@ async function deleteExistingTranslationFiles(): Promise<void> {
  *
  */
 export async function handleTranslateCommand(): Promise<void> {
+	// Reset rate limiting state at the beginning of a new translation session
+	resetRateLimitState();
+
 	if (rebuildMode) {
 		console.log("Rebuild mode: Deleting existing translation files...");
 		await deleteExistingTranslationFiles();
@@ -489,38 +496,51 @@ async function translateIoPackage(): Promise<void> {
 	const indentation = getIndentation(ioPackageFile);
 	const content = JSON.parse(ioPackageFile);
 
-	if (content.common.news) {
-		console.log("Translate News");
-		for (const [k, nw] of Object.entries(content.common.news)) {
-			console.log(`News: ${k}`);
-			await translateNotExisting(nw as any, `news.${k}`);
-		}
-	}
-	if (content.common.titleLang) {
-		console.log("Translate Title");
-		await translateNotExisting(
-			content.common.titleLang,
-			"titleLang",
-			content.common.title,
-		);
-	}
-	if (content.common.desc) {
-		console.log("Translate Description");
-		await translateNotExisting(content.common.desc, "desc");
-	}
-	// https://github.com/ioBroker/adapter-dev/issues/138
-	if (content.common.messages) {
-		console.log("Translate Messages");
-		for (const message of content.common.messages) {
-			console.log(`   Message: ${message.title.en}`);
-			await translateNotExisting(message.title, "message.title");
-			await translateNotExisting(message.text, "message.text");
-			if (message.linkText) {
-				await translateNotExisting(
-					message.linkText,
-					"message.linkText",
-				);
+	try {
+		if (content.common.news) {
+			console.log("Translate News");
+			for (const [k, nw] of Object.entries(content.common.news)) {
+				console.log(`News: ${k}`);
+				await translateNotExisting(nw as any, `news.${k}`);
 			}
+		}
+		if (content.common.titleLang) {
+			console.log("Translate Title");
+			await translateNotExisting(
+				content.common.titleLang,
+				"titleLang",
+				content.common.title,
+			);
+		}
+		if (content.common.desc) {
+			console.log("Translate Description");
+			await translateNotExisting(content.common.desc, "desc");
+		}
+		// https://github.com/ioBroker/adapter-dev/issues/138
+		if (content.common.messages) {
+			console.log("Translate Messages");
+			for (const message of content.common.messages) {
+				console.log(`   Message: ${message.title.en}`);
+				await translateNotExisting(message.title, "message.title");
+				await translateNotExisting(message.text, "message.text");
+				if (message.linkText) {
+					await translateNotExisting(
+						message.linkText,
+						"message.linkText",
+					);
+				}
+			}
+		}
+	} catch (err) {
+		// We accept TranslationSkippedError here, ad still save whatever we had as progress
+		if (err instanceof TranslationSkippedError) {
+			console.log(
+				yellow(
+					"Translation incomplete because of rate Limiting. See above for details.",
+				),
+			);
+		} else {
+			throw err;
 		}
 	}
 	await writeJson(ioPackage, content, { spaces: indentation, EOL });
@@ -538,10 +558,18 @@ async function translateNotExisting(
 		for (const lang of translateLanguages) {
 			if (!obj[lang]) {
 				const time = new Date().getTime();
-				obj[lang] = await translateText(text, lang, context);
-				console.log(
-					gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
-				);
+				try {
+					obj[lang] = await translateText(text, lang, context);
+					console.log(
+						gray(`en -> ${lang} ${new Date().getTime() - time} ms`),
+					);
+				} catch (err) {
+					if (err instanceof TranslationSkippedError) {
+						// Translation was skipped due to rate limiting, don't set obj[lang] - leave it missing
+						console.log(yellow(err.message));
+					}
+					throw err;
+				}
 			}
 		}
 	}
@@ -595,7 +623,21 @@ async function translateI18nJson(
 	const time = new Date().getTime();
 	for (const [t, base] of Object.entries(baseContent)) {
 		if (!content[t]) {
-			content[t] = await translateText(base, lang, t);
+			try {
+				content[t] = await translateText(base, lang, t);
+			} catch (err) {
+				if (err instanceof TranslationSkippedError) {
+					// Translation was skipped due to rate limiting, don't set content[t] - leave it missing
+					console.log(yellow(err.message));
+					console.log(
+						yellow(
+							`Translate Admin en -> ${lang} incomplete because of rate Limiting. See above for details.`,
+						),
+					);
+					return;
+				}
+				throw err;
+			}
 		}
 	}
 	console.log(

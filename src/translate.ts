@@ -6,13 +6,72 @@ import { error } from "./util";
 
 const translationCache = new Map<string, Map<string, string>>();
 
+// Rate limiting state
+let isRateLimited = false;
+let rateLimitRetryAfter: number | undefined;
+
+/**
+ * Custom error class thrown when translation is skipped due to rate limiting
+ */
+export class TranslationSkippedError extends Error {
+	public readonly retryAfter?: number;
+
+	constructor(targetLang: string, retryAfter?: number) {
+		const retryMessage = retryAfter
+			? ` (retry after ${retryAfter} seconds)`
+			: "";
+		super(
+			`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`,
+		);
+		this.name = "TranslationSkippedError";
+		this.retryAfter = retryAfter;
+	}
+}
+
+/**
+ * Resets the rate limiting state. Useful for testing or when starting a new translation session.
+ */
+export function resetRateLimitState(): void {
+	isRateLimited = false;
+	rateLimitRetryAfter = undefined;
+}
+
+/**
+ * Clears the translation cache. Useful for testing.
+ */
+export function clearTranslationCache(): void {
+	translationCache.clear();
+}
+
+/**
+ * Gets the current rate limiting state. Useful for testing.
+ */
+export function getRateLimitState(): {
+	isRateLimited: boolean;
+	rateLimitRetryAfter?: number;
+} {
+	return { isRateLimited, rateLimitRetryAfter };
+}
+
+/**
+ * Sets the rate limiting state. Useful for testing.
+ */
+export function setRateLimitState(
+	rateLimited: boolean,
+	retryAfter?: number,
+): void {
+	isRateLimited = rateLimited;
+	rateLimitRetryAfter = retryAfter;
+}
+
 /**
  * Translates text using the Google Translate API.
  *
  * @param text The text to translate
  * @param targetLang The target language code
  * @param key Optional key name for better error reporting
- * @returns The translated text or the same text if translation failed.
+ * @returns The translated text
+ * @throws {TranslationSkippedError} When translation is skipped due to rate limiting
  */
 export async function translateText(
 	text: string,
@@ -31,27 +90,50 @@ export async function translateText(
 		return text;
 	}
 
-	// Try to read the translation from the translation cache
+	// Try to read the translation from the translation cache first
 	if (!translationCache.has(targetLang)) {
 		translationCache.set(targetLang, new Map());
 	}
 	const langCache = translationCache.get(targetLang)!;
 
-	// or fall back to an online translation
-	if (!langCache.has(text)) {
-		const translator = await getTranslator();
-		let translated;
-		try {
-			translated = await translator.translate(text, targetLang);
-		} catch (e: any) {
-			const keyInfo = key ? ` for key "${key}"` : "";
-			const message = `Could not translate to "${targetLang}"${keyInfo}: ${e.message || e}. The UI can display the original text or key name as fallback.`;
-			error(message);
-			return text;
-		}
-		langCache.set(text, translated);
+	// Return cached translation if available
+	if (langCache.has(text)) {
+		return langCache.get(text)!;
 	}
-	return langCache.get(text)!;
+
+	// Skip new translation requests if we're rate limited
+	if (isRateLimited) {
+		throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
+	}
+
+	// Fall back to an online translation
+	const translator = await getTranslator();
+	let translated;
+	try {
+		translated = await translator.translate(text, targetLang);
+	} catch (e: any) {
+		// Check if this is a rate limiting error
+		if (e.response?.status === 429) {
+			// Set rate limiting state
+			isRateLimited = true;
+
+			// Extract retry-after header if available
+			const retryAfter = e.response.headers["retry-after"];
+			if (retryAfter) {
+				rateLimitRetryAfter = parseInt(retryAfter, 10);
+			}
+
+			// Throw TranslationSkippedError for rate limiting
+			throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
+		}
+
+		const keyInfo = key ? ` for key "${key}"` : "";
+		const message = `Could not translate to "${targetLang}"${keyInfo}: ${e.message || e}. The UI can display the original text or key name as fallback.`;
+		error(message);
+		return text;
+	}
+	langCache.set(text, translated);
+	return translated;
 }
 
 /**
@@ -142,31 +224,21 @@ class GoogleV3Translator implements Translator {
  */
 class LegacyTranslator implements Translator {
 	async translate(text: string, targetLang: string): Promise<string> {
-		try {
-			const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
-				text,
-			)}&ie=UTF-8&oe=UTF-8`;
-			let options: AxiosRequestConfig = {
-				url,
-				timeout: getRequestTimeout(),
-			};
+		const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
+			text,
+		)}&ie=UTF-8&oe=UTF-8`;
+		let options: AxiosRequestConfig = {
+			url,
+			timeout: getRequestTimeout(),
+		};
 
-			// If an https-proxy is defined as an env variable, use it
-			options = applyHttpsProxy(options);
+		// If an https-proxy is defined as an env variable, use it
+		options = applyHttpsProxy(options);
 
-			const response = await axios(options);
-			if (Array.isArray(response.data)) {
-				// we got a valid response
-				return response.data[0].map((t: string[]) => t[0]).join("");
-			}
-		} catch (e: any) {
-			if (e.response?.status === 429) {
-				throw new Error(
-					`Could not translate to "${targetLang}": Rate-limited by Google Translate`,
-				);
-			} else {
-				throw e;
-			}
+		const response = await axios(options);
+		if (Array.isArray(response.data)) {
+			// we got a valid response
+			return response.data[0].map((t: string[]) => t[0]).join("");
 		}
 
 		throw new Error(`Invalid response for translate request`);
