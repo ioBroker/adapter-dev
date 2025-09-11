@@ -197,19 +197,26 @@ To get a DeepL API key:
 3. Get your API key from the account dashboard
 4. Set the environment variable: `DEEPL_API_KEY=your-api-key-here`
 
-**Translation Service Priority:**
-When multiple translation services are configured, the system uses this priority order:
-1. **DeepL API** (if `DEEPL_API_KEY` is set) - Recommended for best quality
-2. **Google Translate V3** (if `GOOGLE_APPLICATION_CREDENTIALS` is set)
-3. **Legacy Google Translate** (free, rate-limited fallback)
-
 Example usage:
 ```bash
 # Use DeepL for translation
 export DEEPL_API_KEY="your-deepl-api-key"
 npm run translate
+```
 
-# Use Google V3 as fallback
+#### Translation Service Priority
+
+When multiple translation services are configured, the system automatically selects the best available service using this priority order:
+
+1. **Testing translator** (when `TESTING=true`) - For development/testing only
+2. **DeepL API** (when `DEEPL_API_KEY` is set) - **Recommended for best quality**
+3. **Google Translate V3** (when `GOOGLE_APPLICATION_CREDENTIALS` is set)
+4. **Legacy Google Translate** (free, rate-limited fallback)
+
+You can configure multiple services as fallbacks. For example:
+```bash
+# Configure both DeepL and Google V3 as fallbacks
+export DEEPL_API_KEY="your-deepl-api-key"
 export GOOGLE_APPLICATION_CREDENTIALS="path/to/google-credentials.json"
 npm run translate
 ```
@@ -286,7 +293,7 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available, fixes #62.
+- (@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
 - (@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
 - (@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
 - (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
