@@ -186,6 +186,34 @@ The file can be generated on the Google Cloud Platform by creating a Service Acc
 }
 ```
 
+#### Translate with DeepL API
+
+**Recommended:** If you wish to use the DeepL API for higher quality translations, you can set the environment variable `DEEPL_API_KEY` to your DeepL API key. DeepL generally provides better translation quality than Google Translate and has a generous free tier.
+
+To get a DeepL API key:
+
+1. Visit [DeepL Pro Developer](https://www.deepl.com/pro#developer)
+2. Sign up for a free DeepL API account
+3. Get your API key from the account dashboard
+4. Set the environment variable: `DEEPL_API_KEY=your-api-key-here`
+
+**Translation Service Priority:**
+When multiple translation services are configured, the system uses this priority order:
+1. **DeepL API** (if `DEEPL_API_KEY` is set) - Recommended for best quality
+2. **Google Translate V3** (if `GOOGLE_APPLICATION_CREDENTIALS` is set)
+3. **Legacy Google Translate** (free, rate-limited fallback)
+
+Example usage:
+```bash
+# Use DeepL for translation
+export DEEPL_API_KEY="your-deepl-api-key"
+npm run translate
+
+# Use Google V3 as fallback
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/google-credentials.json"
+npm run translate
+```
+
 ## Compile adapter files
 
 The `build-adapter` command uses esbuild under the hood for lightning fast compilation. It has an extensive set of options you can use to fine tune the compilation process, although the defaults should work out of the box when the adapter was created with `@iobroker/create-adapter`:
@@ -258,6 +286,7 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available, fixes #62.
 - (@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
 - (@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
 - (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
