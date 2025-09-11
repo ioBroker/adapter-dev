@@ -264,6 +264,7 @@ npm run clean-dir <directory>                         # directory to remove
 - (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation.
 - (@copilot) Sort JSON keys alphabetically in all generated translation files
 - (@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
+- (@copilot) Enhanced handling of rate limits for translations and persist as much progress as possible. 
 
 ### 1.4.0 (2025-02-22)
 - (ticaki) rimraf replaced by by internal tool.
