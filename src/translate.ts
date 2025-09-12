@@ -1,7 +1,10 @@
-import { TranslationServiceClient } from "@google-cloud/translate";
-import axios, { type AxiosRequestConfig } from "axios";
-import { readJson } from "fs-extra";
-import { applyHttpsProxy, getRequestTimeout } from "./network";
+import {
+	type Translator,
+	TestingTranslator,
+	DeeplTranslator,
+	GoogleV3Translator,
+	LegacyTranslator,
+} from "./translators";
 import { error } from "./util";
 
 const translationCache = new Map<string, Map<string, string>>();
@@ -24,6 +27,28 @@ export class TranslationSkippedError extends Error {
 			`Skipping translation to "${targetLang}" due to rate limiting${retryMessage}`,
 		);
 		this.name = "TranslationSkippedError";
+		this.retryAfter = retryAfter;
+	}
+}
+
+/**
+ * Custom error class for rate limiting and quota exceeded errors
+ */
+export class RateLimitedError extends Error {
+	public readonly response: {
+		status: number;
+		headers?: Record<string, string>;
+	};
+	public readonly retryAfter?: number;
+
+	constructor(
+		message: string,
+		retryAfter?: number,
+		headers?: Record<string, string>,
+	) {
+		super(message);
+		this.name = "RateLimitedError";
+		this.response = { status: 429, headers };
 		this.retryAfter = retryAfter;
 	}
 }
@@ -113,15 +138,18 @@ export async function translateText(
 		translated = await translator.translate(text, targetLang);
 	} catch (e: any) {
 		// Check if this is a rate limiting error
-		if (e.response?.status === 429) {
+		if (e instanceof RateLimitedError || e.response?.status === 429) {
 			// Set rate limiting state
 			isRateLimited = true;
 
-			// Extract retry-after header if available
-			const retryAfter = e.response.headers["retry-after"];
-			if (retryAfter) {
-				rateLimitRetryAfter = parseInt(retryAfter, 10);
+			// Extract retry-after from RateLimitedError or headers
+			let retryAfter: number | undefined;
+			if (e instanceof RateLimitedError && e.retryAfter) {
+				retryAfter = e.retryAfter;
+			} else if (e.response?.headers?.["retry-after"]) {
+				retryAfter = parseInt(e.response.headers["retry-after"], 10);
 			}
+			rateLimitRetryAfter = retryAfter;
 
 			// Throw TranslationSkippedError for rate limiting
 			throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
@@ -136,17 +164,21 @@ export async function translateText(
 	return translated;
 }
 
-/**
- * This interface must be implemented to provide a different translation service.
- */
-interface Translator {
-	translate(text: string, targetLang: string): Promise<string>;
-}
-
 async function createTranslator(): Promise<Translator> {
 	if (process.env.TESTING) {
 		console.log("Using dummy testing translation");
 		return new TestingTranslator();
+	}
+
+	if (process.env.DEEPL_API_KEY) {
+		const deeplTranslator = new DeeplTranslator();
+		try {
+			await deeplTranslator.init();
+			console.log("Using DeepL Translate");
+			return deeplTranslator;
+		} catch (err: any) {
+			error(err);
+		}
 	}
 
 	if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
@@ -170,77 +202,4 @@ function getTranslator(): Promise<Translator> {
 		creator = createTranslator();
 	}
 	return creator;
-}
-
-/**
- * @see Translator implementation that is used for testing.
- * It returns a mock text.
- */
-class TestingTranslator implements Translator {
-	translate(text: string, targetLang: string): Promise<string> {
-		return Promise.resolve(
-			`Mock translation of '${text}' to '${targetLang}'`,
-		);
-	}
-}
-
-/**
- * @see Translator implementation that uses the Google Translation API.
- * This API requires credentials which must be stored in a file pointed to
- * by the environment variable GOOGLE_APPLICATION_CREDENTIALS.
- */
-class GoogleV3Translator implements Translator {
-	private credentials: any;
-	private translationClient!: TranslationServiceClient;
-
-	async init(): Promise<void> {
-		this.credentials = await readJson(
-			process.env.GOOGLE_APPLICATION_CREDENTIALS || "",
-		);
-		this.translationClient = new TranslationServiceClient();
-	}
-
-	async translate(text: string, targetLang: string): Promise<string> {
-		const request = {
-			parent: `projects/${this.credentials.project_id}/locations/global`,
-			contents: [text],
-			mimeType: "text/plain",
-			sourceLanguageCode: "en",
-			targetLanguageCode: targetLang,
-		};
-		const [response] = await this.translationClient.translateText(request);
-		if (response.translations && response.translations[0]?.translatedText) {
-			return response.translations[0].translatedText;
-		}
-
-		throw new Error(`Google couldn't translate "${text}"`);
-	}
-}
-
-/**
- * @see Translator implementation that uses the old Google Translation API.
- * This API is rate limited and the user will see an error if too many
- * translation requests are done within a given timespan.
- */
-class LegacyTranslator implements Translator {
-	async translate(text: string, targetLang: string): Promise<string> {
-		const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
-			text,
-		)}&ie=UTF-8&oe=UTF-8`;
-		let options: AxiosRequestConfig = {
-			url,
-			timeout: getRequestTimeout(),
-		};
-
-		// If an https-proxy is defined as an env variable, use it
-		options = applyHttpsProxy(options);
-
-		const response = await axios(options);
-		if (Array.isArray(response.data)) {
-			// we got a valid response
-			return response.data[0].map((t: string[]) => t[0]).join("");
-		}
-
-		throw new Error(`Invalid response for translate request`);
-	}
 }
