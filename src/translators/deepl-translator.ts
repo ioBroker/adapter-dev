@@ -16,7 +16,7 @@ export class DeeplTranslator implements Translator {
 			throw new Error("DEEPL_API_KEY environment variable is required");
 		}
 		this.translator = new deepl.Translator(apiKey);
-		
+
 		// Test the connection by getting usage info
 		await this.translator.getUsage();
 	}
@@ -29,32 +29,38 @@ export class DeeplTranslator implements Translator {
 			"zh-cn": "zh", // ioBroker uses zh-cn, DeepL uses zh
 			// All other codes match directly
 		};
-		
+
 		return languageMap[ioBrokerLang] || ioBrokerLang;
 	}
 
 	async translate(text: string, targetLang: string): Promise<string> {
 		const deeplTargetLang = this.mapLanguageCode(targetLang);
-		
+
 		try {
 			const result = await this.translator.translateText(
 				text,
 				"en",
 				deeplTargetLang as deepl.TargetLanguageCode,
 			);
-			
+
 			return result.text;
 		} catch (err: any) {
 			// Handle DeepL-specific errors
 			if (err instanceof deepl.QuotaExceededError) {
-				throw new RateLimitedError(`DeepL quota exceeded: ${err.message}`);
+				throw new RateLimitedError(
+					`DeepL quota exceeded: ${err.message}`,
+				);
 			} else if (err instanceof deepl.TooManyRequestsError) {
-				throw new RateLimitedError(`DeepL rate limit exceeded: ${err.message}`);
+				throw new RateLimitedError(
+					`DeepL rate limit exceeded: ${err.message}`,
+				);
 			} else if (err instanceof deepl.AuthorizationError) {
 				throw new Error(`DeepL authorization failed: ${err.message}`);
 			}
-			
-			throw new Error(`DeepL couldn't translate "${text}": ${err.message}`);
+
+			throw new Error(
+				`DeepL couldn't translate "${text}": ${err.message}`,
+			);
 		}
 	}
 }

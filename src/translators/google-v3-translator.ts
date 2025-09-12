@@ -28,8 +28,12 @@ export class GoogleV3Translator implements Translator {
 				sourceLanguageCode: "en",
 				targetLanguageCode: targetLang,
 			};
-			const [response] = await this.translationClient.translateText(request);
-			if (response.translations && response.translations[0]?.translatedText) {
+			const [response] =
+				await this.translationClient.translateText(request);
+			if (
+				response.translations &&
+				response.translations[0]?.translatedText
+			) {
 				return response.translations[0].translatedText;
 			}
 
@@ -38,13 +42,19 @@ export class GoogleV3Translator implements Translator {
 			// Handle Google API errors
 			if (err.code === 8 || err.code === 429) {
 				// Resource exhausted (quota exceeded) or rate limited
-				throw new RateLimitedError(`Google Translate quota exceeded or rate limited: ${err.message}`);
+				throw new RateLimitedError(
+					`Google Translate quota exceeded or rate limited: ${err.message}`,
+				);
 			} else if (err.code === 4) {
 				// Deadline exceeded - could be rate limiting
-				throw new RateLimitedError(`Google Translate deadline exceeded: ${err.message}`);
+				throw new RateLimitedError(
+					`Google Translate deadline exceeded: ${err.message}`,
+				);
 			}
-			
-			throw new Error(`Google couldn't translate "${text}": ${err.message || err}`);
+
+			throw new Error(
+				`Google couldn't translate "${text}": ${err.message || err}`,
+			);
 		}
 	}
 }

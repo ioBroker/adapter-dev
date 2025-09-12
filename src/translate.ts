@@ -35,10 +35,17 @@ export class TranslationSkippedError extends Error {
  * Custom error class for rate limiting and quota exceeded errors
  */
 export class RateLimitedError extends Error {
-	public readonly response: { status: number; headers?: Record<string, string> };
+	public readonly response: {
+		status: number;
+		headers?: Record<string, string>;
+	};
 	public readonly retryAfter?: number;
 
-	constructor(message: string, retryAfter?: number, headers?: Record<string, string>) {
+	constructor(
+		message: string,
+		retryAfter?: number,
+		headers?: Record<string, string>,
+	) {
 		super(message);
 		this.name = "RateLimitedError";
 		this.response = { status: 429, headers };
@@ -196,5 +203,3 @@ function getTranslator(): Promise<Translator> {
 	}
 	return creator;
 }
-
-
