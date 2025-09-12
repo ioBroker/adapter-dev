@@ -208,15 +208,17 @@ npm run translate
 
 When multiple translation services are configured, the system automatically selects the best available service using this priority order:
 
-1. **Testing translator** (when `TESTING=true`) - For development/testing only
-2. **DeepL API** (when `DEEPL_API_KEY` is set) - **Recommended for best quality**
-3. **Google Translate V3** (when `GOOGLE_APPLICATION_CREDENTIALS` is set)
-4. **Legacy Google Translate** (free, rate-limited fallback)
+1. **DeepL API** (when `DEEPL_API_KEY` is set) - **Recommended for best quality**
+2. **Google Translate V3** (when `GOOGLE_APPLICATION_CREDENTIALS` is set)
+3. **Legacy Google Translate** (free, rate-limited)
 
-You can configure multiple services as fallbacks. For example:
+Configure your preferred translation service using environment variables:
 ```bash
-# Configure both DeepL and Google V3 as fallbacks
+# For highest quality (recommended)
 export DEEPL_API_KEY="your-deepl-api-key"
+npm run translate
+
+# For Google Translate V3
 export GOOGLE_APPLICATION_CREDENTIALS="path/to/google-credentials.json"
 npm run translate
 ```

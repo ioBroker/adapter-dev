@@ -1,4 +1,5 @@
 import * as deepl from "deepl-node";
+import { RateLimitedError } from "../translate";
 import type { Translator } from "./types";
 
 /**
@@ -46,15 +47,9 @@ export class DeeplTranslator implements Translator {
 		} catch (err: any) {
 			// Handle DeepL-specific errors
 			if (err instanceof deepl.QuotaExceededError) {
-				// Convert quota exceeded to rate limit format for consistent handling
-				const rateLimitError = new Error(`DeepL quota exceeded: ${err.message}`);
-				(rateLimitError as any).response = { status: 429 };
-				throw rateLimitError;
+				throw new RateLimitedError(`DeepL quota exceeded: ${err.message}`);
 			} else if (err instanceof deepl.TooManyRequestsError) {
-				// Convert to a format that our rate limiting detection understands
-				const rateLimitError = new Error(`DeepL rate limit exceeded: ${err.message}`);
-				(rateLimitError as any).response = { status: 429 };
-				throw rateLimitError;
+				throw new RateLimitedError(`DeepL rate limit exceeded: ${err.message}`);
 			} else if (err instanceof deepl.AuthorizationError) {
 				throw new Error(`DeepL authorization failed: ${err.message}`);
 			}

@@ -32,6 +32,21 @@ export class TranslationSkippedError extends Error {
 }
 
 /**
+ * Custom error class for rate limiting and quota exceeded errors
+ */
+export class RateLimitedError extends Error {
+	public readonly response: { status: number; headers?: Record<string, string> };
+	public readonly retryAfter?: number;
+
+	constructor(message: string, retryAfter?: number, headers?: Record<string, string>) {
+		super(message);
+		this.name = "RateLimitedError";
+		this.response = { status: 429, headers };
+		this.retryAfter = retryAfter;
+	}
+}
+
+/**
  * Resets the rate limiting state. Useful for testing or when starting a new translation session.
  */
 export function resetRateLimitState(): void {
@@ -116,15 +131,18 @@ export async function translateText(
 		translated = await translator.translate(text, targetLang);
 	} catch (e: any) {
 		// Check if this is a rate limiting error
-		if (e.response?.status === 429) {
+		if (e instanceof RateLimitedError || e.response?.status === 429) {
 			// Set rate limiting state
 			isRateLimited = true;
 
-			// Extract retry-after header if available
-			const retryAfter = e.response.headers["retry-after"];
-			if (retryAfter) {
-				rateLimitRetryAfter = parseInt(retryAfter, 10);
+			// Extract retry-after from RateLimitedError or headers
+			let retryAfter: number | undefined;
+			if (e instanceof RateLimitedError && e.retryAfter) {
+				retryAfter = e.retryAfter;
+			} else if (e.response?.headers?.["retry-after"]) {
+				retryAfter = parseInt(e.response.headers["retry-after"], 10);
 			}
+			rateLimitRetryAfter = retryAfter;
 
 			// Throw TranslationSkippedError for rate limiting
 			throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
