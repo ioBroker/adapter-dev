@@ -295,14 +295,14 @@ npm run clean-dir <directory>                         # directory to remove
 	### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
-- (@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
-- (@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
-- (@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
-- (@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation.
-- (@copilot) Sort JSON keys alphabetically in all generated translation files
-- (@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
-- (@copilot) Enhanced handling of rate limits for translations and persist as much progress as possible. 
+- (@Apollon77/@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
+- (@Apollon77/@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
+- (@Apollon77/@copilot) Enhanced translation error messages for empty string keys with clearer error context and actionable guidance
+- (@Apollon77/@copilot) Add `--rebuild` option to translate command for complete regeneration of translation files
+- (@Apollon77/@copilot) Detect and preserve original indentation in JSON files during translation. Files using tab indentation or different space amounts are now preserved correctly instead of being converted to 4-space indentation.
+- (@Apollon77/@copilot) Sort JSON keys alphabetically in all generated translation files
+- (@Apollon77/@copilot) ESM support for TypeScript build format option. The `--typescriptFormat` option now accepts both `cjs` (CommonJS) and `esm` (ES modules) formats
+- (@Apollon77/@copilot) Enhanced handling of rate limits for translations and persist as much progress as possible. 
 
 ### 1.4.0 (2025-02-22)
 - (ticaki) rimraf replaced by by internal tool.
