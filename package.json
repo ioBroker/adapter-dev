@@ -78,7 +78,7 @@
     "axios": "^1.11.0",
     "deepl-node": "^1.19.1",
     "esbuild": "^0.25.10",
-    "fs-extra": "^11.3.1",
+    "fs-extra": "^11.3.2",
     "rimraf": "^5.0.10",
     "tiny-glob": "^0.2.9",
     "yargs": "^18.0.0"
