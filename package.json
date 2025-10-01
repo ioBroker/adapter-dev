@@ -59,7 +59,7 @@
     "@types/node": "^24.3.0",
     "@types/sinon": "^17.0.4",
     "@types/yargs": "^17.0.33",
-    "chai": "^4.5.0",
+    "chai": "^6.2.0",
     "chai-as-promised": "^8.0.2",
     "cross-spawn": ">=7.0.6",
     "dir-compare": "^5.0.0",
