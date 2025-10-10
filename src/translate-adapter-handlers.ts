@@ -202,7 +202,7 @@ export async function parseOptions(options: {
 	/**
 	 *
 	 */
-	"rate-limit-max-wait-time"?: number;
+	"ratelimit-max-time"?: number;
 }): Promise<void> {
 	// io-package.json
 	ioPackage = path.resolve(options["io-package"]);
@@ -264,7 +264,7 @@ export async function parseOptions(options: {
 	removeKeyValue = options.key;
 
 	// Set rate limit max wait time
-	rateLimitMaxWaitTimeValue = options["rate-limit-max-wait-time"];
+	rateLimitMaxWaitTimeValue = options["ratelimit-max-time"];
 }
 
 /***************************** Command Handlers *******************************/

@@ -107,11 +107,11 @@ The `--rebuild` option deletes all existing translation files (except English ba
 #### Rate Limit Handling
 
 ```bash
-npm run translate -- --rate-limit-max-wait-time 15    # Wait up to 15 seconds on rate limits
-npm run translate -- --rate-limit-max-wait-time 0     # Never retry on rate limits
+npm run translate -- --ratelimit-max-time 15    # Wait up to 15 seconds on rate limits
+npm run translate -- -mt 0                      # Never retry on rate limits
 ```
 
-The `--rate-limit-max-wait-time` option controls automatic retry behavior when the translation API returns a rate limit error (default: 10 seconds):
+The `--ratelimit-max-time` (alias `-mt`) option controls automatic retry behavior when the translation API returns a rate limit error (default: 10 seconds):
 
 - If the API requests a wait time ≤ max wait time, the tool will wait (retry-after + 1 second) and retry once
 - If the retry also hits a rate limit, all further translations are skipped

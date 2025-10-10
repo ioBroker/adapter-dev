@@ -6,6 +6,7 @@ import {
 	LegacyTranslator,
 } from "./translators";
 import { error } from "./util";
+import { gray, yellow } from "ansi-colors";
 
 const translationCache = new Map<string, Map<string, string>>();
 
@@ -184,11 +185,15 @@ export async function translateText(
 				const keyInfo = key ? ` for key "${key}"` : "";
 				if (retryAfter !== undefined) {
 					console.log(
-						`Rate limit hit${keyInfo}. Server requests waiting ${retryAfter} seconds before retry.`,
+						yellow(
+							`Rate limit hit${keyInfo}. Server requests waiting ${retryAfter} seconds before retry.`,
+						),
 					);
 				} else {
 					console.log(
-						`Rate limit hit${keyInfo}. No retry-after time provided.`,
+						yellow(
+							`Rate limit hit${keyInfo}. No retry-after time provided.`,
+						),
 					);
 				}
 
@@ -202,7 +207,9 @@ export async function translateText(
 				if (shouldRetry) {
 					const waitTime = retryAfter! + 1; // Wait 1 second longer than requested
 					console.log(
-						`Waiting ${waitTime} seconds (${retryAfter} + 1s buffer) before retrying...`,
+						gray(
+							`Waiting ${waitTime} seconds (${retryAfter} + 1s buffer) before retrying...`,
+						),
 					);
 					await new Promise(resolve =>
 						setTimeout(resolve, waitTime * 1000),
@@ -217,19 +224,27 @@ export async function translateText(
 
 					if (retryCount > 0) {
 						console.log(
-							`Rate limit hit again after retry. Skipping further translations.`,
+							yellow(
+								`Rate limit hit again after retry. Skipping further translations.`,
+							),
 						);
 					} else if (rateLimitMaxWaitTime === 0) {
 						console.log(
-							`Rate limit max wait time is 0. Skipping translation without retry.`,
+							yellow(
+								`Rate limit max wait time is 0. Skipping translation without retry.`,
+							),
 						);
 					} else if (retryAfter === undefined) {
 						console.log(
-							`No retry-after time provided. Skipping further translations.`,
+							yellow(
+								`No retry-after time provided. Skipping further translations.`,
+							),
 						);
 					} else if (retryAfter > rateLimitMaxWaitTime) {
 						console.log(
-							`Retry-after time (${retryAfter}s) exceeds max wait time (${rateLimitMaxWaitTime}s). Skipping further translations.`,
+							yellow(
+								`Retry-after time (${retryAfter}s) exceeds max wait time (${rateLimitMaxWaitTime}s). Skipping further translations.`,
+							),
 						);
 					}
 
