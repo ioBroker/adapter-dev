@@ -6,12 +6,15 @@ import {
 	LegacyTranslator,
 } from "./translators";
 import { error } from "./util";
+import { gray, yellow } from "ansi-colors";
 
 const translationCache = new Map<string, Map<string, string>>();
 
 // Rate limiting state
 let isRateLimited = false;
 let rateLimitRetryAfter: number | undefined;
+let rateLimitMaxWaitTime = 10; // Default max wait time in seconds
+let translationsSkippedDueToRateLimit = false;
 
 /**
  * Custom error class thrown when translation is skipped due to rate limiting
@@ -59,6 +62,7 @@ export class RateLimitedError extends Error {
 export function resetRateLimitState(): void {
 	isRateLimited = false;
 	rateLimitRetryAfter = undefined;
+	translationsSkippedDueToRateLimit = false;
 }
 
 /**
@@ -74,8 +78,13 @@ export function clearTranslationCache(): void {
 export function getRateLimitState(): {
 	isRateLimited: boolean;
 	rateLimitRetryAfter?: number;
+	translationsSkippedDueToRateLimit: boolean;
 } {
-	return { isRateLimited, rateLimitRetryAfter };
+	return {
+		isRateLimited,
+		rateLimitRetryAfter,
+		translationsSkippedDueToRateLimit,
+	};
 }
 
 /**
@@ -87,6 +96,22 @@ export function setRateLimitState(
 ): void {
 	isRateLimited = rateLimited;
 	rateLimitRetryAfter = retryAfter;
+}
+
+/**
+ * Sets the maximum wait time for rate limiting retries.
+ *
+ * @param seconds Maximum wait time in seconds. Set to 0 to disable retries.
+ */
+export function setRateLimitMaxWaitTime(seconds: number): void {
+	rateLimitMaxWaitTime = seconds;
+}
+
+/**
+ * Gets whether any translations were skipped due to rate limiting.
+ */
+export function getTranslationsSkippedDueToRateLimit(): boolean {
+	return translationsSkippedDueToRateLimit;
 }
 
 /**
@@ -134,34 +159,113 @@ export async function translateText(
 	// Fall back to an online translation
 	const translator = await getTranslator();
 	let translated;
-	try {
-		translated = await translator.translate(text, targetLang);
-	} catch (e: any) {
-		// Check if this is a rate limiting error
-		if (e instanceof RateLimitedError || e.response?.status === 429) {
-			// Set rate limiting state
-			isRateLimited = true;
+	let retryCount = 0;
+	const maxRetries = 1;
 
-			// Extract retry-after from RateLimitedError or headers
-			let retryAfter: number | undefined;
-			if (e instanceof RateLimitedError && e.retryAfter) {
-				retryAfter = e.retryAfter;
-			} else if (e.response?.headers?.["retry-after"]) {
-				retryAfter = parseInt(e.response.headers["retry-after"], 10);
+	while (retryCount <= maxRetries) {
+		try {
+			translated = await translator.translate(text, targetLang);
+			langCache.set(text, translated);
+			return translated;
+		} catch (e: any) {
+			// Check if this is a rate limiting error
+			if (e instanceof RateLimitedError || e.response?.status === 429) {
+				// Extract retry-after from RateLimitedError or headers
+				let retryAfter: number | undefined;
+				if (e instanceof RateLimitedError && e.retryAfter) {
+					retryAfter = e.retryAfter;
+				} else if (e.response?.headers?.["retry-after"]) {
+					retryAfter = parseInt(
+						e.response.headers["retry-after"],
+						10,
+					);
+				}
+
+				// Log detailed rate limit information
+				const keyInfo = key ? ` for key "${key}"` : "";
+				if (retryAfter !== undefined) {
+					console.log(
+						yellow(
+							`Rate limit hit${keyInfo}. Server requests waiting ${retryAfter} seconds before retry.`,
+						),
+					);
+				} else {
+					console.log(
+						yellow(
+							`Rate limit hit${keyInfo}. No retry-after time provided.`,
+						),
+					);
+				}
+
+				// Decide whether to retry or fail
+				const shouldRetry =
+					retryCount < maxRetries &&
+					rateLimitMaxWaitTime > 0 &&
+					retryAfter !== undefined &&
+					retryAfter <= rateLimitMaxWaitTime;
+
+				if (shouldRetry) {
+					const waitTime = retryAfter! + 1; // Wait 1 second longer than requested
+					console.log(
+						gray(
+							`Waiting ${waitTime} seconds (${retryAfter} + 1s buffer) before retrying...`,
+						),
+					);
+					await new Promise(resolve =>
+						setTimeout(resolve, waitTime * 1000),
+					);
+					retryCount++;
+					continue; // Retry the translation
+				} else {
+					// Set rate limiting state to skip further translations
+					isRateLimited = true;
+					rateLimitRetryAfter = retryAfter;
+					translationsSkippedDueToRateLimit = true;
+
+					if (retryCount > 0) {
+						console.log(
+							yellow(
+								`Rate limit hit again after retry. Skipping further translations.`,
+							),
+						);
+					} else if (rateLimitMaxWaitTime === 0) {
+						console.log(
+							yellow(
+								`Rate limit max wait time is 0. Skipping translation without retry.`,
+							),
+						);
+					} else if (retryAfter === undefined) {
+						console.log(
+							yellow(
+								`No retry-after time provided. Skipping further translations.`,
+							),
+						);
+					} else if (retryAfter > rateLimitMaxWaitTime) {
+						console.log(
+							yellow(
+								`Retry-after time (${retryAfter}s) exceeds max wait time (${rateLimitMaxWaitTime}s). Skipping further translations.`,
+							),
+						);
+					}
+
+					// Throw TranslationSkippedError for rate limiting
+					throw new TranslationSkippedError(
+						targetLang,
+						rateLimitRetryAfter,
+					);
+				}
 			}
-			rateLimitRetryAfter = retryAfter;
 
-			// Throw TranslationSkippedError for rate limiting
-			throw new TranslationSkippedError(targetLang, rateLimitRetryAfter);
+			// Non-rate-limit error
+			const keyInfo = key ? ` for key "${key}"` : "";
+			const message = `Could not translate to "${targetLang}"${keyInfo}: ${e.message || e}. The UI can display the original text or key name as fallback.`;
+			error(message);
+			return text;
 		}
-
-		const keyInfo = key ? ` for key "${key}"` : "";
-		const message = `Could not translate to "${targetLang}"${keyInfo}: ${e.message || e}. The UI can display the original text or key name as fallback.`;
-		error(message);
-		return text;
 	}
-	langCache.set(text, translated);
-	return translated;
+
+	// Should not reach here, but just in case
+	return text;
 }
 
 async function createTranslator(): Promise<Translator> {

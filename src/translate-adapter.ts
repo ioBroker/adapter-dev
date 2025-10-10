@@ -31,6 +31,13 @@ parser
 				description:
 					"Delete all existing translation files and rebuild everything",
 			},
+			"ratelimit-max-time": {
+				type: "number",
+				alias: "mt",
+				default: 10,
+				description:
+					"Maximum time in seconds to wait for rate limit retry. Set to 0 to never retry.",
+			},
 		},
 		interceptErrors(handleTranslateCommand),
 	)
