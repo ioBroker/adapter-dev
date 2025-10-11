@@ -27,6 +27,7 @@ export class DeeplTranslator implements Translator {
 	private mapLanguageCode(ioBrokerLang: string): string {
 		const languageMap: Record<string, string> = {
 			"zh-cn": "zh", // ioBroker uses zh-cn, DeepL uses zh
+			pt: "pt-BR", // DeepL deprecated "pt", use Brazilian Portuguese
 			// All other codes match directly
 		};
 
