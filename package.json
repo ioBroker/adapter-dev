@@ -52,7 +52,7 @@
     "@alcalzone/release-script-plugin-license": "^3.7.0",
     "@iobroker/eslint-config": "^2.2.0",
     "@iobroker/types": "^7.0.7",
-    "@tsconfig/node12": "^12.1.4",
+    "@tsconfig/node12": "^12.1.5",
     "@types/chai": "^4.3.20",
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.10",
