@@ -294,6 +294,9 @@ npm run clean-dir <directory>                         # directory to remove
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (@copilot) Fix DeepL translation error for Portuguese language by mapping "pt" to "pt-BR" to comply with DeepL API requirements
+
 ### 1.5.0 (2025-09-20)
 - (@Apollon77/@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
 - (@Apollon77/@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
