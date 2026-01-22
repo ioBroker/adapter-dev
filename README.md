@@ -104,6 +104,20 @@ The `--rebuild` option deletes all existing translation files (except English ba
 - You want to ensure structural consistency across all translation files  
 - You've modified the English keys and want to clean up old translations
 
+#### Rate Limit Handling
+
+```bash
+npm run translate -- --ratelimit-max-time 15    # Wait up to 15 seconds on rate limits
+npm run translate -- -mt 0                      # Never retry on rate limits
+```
+
+The `--ratelimit-max-time` (alias `-mt`) option controls automatic retry behavior when the translation API returns a rate limit error (default: 10 seconds):
+
+- If the API requests a wait time ≤ max wait time, the tool will wait (retry-after + 1 second) and retry once
+- If the retry also hits a rate limit, all further translations are skipped
+- Set to `0` to immediately fail on rate limits without retrying
+- A red warning message is displayed at the end if translations are incomplete due to rate limiting
+
 Previously known as `gulp translate`.
 
 ### `to-json` Command
@@ -294,6 +308,9 @@ npm run clean-dir <directory>                         # directory to remove
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (@copilot) Improved rate limit handling with automatic retry logic. Translations now retry when rate limited if wait time is 10 seconds or less (configurable via `--rate-limit-max-wait-time`). System waits 1 second longer than requested and logs detailed rate limit information. A red warning is displayed at the end if translations are incomplete due to rate limiting.
+
 ### 1.5.0 (2025-09-20)
 - (@Apollon77/@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
 - (@Apollon77/@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
