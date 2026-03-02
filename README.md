@@ -294,6 +294,10 @@ npm run clean-dir <directory>                         # directory to remove
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+- (hombach) Bump dev dependencies
+
 ### 1.5.0 (2025-09-20)
 - (@Apollon77/@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
 - (@Apollon77/@copilot) Add `remove-translations` (`rt`) and `remove-key` (`rk`) commands for translation management. New commands allow removing translation keys from language files efficiently
@@ -305,7 +309,7 @@ npm run clean-dir <directory>                         # directory to remove
 - (@Apollon77/@copilot) Enhanced handling of rate limits for translations and persist as much progress as possible.
 
 ### 1.4.0 (2025-02-22)
-- (ticaki) rimraf replaced by by internal tool.
+- (ticaki) rimraf replaced by internal tool.
 - (hombach) change year to 2025
 - (hombach) Fix two vulnerabilities
 - (hombach) Bump dev dependencies
