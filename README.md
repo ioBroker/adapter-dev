@@ -296,6 +296,7 @@ npm run clean-dir <directory>                         # directory to remove
 -->
 
 ### **WORK IN PROGRESS**
+- (hombach) change year to 2026
 - (hombach) Bump dev dependencies
 
 ### 1.5.0 (2025-09-20)
