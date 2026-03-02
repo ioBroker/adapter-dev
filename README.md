@@ -298,6 +298,7 @@ npm run clean-dir <directory>                         # directory to remove
 ### **WORK IN PROGRESS**
 - (hombach) change year to 2026
 - (hombach) Bump dev dependencies
+- (hombach) Bump dependencies
 - (hombach) remove node 18 tests
 - (hombach) raise minimum node to 18 
 
