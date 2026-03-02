@@ -299,6 +299,7 @@ npm run clean-dir <directory>                         # directory to remove
 - (hombach) change year to 2026
 - (hombach) Bump dev dependencies
 - (hombach) remove node 18 tests
+- (hombach) raise minimum node to 18 
 
 ### 1.5.0 (2025-09-20)
 - (@Apollon77/@copilot) Add DeepL API support for higher quality translations. Set `DEEPL_API_KEY` environment variable to use DeepL as the preferred translation service. DeepL is prioritized over Google Translate when available.
