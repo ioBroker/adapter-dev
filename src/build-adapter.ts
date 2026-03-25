@@ -117,7 +117,7 @@ const tsOptions = {
 	typescriptCompileTarget: {
 		type: "string",
 		alias: "tst",
-		default: "node12",
+		default: "node20",
 		description:
 			"Compilation target for TypeScript. Determines which JS features will be used in the output file. Should be in sync with the minimum Node.js version supported by the adapter/ioBroker.",
 	},
