@@ -1,4 +1,4 @@
-import { gray, yellow } from "ansi-colors";
+import { bold, gray, yellow } from "ansi-colors";
 import {
 	ensureDir,
 	existsSync,
@@ -17,6 +17,8 @@ import {
 	translateText,
 	resetRateLimitState,
 	TranslationSkippedError,
+	setRateLimitMaxWaitTime,
+	getTranslationsSkippedDueToRateLimit,
 } from "./translate";
 import {
 	die,
@@ -33,6 +35,7 @@ let i18nBases: string[];
 let translateLanguages: ioBroker.Languages[];
 let rebuildMode: boolean;
 let removeKeyValue: string | undefined;
+let rateLimitMaxWaitTimeValue: number | undefined;
 const EOL = "\n"; // Use only LINUX line endings
 
 /********************************** Helpers ***********************************/
@@ -196,6 +199,10 @@ export async function parseOptions(options: {
 	 *
 	 */
 	key?: string;
+	/**
+	 *
+	 */
+	"ratelimit-max-time"?: number;
 }): Promise<void> {
 	// io-package.json
 	ioPackage = path.resolve(options["io-package"]);
@@ -255,6 +262,9 @@ export async function parseOptions(options: {
 
 	// Set key value for remove commands
 	removeKeyValue = options.key;
+
+	// Set rate limit max wait time
+	rateLimitMaxWaitTimeValue = options["ratelimit-max-time"];
 }
 
 /***************************** Command Handlers *******************************/
@@ -312,6 +322,11 @@ export async function handleTranslateCommand(): Promise<void> {
 	// Reset rate limiting state at the beginning of a new translation session
 	resetRateLimitState();
 
+	// Set rate limit max wait time if provided
+	if (rateLimitMaxWaitTimeValue !== undefined) {
+		setRateLimitMaxWaitTime(rateLimitMaxWaitTimeValue);
+	}
+
 	if (rebuildMode) {
 		console.log("Rebuild mode: Deleting existing translation files...");
 		await deleteExistingTranslationFiles();
@@ -320,6 +335,16 @@ export async function handleTranslateCommand(): Promise<void> {
 	await translateIoPackage();
 	for (const i18nBase of i18nBases) {
 		await translateI18n(i18nBase);
+	}
+
+	// Display warning if translations were skipped due to rate limiting
+	if (getTranslationsSkippedDueToRateLimit()) {
+		console.log();
+		console.error(
+			bold.red(
+				"WARNING: Translations are only partial due to rate limiting!",
+			),
+		);
 	}
 }
 
