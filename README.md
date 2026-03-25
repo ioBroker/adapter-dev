@@ -290,6 +290,11 @@ npm run clean-dir <directory>                         # directory to remove
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (hombach/@UncleSamSwiss) change year to 2026
+- (hombach/@UncleSamSwiss) remove node 18 tests
+- (@UncleSamSwiss) raise minimum node to 20 
+
 <!--
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
