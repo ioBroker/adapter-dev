@@ -617,7 +617,13 @@ async function translateI18nJson(
 	lang: ioBroker.Languages,
 	baseContent: Readonly<Record<string, string>>,
 ): Promise<void> {
-	if (lang === "en") {
+    if (lang === "en") {
+
+        for (const [t, base] of Object.entries(baseContent)) {
+            if (!content[t]) {
+                content[t] = base;
+            }
+        }
 		return;
 	}
 	const time = new Date().getTime();
